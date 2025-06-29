@@ -1,15 +1,16 @@
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import { stylists } from '@/db/schema/stylists'
+// src/core/domains/stylists/stylist.repository.ts
+
+import type { DbClient } from '@/db'
 
 // Funcția-Fabrică pentru repository
-export function createStylistRepository(db: PostgresJsDatabase) {
+export function createStylistRepository(db: DbClient) {
   return {
     /** Găsește toți stiliștii din baza de date. */
     async findAll() {
-      // Folosește instanța `db` injectată
-      return db.select().from(stylists)
+      // Folosim API-ul Relațional pentru a găsi toate înregistrările
+      return db.query.stylists.findMany()
     },
-    // Aici vom adăuga findById, create, update etc., toate folosind `db`
+    // Aici vom adăuga findById, create, update etc., toate folosind `db.query.stylists...`
   }
 }
 

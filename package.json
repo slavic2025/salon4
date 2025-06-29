@@ -33,20 +33,25 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@stylistic/eslint-plugin": "^5.1.0",
-    "@tailwindcss/postcss": "^4",
+    "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "^15.3.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
     "dotenv": "^17.0.0",
-    "dotenv-cli": "^8.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.4",
+    "eslint": "^9.30.0",
+    "eslint-config-next": "^15.3.4",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
-    "tw-animate-css": "^1.3.4",
-    "typescript": "^5",
-    "typescript-eslint": "^8.35.0"
+    "typescript": "^5"
   }
 }
