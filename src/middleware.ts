@@ -5,7 +5,7 @@ import { type NextRequest } from 'next/server'
 import { createAuthRepository } from './core/domains/auth/auth.repository'
 import { createAuthService } from './core/domains/auth/auth.service'
 import { db } from './db'
-import { createSupabaseClientForMiddleware } from './lib/supabase-middleware'
+import { createSupabaseClientForMiddleware } from './lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
   // Asamblarea dependențelor...

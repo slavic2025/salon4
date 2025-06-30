@@ -1,11 +1,15 @@
 // src/core/domains/auth/auth.service.ts - Varianta finală, "best practice"
 
-import type { Session } from '@supabase/supabase-js'
+import { type Session } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { APP_ROUTES, ROLES, type UserRole } from '@/lib/constants'
+import { createLogger } from '@/lib/logger'
+import { createAdminClient } from '@/lib/supabase/admin'
 
+import { AUTH_MESSAGES } from './auth.constants'
 import type { AuthRepository } from './auth.repository'
+import { SignInFormValues } from './auth.types'
 
 // O hartă simplă pentru a asocia un rol cu calea sa de dashboard corectă.
 const ROLE_DASHBOARD_MAP: Record<string, string> = {
@@ -14,6 +18,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
 } as const
 
 export function createAuthService(repository: AuthRepository) {
+  const logger = createLogger('AuthService')
   /**
    * O funcție pură, privată, pentru a determina dacă este necesară o redirecționare.
    * Returnează calea către care trebuie redirecționat sau `null` dacă nu este necesar.
@@ -55,7 +60,7 @@ export function createAuthService(repository: AuthRepository) {
       // Cazul special: utilizator logat, dar fără rol în baza de date.
       if (session && !role) {
         const loginUrl = url(APP_ROUTES.LOGIN)
-        loginUrl.searchParams.set('error', 'no_role_assigned')
+        loginUrl.searchParams.set('error', AUTH_MESSAGES.SERVER.NO_ROLE_ASSIGNED.code)
         return NextResponse.redirect(loginUrl)
       }
 
@@ -71,20 +76,49 @@ export function createAuthService(repository: AuthRepository) {
     },
 
     /**
-     * Asigură că rolul utilizatorului este prezent în sesiune.
-     * Dacă nu este, îl preia din baza de date.
-     * Această metodă ar trebui apelată în middleware înainte de `handleAuthorization`.
+     * Asigură că rolul utilizatorului este cunoscut, fie din sesiune, fie din baza de date.
      */
     async ensureUserRole(session: Session | null): Promise<UserRole> {
       if (!session) return null
 
-      // Preferăm rolul din metadate, dacă există, pentru performanță.
       if (session.user.app_metadata.role) {
+        logger.debug('Role found in session metadata.', {
+          userId: session.user.id,
+          role: session.user.app_metadata.role,
+        })
         return session.user.app_metadata.role as UserRole
       }
 
-      // Dacă nu, îl căutăm în baza de date.
+      logger.info('Role not found in session, fetching from database...', { userId: session.user.id })
       return repository.getUserRole(session.user.id)
+    },
+
+    /**
+     * Autentifică un utilizator folosind email și parolă.
+     */
+    async signInWithPassword(credentials: SignInFormValues) {
+      // Notă: Pentru signIn, folosim un client Supabase care poate gestiona cookie-uri
+      const supabase = createAdminClient()
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      })
+
+      if (error) {
+        logger.warn('Failed sign-in attempt.', { email: credentials.email, error: error.message })
+        return {
+          success: false,
+          // 3. Folosim constantele pentru mesaje, pentru consistență.
+          message: AUTH_MESSAGES.SERVER.INVALID_CREDENTIALS.message,
+        }
+      }
+
+      logger.info('User signed in successfully.', { email: credentials.email })
+      return {
+        success: true,
+        message: AUTH_MESSAGES.SERVER.LOGIN_SUCCESS.message,
+      }
     },
   }
 }
