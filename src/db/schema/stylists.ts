@@ -1,6 +1,6 @@
 // src/db/schema/stylists.ts
 
-import { pgTable, text, timestamp, boolean, uuid } from 'drizzle-orm/pg-core'
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 export const stylists = pgTable('stylists', {
   // Vom folosi același ID ca în tabela `auth.users` de la Supabase

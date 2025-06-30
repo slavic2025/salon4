@@ -1,8 +1,8 @@
 // src/types/supabase.types.ts
 
-import { ROLES } from '@/lib/constants';
+import { ROLES } from '@/lib/constants'
 // Extragem tipul exact al rolurilor: 'ADMIN' | 'STYLIST'
-type Role = keyof typeof ROLES;
+type Role = keyof typeof ROLES
 
 // Folosim "declaration merging" pentru a extinde tipurile din pachetul Supabase
 declare module '@supabase/supabase-js' {
@@ -10,6 +10,6 @@ declare module '@supabase/supabase-js' {
   export interface UserAppMetadata {
     // Acum, TypeScript știe că `app_metadata` poate conține o cheie `role`
     // de tip 'ADMIN' sau 'STYLIST'.
-    role?: Role;
+    role?: Role
   }
 }

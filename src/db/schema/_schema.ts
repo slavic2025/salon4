@@ -1,2 +1,2 @@
-export * from './stylists'
 export * from './admins'
+export * from './stylists'
