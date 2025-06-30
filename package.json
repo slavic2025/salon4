@@ -7,8 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "lint:fix": "next lint --fix",
+    "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
+    "db:push": "dotenv -e .env.local -- drizzle-kit push",
+    "promote:admin": "dotenv -e .env.local -- tsx src/lib/cli/promote-to-admin.ts",
+    "db:test": "dotenv -e .env.local -- tsx src/lib/cli/test-db-connection.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -19,6 +22,7 @@
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.2",
     "drizzle-zod": "^0.8.2",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.525.0",
     "next": "15.3.4",
     "pino": "^9.7.0",
@@ -35,12 +39,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@next/eslint-plugin-next": "^15.3.4",
+    "@types/lodash": "^4.17.19",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^8.35.0",
     "dotenv": "^17.0.0",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.30.0",
     "eslint-config-next": "^15.3.4",
     "eslint-config-prettier": "^10.1.5",
@@ -52,6 +58,7 @@
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }
