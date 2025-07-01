@@ -1,6 +1,5 @@
 // src/core/domains/auth/auth.service.ts - Varianta finală, "best practice"
-
-import { type Session } from '@supabase/supabase-js'
+import { type User } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { APP_ROUTES, ROLES, type UserRole } from '@/lib/constants'
@@ -8,7 +7,6 @@ import { createLogger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/server'
 
 import { AUTH_MESSAGES } from './auth.constants'
-import type { AuthRepository } from './auth.repository'
 import { SignInFormValues } from './auth.types'
 
 // O hartă simplă pentru a asocia un rol cu calea sa de dashboard corectă.
@@ -17,7 +15,7 @@ const ROLE_DASHBOARD_MAP: Record<string, string> = {
   [ROLES.STYLIST]: APP_ROUTES.STYLIST_DASHBOARD,
 } as const
 
-export function createAuthService(repository: AuthRepository) {
+export function createAuthService() {
   const logger = createLogger('AuthService')
   /**
    * O funcție pură, privată, pentru a determina dacă este necesară o redirecționare.
@@ -53,12 +51,12 @@ export function createAuthService(repository: AuthRepository) {
     /**
      * Punctul de intrare principal. Orchestrează verificările și returnează răspunsul final.
      */
-    handleAuthorization(request: NextRequest, session: Session | null, role: UserRole): NextResponse {
+    handleAuthorization(request: NextRequest, user: User | null, role: UserRole): NextResponse {
       const { pathname } = request.nextUrl
       const url = (path: string) => new URL(path, request.url)
 
       // Cazul special: utilizator logat, dar fără rol în baza de date.
-      if (session && !role) {
+      if (user && !role) {
         const loginUrl = url(APP_ROUTES.LOGIN)
         loginUrl.searchParams.set('error', AUTH_MESSAGES.SERVER.NO_ROLE_ASSIGNED.code)
         return NextResponse.redirect(loginUrl)
@@ -78,19 +76,19 @@ export function createAuthService(repository: AuthRepository) {
     /**
      * Asigură că rolul utilizatorului este cunoscut, fie din sesiune, fie din baza de date.
      */
-    async ensureUserRole(session: Session | null): Promise<UserRole> {
-      if (!session) return null
+    async ensureUserRole(user: User | null): Promise<UserRole> {
+      if (!user) return null
 
-      if (session.user.app_metadata.role) {
-        logger.debug('Role found in session metadata.', {
-          userId: session.user.id,
-          role: session.user.app_metadata.role,
-        })
-        return session.user.app_metadata.role as UserRole
+      // Citim rolul direct din metadate. Nu mai este nevoie de repository.
+      const role = user.app_metadata.role as UserRole | undefined
+
+      if (!role) {
+        logger.warn('Role not found in user metadata.', { userId: user.id })
+        return null
       }
 
-      logger.info('Role not found in session, fetching from database...', { userId: session.user.id })
-      return repository.getUserRole(session.user.id)
+      logger.debug('Role found in user metadata.', { userId: user.id, role })
+      return role
     },
 
     /**

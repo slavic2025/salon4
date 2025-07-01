@@ -1,63 +1,46 @@
 // src/features/auth/actions.ts
-'use server'
+'use server' // Directiva este la începutul fișierului
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { createAuthRepository } from '@/core/domains/auth/auth.repository'
 import { createAuthService } from '@/core/domains/auth/auth.service'
-import { setPasswordActionSchema, signInActionSchema } from '@/core/domains/auth/auth.types'
-import { db } from '@/db'
+import { setPasswordActionSchema, signInActionSchema, type SignInPayload } from '@/core/domains/auth/auth.types'
 import { APP_ROUTES } from '@/lib/constants'
-import { createSafeAction } from '@/lib/safe-action'
+import { executeSafeAction } from '@/lib/safe-action'
 
-/**
- * Funcție ajutătoare care asamblează serviciul de autentificare cu dependențele sale.
- * Respectă pattern-ul de Dependency Injection.
- */
 function getAuthService() {
-  const authRepository = createAuthRepository(db)
-  const authService = createAuthService(authRepository)
+  const authService = createAuthService()
   return authService
 }
 
-// --- Acțiuni care returnează o stare către UI ---
+export async function signInAction(credentials: SignInPayload) {
+  return executeSafeAction(signInActionSchema, credentials, async (validatedCredentials) => {
+    const authService = getAuthService()
+    const result = await authService.signInWithPassword(validatedCredentials)
 
-export const signInAction = createSafeAction(signInActionSchema, async (credentials) => {
-  const authService = getAuthService()
-  const result = await authService.signInWithPassword(credentials)
+    if (!result.success) {
+      return { serverError: result.message }
+    }
+    return { data: { success: true } }
+  })
+}
 
-  if (!result.success) {
-    // Returnăm un `serverError` dacă autentificarea eșuează.
-    return { serverError: result.message }
-  }
+export async function setPasswordAction(payload: { password: string }) {
+  return executeSafeAction(setPasswordActionSchema, payload, async ({ password }) => {
+    const authService = getAuthService()
+    const result = await authService.setPassword(password)
 
-  // Returnăm un obiect `data` la succes.
-  return { data: { success: true } }
-})
-
-export const setPasswordAction = createSafeAction(setPasswordActionSchema, async ({ password }) => {
-  const authService = getAuthService()
-  const result = await authService.setPassword(password)
-
-  if (!result.success) {
-    // Returnăm un `serverError` dacă setarea parolei eșuează.
-    return { serverError: result.message }
-  }
-
-  // Returnăm un obiect `data` cu un mesaj de succes.
-  return { data: { message: result.message } }
-})
-
-// --- Acțiune care face redirect ---
+    if (!result.success) {
+      return { serverError: result.message }
+    }
+    return { data: { message: result.message } }
+  })
+}
 
 export async function signOutAction() {
   const authService = getAuthService()
   await authService.signOut()
-
-  // Curățăm cache-ul pentru a reflecta starea de "delogat"
   revalidatePath('/', 'layout')
-
-  // Redirecționăm utilizatorul către pagina de login
   redirect(APP_ROUTES.LOGIN)
 }

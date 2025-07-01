@@ -2,29 +2,30 @@
 
 import { type NextRequest } from 'next/server'
 
-import { createAuthRepository } from './core/domains/auth/auth.repository'
 import { createAuthService } from './core/domains/auth/auth.service'
-import { db } from './db'
 import { createSupabaseClientForMiddleware } from './lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  // Asamblarea dependențelor...
-  const authRepository = createAuthRepository(db)
-  const authService = createAuthService(authRepository)
+  // 1. Creăm clientul și răspunsul
   const { supabase } = createSupabaseClientForMiddleware(request)
-
-  // Obținem sesiunea
+  // 2. Apelăm `getUser()` în loc de `getSession()` - Aici este corecția de securitate
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Asigurăm că avem rolul, fie din JWT, fie din DB
-  const role = await authService.ensureUserRole(session)
+  // 3. Asamblăm serviciul ca înainte
+  const authService = createAuthService()
 
-  // Delegăm complet logica și returnăm rezultatul
-  return authService.handleAuthorization(request, session, role)
+  // 4. Obținem rolul, pasând obiectul `user` validat
+  const role = await authService.ensureUserRole(user)
+
+  // 5. Delegăm logica de redirect, pasând `user` în loc de `session`
+  const finalResponse = authService.handleAuthorization(request, user, role)
+
+  // Returnăm răspunsul final
+  return finalResponse
 }
-// Configurația matcher rămâne aceeași
+
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }

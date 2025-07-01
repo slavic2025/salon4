@@ -2,18 +2,22 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/atoms/form'
-import { Input } from '@/components/atoms/input'
 import { SubmitButton } from '@/components/molecules/submit-button'
-import { type SignInFormValues, signInSchema } from '@/core/domains/auth/auth.types'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { AUTH_MESSAGES } from '@/core/domains/auth/auth.constants'
+import { signInFormSchema, type SignInFormValues } from '@/core/domains/auth/auth.types'
 import { signInAction } from '@/features/auth/actions'
 import { useActionForm } from '@/hooks/useActionForm'
 
 export function LoginForm() {
+  const router = useRouter()
+
   const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -22,13 +26,26 @@ export function LoginForm() {
 
   const { formSubmit, isPending } = useActionForm({
     action: signInAction,
-    // La succes, nu facem nimic special. Middleware-ul va prelua controlul.
     onSuccess: () => {
-      // Pagina se va reîmprospăta automat, declanșând middleware-ul
-      window.location.reload()
+      router.refresh()
+    },
+    onError: ({ validationErrors }) => {
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, messages]) => {
+          form.setError(field as keyof SignInFormValues, {
+            type: 'server',
+            message: messages?.[0],
+          })
+        })
+      }
+    },
+    toastMessages: {
+      loading: 'Se verifică credențialele...',
+      error: AUTH_MESSAGES.SERVER.INVALID_CREDENTIALS.message,
     },
   })
 
+  // Am eliminat `div`-urile exterioare. Componenta returnează direct formularul.
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(formSubmit)} className="space-y-6">
@@ -39,7 +56,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="nume@email.com" {...field} />
+                <Input placeholder="nume@email.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -52,7 +69,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Parolă</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" {...field} />
+                <Input type="password" placeholder="••••••••" autoComplete="current-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
