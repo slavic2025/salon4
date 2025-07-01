@@ -41,6 +41,7 @@ export async function createClient() {
             // static (ex: un Server Component care nu este dinamic).
             // Poate fi ignorată în siguranță dacă un middleware se ocupă
             // de reîmprospătarea sesiunii.
+            void error
           }
         },
       },

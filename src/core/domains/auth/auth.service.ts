@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { APP_ROUTES, ROLES, type UserRole } from '@/lib/constants'
 import { createLogger } from '@/lib/logger'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 
 import { AUTH_MESSAGES } from './auth.constants'
 import type { AuthRepository } from './auth.repository'
@@ -98,8 +98,7 @@ export function createAuthService(repository: AuthRepository) {
      */
     async signInWithPassword(credentials: SignInFormValues) {
       // Notă: Pentru signIn, folosim un client Supabase care poate gestiona cookie-uri
-      const supabase = createAdminClient()
-
+      const supabase = await createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password,
@@ -118,6 +117,31 @@ export function createAuthService(repository: AuthRepository) {
       return {
         success: true,
         message: AUTH_MESSAGES.SERVER.LOGIN_SUCCESS.message,
+      }
+    },
+    async setPassword(password: string) {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.updateUser({ password })
+
+      if (error) {
+        logger.error('Failed to set password.', { error })
+        return { success: false, message: error.message }
+      }
+
+      logger.info('Password set successfully for current user.')
+      return { success: true, message: AUTH_MESSAGES.SERVER.PASSWORD_SET_SUCCESS.message }
+    },
+
+    /**
+     * Deloghează utilizatorul curent.
+     */
+    async signOut() {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        logger.error('Failed to sign out.', { error })
+        // Chiar dacă delogarea eșuează, vom încerca să redirecționăm
       }
     },
   }
