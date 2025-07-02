@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 
-import { LoginForm } from '@/components/organisms/LoginForm'
+import { LoginForm } from '@/components/features/auth/LoginForm'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { APP_ROUTES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
