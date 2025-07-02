@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-import './globals.css' // Asigură-te că globals.css este importat
+import './globals.css'
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
