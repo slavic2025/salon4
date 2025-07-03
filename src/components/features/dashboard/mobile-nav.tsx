@@ -1,18 +1,15 @@
-// src/components/dashboard/mobile-nav.tsx
+// src/components/features/dashboard/MobileNav.tsx
 'use client'
 
 import { Menu } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import type { NavItem } from '@/types/ui.types'
+import { MobileNavProps } from '@/types/ui.types'
 
 import { MainNav } from './main-nav'
-
-interface MobileNavProps {
-  navItems: NavItem[]
-}
 
 export function MobileNav({ navItems }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,17 +17,24 @@ export function MobileNav({ navItems }: MobileNavProps) {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        {/* Butonul de meniu este vizibil doar pe ecrane mici */}
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Deschide Meniu</span>
+        <Button variant="ghost" size="icon" className="shrink-0 md:hidden">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Deschide meniul de navigație</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] p-6">
-        <div className="text-lg font-semibold mb-6">Meniu</div>
-        {/* 2. Folosim direct `MainNav` și îi pasăm item-ele și un callback
-            pentru a închide meniul la click pe un link. */}
-        <MainNav items={navItems} onLinkClick={() => setIsOpen(false)} />
+      <SheetContent side="left" className="flex flex-col p-0">
+        {/* Adăugăm un header în meniu, similar cu cel de pe desktop */}
+        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            {/* Aici poți adăuga un logo SVG */}
+            <span className="">Salon App</span>
+          </Link>
+        </div>
+
+        {/* Adăugăm padding aici pentru a controla spațierea conținutului */}
+        <div className="flex-1 overflow-auto p-4">
+          <MainNav items={navItems} onLinkClick={() => setIsOpen(false)} />
+        </div>
       </SheetContent>
     </Sheet>
   )

@@ -1,8 +1,11 @@
-// src/components/dashboard/user-nav-client.tsx
+// src/components/features/dashboard/user-nav-client.tsx
 'use client'
 
 import type { User } from '@supabase/supabase-js'
 import { LogOut, Settings, User as UserIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useTransition } from 'react'
+import { toast } from 'sonner'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -22,13 +25,23 @@ interface UserNavClientProps {
 }
 
 export function UserNavClient({ user }: UserNavClientProps) {
-  // Helper to get user initials from email
-  const getInitials = (email: string) => {
-    return email.split('@')[0].substring(0, 2).toUpperCase()
+  const [isPending, startTransition] = useTransition()
+
+  // Simplified and safer helper for initials
+  const getInitials = (email?: string | null) => {
+    return email?.slice(0, 2).toUpperCase() ?? '??'
   }
 
+  const handleSignOut = () => {
+    startTransition(() => {
+      toast.info('Deconectare în curs...')
+      void signOutAction()
+    })
+  }
+
+  // If there's no user, we don't render the component.
+  // The layout can handle showing a login button.
   if (!user) {
-    // Optionally render a login button if user is not found
     return null
   }
 
@@ -37,8 +50,8 @@ export function UserNavClient({ user }: UserNavClientProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email ?? ''} />
-            <AvatarFallback>{getInitials(user.email ?? '??')}</AvatarFallback>
+            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name ?? user.email ?? ''} />
+            <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -51,25 +64,24 @@ export function UserNavClient({ user }: UserNavClientProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Setări</span>
-          </DropdownMenuItem>
+          <Link href="/account/profile">
+            <DropdownMenuItem>
+              <UserIcon className="mr-2 h-4 w-4" />
+              <span>Profil</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/account/settings">
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Setări</span>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        {/* The logout action is handled by a form for robustness */}
-        <form action={signOutAction}>
-          <button type="submit" className="w-full">
-            <DropdownMenuItem>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Deconectare</span>
-            </DropdownMenuItem>
-          </button>
-        </form>
+        <DropdownMenuItem onClick={handleSignOut} disabled={isPending} className="cursor-pointer">
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Deconectare</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
