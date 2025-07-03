@@ -4,8 +4,16 @@ import { redirect } from 'next/navigation'
 
 import { LoginForm } from '@/components/features/auth/LoginForm'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { APP_ROUTES } from '@/lib/constants'
+import { createAuthRepository } from '@/core/domains/auth/auth.repository'
+import { createAuthService } from '@/core/domains/auth/auth.service'
+import { db } from '@/db'
+import { APP_ROUTES, ROLES } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
+
+const ROLE_DASHBOARD_MAP: Record<string, string> = {
+  [ROLES.ADMIN]: APP_ROUTES.ADMIN_DASHBOARD,
+  [ROLES.STYLIST]: APP_ROUTES.STYLIST_DASHBOARD,
+}
 
 /**
  * Pagina de Login.
@@ -14,15 +22,24 @@ import { createClient } from '@/lib/supabase/server'
  */
 export default async function LoginPage() {
   const supabase = await createClient()
+  const authRepository = createAuthRepository(db)
+  const authService = createAuthService(authRepository, supabase)
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Dacă utilizatorul este deja logat, nu are ce căuta pe pagina de login.
-  // Îl redirecționăm către pagina principală sau dashboard.
-  // Aceasta este o măsură de siguranță suplimentară pe lângă middleware.
   if (user) {
-    redirect(APP_ROUTES.LANDING) // Sau către un dashboard, dacă preferi
+    // Folosim metoda din serviciul nostru pentru a obține rolul
+    const role = await authService.ensureUserRole(user)
+
+    const dashboardPath = role ? ROLE_DASHBOARD_MAP[role] : null
+
+    if (dashboardPath) {
+      redirect(dashboardPath)
+    } else {
+      redirect(APP_ROUTES.LANDING)
+    }
   }
 
   // Dacă nu există utilizator, afișăm pagina de login.

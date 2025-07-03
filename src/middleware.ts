@@ -1,24 +1,34 @@
 // src/middleware.ts
-import { type NextRequest } from 'next/server'
-
-import { updateSession } from '@/lib/supabase/middleware'
+import { type CookieOptions, createServerClient } from '@supabase/ssr'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Apelăm helper-ul, care se ocupă de tot:
-  // - creează clientul
-  // - reîmprospătează sesiunea
-  // - returnează răspunsul cu cookie-urile corecte
-  return await updateSession(request)
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+        },
+      },
+    },
+  )
+
+  // Rolul principal al middleware-ului: reîmprospătează token-ul de sesiune
+  await supabase.auth.getUser()
+  response.headers.set('x-pathname', request.nextUrl.pathname)
+
+  return response
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Rulează pe toate rutele, cu excepția celor care:
-     * - conțin un punct (fișiere statice)
-     * - încep cu `_next` (fișiere interne Next.js)
-     * - încep cu `api` (rute API)
-     */
-    '/((?!api|_next/static|_next/image|.*\\..*).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

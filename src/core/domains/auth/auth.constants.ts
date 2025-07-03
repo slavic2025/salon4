@@ -1,5 +1,7 @@
 // src/core/domains/auth/auth.constants.ts
 
+import { APP_ROUTES, ROLES } from '@/lib/constants'
+
 export const AUTH_MESSAGES = {
   // Mesajele de validare pentru Zod rămân simple
   VALIDATION: {
@@ -28,4 +30,10 @@ export const AUTH_MESSAGES = {
       message: 'Parola a fost setată cu succes!',
     },
   },
+} as const
+
+// O hartă simplă pentru a asocia un rol cu calea sa de dashboard corectă.
+export const ROLE_DASHBOARD_MAP: Record<string, string> = {
+  [ROLES.ADMIN]: APP_ROUTES.ADMIN_DASHBOARD,
+  [ROLES.STYLIST]: APP_ROUTES.STYLIST_DASHBOARD,
 } as const
