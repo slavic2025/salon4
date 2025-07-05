@@ -5,10 +5,11 @@ import type { DbClient } from '@/db'
 // Funcția-Fabrică pentru repository
 export function createStylistRepository(db: DbClient) {
   return {
-    /** Găsește toți stiliștii din baza de date. */
+    /** Găsește toți stiliștii din baza de date, ordonați după data creării. */
     async findAll() {
-      // Folosim API-ul Relațional pentru a găsi toate înregistrările
-      return db.query.stylists.findMany()
+      return db.query.stylists.findMany({
+        orderBy: (stylists, { desc }) => [desc(stylists.createdAt)],
+      })
     },
     // Aici vom adăuga findById, create, update etc., toate folosind `db.query.stylists...`
   }

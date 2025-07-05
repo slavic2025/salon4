@@ -32,7 +32,6 @@ export const AUTH_MESSAGES = {
   },
 } as const
 
-// O hartă simplă pentru a asocia un rol cu calea sa de dashboard corectă.
 export const ROLE_DASHBOARD_MAP: Record<string, string> = {
   [ROLES.ADMIN]: APP_ROUTES.ADMIN_DASHBOARD,
   [ROLES.STYLIST]: APP_ROUTES.STYLIST_DASHBOARD,
