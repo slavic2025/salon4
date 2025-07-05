@@ -9,6 +9,7 @@ export const APP_ROUTES = {
   LOGIN: '/login',
   ADMIN_DASHBOARD: '/admin',
   STYLIST_DASHBOARD: '/stylist',
+  ADMIN_STYLISTS_PAGE: '/admin/stylists',
   ACCOUNT_SETUP: '/account-setup',
   LANDING: '/',
 } as const

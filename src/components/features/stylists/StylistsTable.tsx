@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { Stylist } from '@/core/domains/stylists/stylist.types'
 
-interface StylistsTableProps {
+type StylistsTableProps = {
   stylists: Stylist[]
 }
 

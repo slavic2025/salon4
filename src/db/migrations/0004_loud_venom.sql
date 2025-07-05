@@ -1,0 +1,1 @@
+ALTER TABLE "stylists" ALTER COLUMN "description" SET NOT NULL;

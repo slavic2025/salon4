@@ -15,6 +15,27 @@
       "when": 1751204080770,
       "tag": "0001_fearless_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751740363225,
+      "tag": "0002_new_the_liberteens",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751740842780,
+      "tag": "0003_mature_gertrude_yorkes",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751740887533,
+      "tag": "0004_loud_venom",
+      "breakpoints": true
     }
   ]
 }

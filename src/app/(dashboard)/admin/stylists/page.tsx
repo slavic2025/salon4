@@ -3,6 +3,7 @@ import { StylistsPageContent } from '@/components/features/stylists/StylistsPage
 import { createStylistRepository } from '@/core/domains/stylists/stylist.repository'
 import { createStylistService } from '@/core/domains/stylists/stylist.sevice'
 import { db } from '@/db'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * Pagina Server Component pentru afișarea stiliștilor.
@@ -11,7 +12,8 @@ import { db } from '@/db'
 export default async function AdminStylistsPage() {
   // Asamblăm dependențele: db -> repository -> service
   const stylistRepository = createStylistRepository(db)
-  const stylistService = createStylistService(stylistRepository)
+  const supabaseAdmin = createAdminClient()
+  const stylistService = createStylistService(stylistRepository, supabaseAdmin)
 
   // Apelăm serviciul pentru a obține datele
   const stylists = await stylistService.getAllStylists()

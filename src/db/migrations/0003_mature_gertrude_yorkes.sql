@@ -1,0 +1,1 @@
+ALTER TABLE "stylists" ALTER COLUMN "is_active" SET NOT NULL;

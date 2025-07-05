@@ -8,11 +8,11 @@ export const stylists = pgTable('stylists', {
 
   fullName: text('full_name').notNull(),
   email: text('email').notNull().unique(),
-  phone: text('phone').unique(),
-  description: text('description'),
+  phone: text('phone').notNull().unique(),
+  description: text('description').notNull(),
 
   profilePicture: text('profile_picture'),
-  isActive: boolean('is_active').default(true),
+  isActive: boolean('is_active').notNull().default(true),
 
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),

@@ -10,7 +10,7 @@ import type { Stylist } from '@/core/domains/stylists/stylist.types'
 
 import { StylistsTable } from './StylistsTable'
 
-interface StylistsPageContentProps {
+type StylistsPageContentProps = {
   stylists: Stylist[]
 }
 
