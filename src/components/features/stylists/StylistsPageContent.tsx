@@ -1,16 +1,14 @@
 // src/components/features/stylists/StylistsPageContent.tsx
 'use client'
 
-import { PlusCircle } from 'lucide-react'
-
 import { EmptyState } from '@/components/shared/EmptyState'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Stylist } from '@/core/domains/stylists/stylist.types'
 
+import { AddStylistDialog } from './AddStylistDialog' // Importăm dialogul de adăugare
 import { StylistsTable } from './StylistsTable'
 
-type StylistsPageContentProps = {
+interface StylistsPageContentProps {
   stylists: Stylist[]
 }
 
@@ -22,10 +20,8 @@ export function StylistsPageContent({ stylists }: StylistsPageContentProps) {
           <h1 className="text-2xl font-bold tracking-tight">Management Stiliști</h1>
           <p className="text-muted-foreground">Vizualizează, adaugă sau editează stiliștii din salonul tău.</p>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Adaugă Stilist
-        </Button>
+        {/* Adăugăm componenta de dialog direct în header */}
+        <AddStylistDialog />
       </div>
 
       <Card>
@@ -40,6 +36,7 @@ export function StylistsPageContent({ stylists }: StylistsPageContentProps) {
             <EmptyState
               title="Niciun stilist adăugat"
               description="Începe prin a adăuga primul stilist în echipa ta."
+              actions={<AddStylistDialog />} // Putem refolosi dialogul și aici
             />
           )}
         </CardContent>

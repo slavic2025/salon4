@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
-import { SubmitButton } from '@/components/shared/submit-button'
+import { SubmitButton } from '@/components/shared/SubmitButton'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { AUTH_MESSAGES } from '@/core/domains/auth/auth.constants'

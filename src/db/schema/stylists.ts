@@ -2,9 +2,13 @@
 
 import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
+import { users } from './auth'
+
 export const stylists = pgTable('stylists', {
   // Vom folosi același ID ca în tabela `auth.users` de la Supabase
-  id: uuid('id').primaryKey(),
+  id: uuid('id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
 
   fullName: text('full_name').notNull(),
   email: text('email').notNull().unique(),

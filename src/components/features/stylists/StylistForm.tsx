@@ -23,7 +23,13 @@ type StylistFormProps = {
 export function StylistForm({ defaultValues, onSubmit, isPending, submitButtonText = 'Salvează' }: StylistFormProps) {
   const form = useForm<StylistFormValues>({
     resolver: zodResolver(stylistFormSchema),
-    defaultValues: defaultValues,
+    defaultValues: {
+      fullName: defaultValues?.fullName ?? '',
+      email: defaultValues?.email ?? '',
+      phone: defaultValues?.phone ?? '',
+      description: defaultValues?.description ?? '',
+      isActive: defaultValues?.isActive ?? true,
+    },
   })
 
   return (
