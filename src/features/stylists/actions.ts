@@ -2,6 +2,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
 import { createStylistRepository } from '@/core/domains/stylists/stylist.repository'
 import { createStylistService } from '@/core/domains/stylists/stylist.sevice'
@@ -21,20 +22,17 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 
 /**
- * Funcție ajutătoare care asamblează serviciul de stiliști.
- * Nu mai face verificarea de securitate aici; aceasta va fi delegată.
+ * Instanțiem serviciul o singură dată la nivel de modul.
+ * Acest lucru este eficient și simplifică corpul acțiunilor.
  */
-function getStylistService() {
-  const stylistRepository = createStylistRepository(db)
-  const supabaseAdmin = createAdminClient()
-  return createStylistService(stylistRepository, supabaseAdmin)
-}
+const stylistService = createStylistService(createStylistRepository(db), createAdminClient())
 
 /**
  * Helper intern pentru a verifica dacă utilizatorul este admin.
- * Aruncă o eroare dacă nu este autorizat.
+ * Aruncă o eroare dacă nu este autorizat. Numele este mai explicit.
+ * @private
  */
-async function ensureAdmin() {
+async function _ensureUserIsAdmin() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -45,54 +43,60 @@ async function ensureAdmin() {
   }
 }
 
-// --- Acțiunile Noastre, Acum Funcții Standard ---
+/**
+ * FACTORY FUNCTION: Piesa centrală a refactorizării.
+ * Creează o acțiune sigură care necesită privilegii de admin.
+ * Încorporează validarea, autorizarea, execuția, gestionarea erorilor și revalidarea.
+ *
+ * @param schema - Schema Zod pentru validarea datelor de intrare.
+ * @param actionLogic - Funcția care conține logica de business specifică.
+ * @returns O Server Action completă și sigură.
+ */
+function createAdminStylistAction<T extends z.ZodType<any, any, any>>(
+  schema: T,
+  actionLogic: (payload: z.infer<T>) => Promise<any>,
+) {
+  return (payload: z.infer<T>) => {
+    return executeSafeAction(schema, payload, async (validatedPayload) => {
+      // 1. Securitatea este aplicată automat aici.
+      await _ensureUserIsAdmin()
 
-export async function createStylistAction(payload: CreateStylistPayload) {
-  // Apelăm helper-ul cu schema, datele primite și logica de business
-  return executeSafeAction(createStylistActionSchema, payload, async (validatedPayload) => {
-    await ensureAdmin() // Verificarea de securitate se face aici, în interior.
-    const stylistService = getStylistService()
+      try {
+        // 2. Execuția logicii de business specifice.
+        const result = await actionLogic(validatedPayload)
 
-    try {
-      const result = await stylistService.createStylist(validatedPayload)
-      revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
-      return { data: result }
-    } catch (error) {
-      if (error instanceof UniquenessError) {
-        return { validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])) }
+        // 3. Revalidarea căii este centralizată.
+        revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
+
+        return { data: result }
+      } catch (error) {
+        // 4. Gestionarea erorilor specifice domeniului este centralizată.
+        if (error instanceof UniquenessError) {
+          return {
+            validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
+          }
+        }
+        // Orice altă eroare va fi prinsă de `executeSafeAction` și va returna o eroare de server.
+        throw error
       }
-      // Orice altă eroare va fi prinsă de wrapper-ul `executeSafeAction`
-      throw error
-    }
-  })
+    })
+  }
 }
 
-export async function updateStylistAction(payload: UpdateStylistPayload) {
-  return executeSafeAction(updateStylistActionSchema, payload, async (validatedPayload) => {
-    await ensureAdmin()
-    const stylistService = getStylistService()
+// --- PUBLIC SERVER ACTIONS ---
+// Definițiile sunt acum declarative, concise și ușor de citit.
 
-    try {
-      const result = await stylistService.updateStylist(validatedPayload)
-      revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
-      return { data: result }
-    } catch (error) {
-      if (error instanceof UniquenessError) {
-        return { validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])) }
-      }
-      throw error
-    }
-  })
-}
+export const createStylistAction = createAdminStylistAction(
+  createStylistActionSchema,
+  (payload: CreateStylistPayload) => stylistService.createStylist(payload),
+)
 
-export async function deleteStylistAction(payload: DeleteStylistPayload) {
-  return executeSafeAction(deleteStylistActionSchema, payload, async ({ id }) => {
-    await ensureAdmin()
-    const stylistService = getStylistService()
+export const updateStylistAction = createAdminStylistAction(
+  updateStylistActionSchema,
+  (payload: UpdateStylistPayload) => stylistService.updateStylist(payload),
+)
 
-    const result = await stylistService.deleteStylist(id)
-    revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
-
-    return { data: result }
-  })
-}
+export const deleteStylistAction = createAdminStylistAction(
+  deleteStylistActionSchema,
+  (payload: DeleteStylistPayload) => stylistService.deleteStylist(payload.id),
+)

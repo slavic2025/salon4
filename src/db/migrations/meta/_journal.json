@@ -43,6 +43,13 @@
       "when": 1751785079271,
       "tag": "0005_tan_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1751798955280,
+      "tag": "0006_groovy_darkhawk",
+      "breakpoints": true
     }
   ]
 }
