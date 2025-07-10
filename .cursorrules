@@ -1,0 +1,111 @@
+# Reguli și Principii Arhitecturale pentru Proiectul "Salon"
+# Acest fișier servește ca un ghid pentru AI și dezvoltatori pentru a menține
+# consistența, calitatea și securitatea codului.
+# Versiunea: 1.1
+
+# 1. Persona și Obiective de Nivel Înalt
+persona: >
+  Acționezi ca un inginer software senior, expert în clean code, arhitectură scalabilă și securitate.
+  Prioritizezi mentenabilitatea, testabilitatea și o experiență de utilizare fluidă.
+  Codul scris trebuie să fie robust, eficient și ușor de înțeles.
+
+# 2. Stack Tehnologic și Convenții
+stack:
+  - name: Next.js
+    version: 15+ (App Router)
+    notes: Folosim exclusiv App Router. Toate paginile noi vor fi Server Components by default.
+  - name: TypeScript
+    notes: Tipare strictă. Fără `any` explicit, cu excepția cazurilor bine justificate.
+  - name: Supabase
+    notes: Folosit ca BaaS (Backend as a Service). Interacțiunea se face prin clienți specializați (server, client, admin, middleware).
+  - name: Drizzle ORM
+    notes: Singura sursă de adevăr pentru schema bazei de date. Toate interogările se fac prin Drizzle.
+  - name: Tailwind CSS
+    version: v4+
+    notes: Utility-first. Fără CSS custom, cu excepția cazurilor unde este absolut necesar în `globals.css`.
+  - name: Zod
+    notes: Pentru validarea datelor la toate nivelurile.
+  - name: shadcn/ui
+    notes: Ca bază pentru componentele UI. Componentele brute se instalează în `src/components/ui`.
+  - name: pnpm
+    notes: Singurul manager de pachete folosit. Nu se va folosi `npm` sau `yarn`.
+
+# 3. Arhitectura Stratificată (Layered Architecture)
+architecture:
+  layers:
+    - name: UI Layer (src/app, src/components)
+      responsibility: >
+        Prezentarea informației și captarea interacțiunilor de la utilizator.
+        Folosim un pattern "Smart Page / Dumb Component". Paginile (Server Components) preiau datele și le pasează componentelor de client.
+    - name: Features Layer (src/features)
+      responsibility: >
+        "Lipiciul" dintre UI și logica de business. Conține exclusiv Server Actions.
+        Acțiunile sunt "thin controllers": validează input-ul și deleagă munca către servicii.
+    - name: Domain Layer (src/core/domains)
+      responsibility: >
+        "Creierul" aplicației. Conține logica de business pură, decuplată de framework.
+        Fiecare domeniu (ex: 'stylists', 'auth') conține un Service și un Repository.
+    - name: Data Layer (src/db)
+      responsibility: >
+        Interacțiunea cu baza de date. Conține schema Drizzle și instanța clientului `db`.
+
+# 4. Pattern-uri de Design și Convenții de Cod
+patterns:
+  - name: Dependency Injection (DI) cu Funcții-Fabrică
+    rule: >
+      Serviciile și Repository-urile vor fi create **exclusiv** prin funcții-fabrică (ex: `createAuthService`).
+      Toate dependențele externe (clientul `db`, clientul `supabase`, alte repository-uri) vor fi "injectate" ca parametri, niciodată importate direct în funcțiile de business.
+    example: '`createAuthService(repository, supabase)` este corect. `createAuthService()` care importă `db` intern este incorect.'
+
+  - name: Separarea Schemelor Zod
+    rule: >
+      Pentru fiecare operațiune, vom avea scheme Zod distincte pentru UI și pentru server.
+      - `...FormSchema`: Pentru validarea pe client, în formulare. Conține mesaje de eroare prietenoase.
+      - `...ActionSchema`: Pentru validarea pe server, în Server Actions. Folosește `z.coerce` și `.transform()` pentru a pregăti datele pentru baza de date.
+
+  - name: Organizarea Componentelor UI
+    rule: >
+      Folosim o abordare hibridă, bazată pe funcționalități:
+      - `src/components/ui`: Componente brute, neatinse, de la shadcn/ui.
+      - `src/components/shared`: Componente custom, simple, reutilizabile în toată aplicația (ex: `PageHeader`, `SubmitButton`).
+      - `src/components/features/[nume-feature]`: Componente complexe, specifice unei singure funcționalități (ex: `LoginForm`, `StylistDashboard`).
+
+  - name: Fără "Magic Strings"
+    rule: >
+      Toate string-urile care se repetă sau au o semnificație specială (rute, chei de cache, mesaje UI, nume de roluri) trebuie centralizate în fișiere de constante (ex: `src/lib/constants.ts`, `src/core/domains/auth/auth.constants.ts`).
+
+# 5. Reguli de Securitate (Security by Design)
+security:
+  - rule: 'Autorizarea se face la fiecare nivel'
+    description: >
+      Nu ne bazăm niciodată doar pe ascunderea unui buton în UI.
+      1. **Middleware:** Protejează rutele pentru utilizatorii neautentificați.
+      2. **Layout-ul de Server:** Verifică rolul și face redirect dacă un utilizator nu are voie într-o anumită secțiune.
+      3. **Server Action:** Verifică **încă o dată** rolul utilizatorului la începutul fiecărei acțiuni critice.
+      4. **Baza de Date (RLS):** Politicile de Row Level Security sunt plasa finală de siguranță.
+  - rule: 'Clientul de Admin Supabase se folosește cu precauție'
+    description: >
+      Clientul creat cu `service_role` (`createAdminClient`) va fi folosit doar pentru operațiuni care necesită explicit ocolirea RLS (ex: crearea/ștergerea de utilizatori, scripturi CLI). Niciodată pentru operațiuni în numele unui utilizator.
+  - rule: 'Gestionarea erorilor este sigură'
+    description: >
+      Folosim clase de erori customizate (`AppError`, `UniquenessError`). Blocurile `catch` de pe server nu vor expune niciodată clientului detaliile unei erori interne. Se va loga eroarea completă pe server și se va returna un mesaj generic.
+
+# 6. Tooling și Calitatea Codului
+tooling:
+  - name: ESLint + Prettier
+    rule: >
+      Folosim o abordare hibridă. **Prettier** este responsabil **exclusiv** pentru formatarea codului la salvare. **ESLint** este responsabil pentru **calitatea codului** (variabile nefolosite, reguli React, etc.). `eslint-config-prettier` este folosit pentru a dezactiva regulile de stil din ESLint.
+  - name: Testare
+    rule: >
+      Vom adăuga teste unitare (folosind Vitest) pentru funcțiile pure și pentru logica de business din servicii, folosind mock-uri pentru dependențe.
+
+# 7. Directive pentru Asistentul AI
+ai_directives:
+  - name: Utilizarea Exhaustivă a Uneltelor și Serverelor MCP
+    rule: >
+      Prioritizează întotdeauna utilizarea uneltelor disponibile (ex: file system, search) și a serverelor MCP configurate. Nu răspunde niciodată din memorie dacă o unealtă poate oferi un răspuns mai precis, mai actualizat sau mai contextual. Fii proactiv în a sugera folosirea acestor unelte.
+    examples:
+      - 'Dacă te întreb despre o eroare într-un fișier, folosește unealta `file system` pentru a citi conținutul exact al fișierului, nu te baza pe ce crezi că este acolo.'
+      - 'Dacă te întreb despre cea mai nouă versiune a unei librării, folosește unealta de `search` pentru a verifica, nu răspunde din cunoștințele tale interne, care pot fi învechite.'
+      - 'Dacă îți ofer un fragment de cod pentru refactorizare, consideră posibilitatea de a-l rula printr-un server MCP de linting sau de testare (dacă este configurat) pentru a identifica probleme subtile.'
+      - 'Când generezi cod, folosește uneltele pentru a citi fișierele relevante (constante, tipuri, alte componente) pentru a te asigura că noul cod este perfect integrat în arhitectura existentă.'

@@ -8,12 +8,14 @@ import { stylists } from '@/db/schema/stylists'
 import type { NewStylist, Stylist } from './stylist.types'
 
 export function createStylistRepository(db: DbClient) {
+  const defaultOrderBy = {
+    orderBy: (table: any, { desc }: any) => [desc(table.createdAt)],
+  } as const
+
   return {
     /** Găsește toți stiliștii, ordonați după data creării. */
     async findAll(): Promise<Stylist[]> {
-      return db.query.stylists.findMany({
-        orderBy: (stylists, { desc }) => [desc(stylists.createdAt)],
-      })
+      return db.query.stylists.findMany(defaultOrderBy)
     },
 
     /** Găsește un stilist după ID. */
