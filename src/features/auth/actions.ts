@@ -29,7 +29,7 @@ const authService = createAuthService(createAuthRepository(db), createClient())
 /**
  * Gestionează autentificarea utilizatorului cu email și parolă.
  */
-export const signInAction = (credentials: SignInPayload) => {
+export const signInAction = async (credentials: SignInPayload) => {
   return executeSafeAction(signInActionSchema, credentials, async (validatedCredentials) => {
     const result = await authService.signInWithPassword(validatedCredentials)
 
@@ -47,7 +47,7 @@ export const signInAction = (credentials: SignInPayload) => {
 /**
  * Permite unui utilizator autentificat să își seteze sau să își schimbe parola.
  */
-export const setPasswordAction = (payload: SetPasswordPayload) => {
+export const setPasswordAction = async (payload: SetPasswordPayload) => {
   return executeSafeAction(setPasswordActionSchema, payload, async ({ password }) => {
     const result = await authService.setPassword(password)
 

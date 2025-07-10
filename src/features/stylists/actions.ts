@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
 import { createStylistRepository } from '@/core/domains/stylists/stylist.repository'
-import { createStylistService } from '@/core/domains/stylists/stylist.sevice'
+import { createStylistService } from '@/core/domains/stylists/stylist.service'
 import {
   createStylistActionSchema,
   type CreateStylistPayload,
@@ -88,15 +88,15 @@ function createAdminStylistAction<T extends z.ZodType<any, any, any>>(
 
 export const createStylistAction = createAdminStylistAction(
   createStylistActionSchema,
-  (payload: CreateStylistPayload) => stylistService.createStylist(payload),
+  async (payload: CreateStylistPayload) => stylistService.createStylist(payload),
 )
 
 export const updateStylistAction = createAdminStylistAction(
   updateStylistActionSchema,
-  (payload: UpdateStylistPayload) => stylistService.updateStylist(payload),
+  async (payload: UpdateStylistPayload) => stylistService.updateStylist(payload),
 )
 
 export const deleteStylistAction = createAdminStylistAction(
   deleteStylistActionSchema,
-  (payload: DeleteStylistPayload) => stylistService.deleteStylist(payload.id),
+  async (payload: DeleteStylistPayload) => stylistService.deleteStylist(payload.id),
 )

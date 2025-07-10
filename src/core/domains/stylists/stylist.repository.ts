@@ -1,16 +1,15 @@
 // src/core/domains/stylists/stylist.repository.ts
 
 import { eq } from 'drizzle-orm'
+import { desc } from 'drizzle-orm'
 
 import { type DbClient } from '@/db'
-import { defaultOrderBy } from '@/db/helpers' // Importăm noul helper
 import { stylists } from '@/db/schema/stylists'
 
 import type { NewStylist, Stylist } from './stylist.types'
 
 export function createStylistRepository(db: DbClient) {
   const TABLE = stylists
-  const orderByCreatedAt = defaultOrderBy(TABLE.createdAt)
 
   // Funcție privată, generică, pentru a găsi o singură înregistrare.
   async function _findOneBy(field: keyof Stylist, value: string): Promise<Stylist | undefined> {
@@ -21,7 +20,9 @@ export function createStylistRepository(db: DbClient) {
 
   return {
     async findAll(): Promise<Stylist[]> {
-      return db.query.stylists.findMany({ ...orderByCreatedAt })
+      return db.query.stylists.findMany({
+        orderBy: [desc(stylists.createdAt)],
+      })
     },
     async findById(id: string): Promise<Stylist | undefined> {
       return _findOneBy('id', id)

@@ -1,7 +1,7 @@
 // src/app/(dashboard)/admin/stylists/page.tsx
 import { StylistsPageContent } from '@/components/features/stylists/StylistsPageContent'
 import { createStylistRepository } from '@/core/domains/stylists/stylist.repository'
-import { createStylistService } from '@/core/domains/stylists/stylist.sevice'
+import { createStylistService } from '@/core/domains/stylists/stylist.service'
 import { db } from '@/db'
 import { createAdminClient } from '@/lib/supabase/admin'
 

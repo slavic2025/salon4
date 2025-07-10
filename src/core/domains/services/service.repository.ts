@@ -1,20 +1,22 @@
 // src/core/domains/services/service.repository.ts
 
-import { eq, ilike } from 'drizzle-orm'
+import { desc, eq, ilike } from 'drizzle-orm'
 
 import { type DbClient } from '@/db'
-import { defaultOrderBy } from '@/db/helpers' // Importăm noul helper
 import { services } from '@/db/schema/services'
 
 import { type NewService, type Service, type ServiceCategory } from './service.types'
 
 export function createServiceRepository(db: DbClient) {
   const TABLE = services
-  const orderByCreatedAt = defaultOrderBy(TABLE.createdAt)
+
+  const defaultOrderBy = {
+    orderBy: [desc(services.createdAt)],
+  }
 
   return {
     async findAll(): Promise<Service[]> {
-      return db.query.services.findMany({ ...orderByCreatedAt })
+      return db.query.services.findMany(defaultOrderBy)
     },
     async findById(id: string): Promise<Service | undefined> {
       return db.query.services.findFirst({ where: eq(TABLE.id, id) })
@@ -25,13 +27,13 @@ export function createServiceRepository(db: DbClient) {
     async findActive(): Promise<Service[]> {
       return db.query.services.findMany({
         where: eq(TABLE.isActive, true),
-        ...orderByCreatedAt,
+        ...defaultOrderBy,
       })
     },
     async findByCategory(category: ServiceCategory): Promise<Service[]> {
       return db.query.services.findMany({
         where: eq(TABLE.category, category),
-        ...orderByCreatedAt,
+        ...defaultOrderBy,
       })
     },
     async create(newService: NewService): Promise<Service> {
