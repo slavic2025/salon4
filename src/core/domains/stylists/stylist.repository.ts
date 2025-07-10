@@ -2,62 +2,50 @@
 
 import { eq } from 'drizzle-orm'
 
-import type { DbClient } from '@/db'
+import { type DbClient } from '@/db'
+import { defaultOrderBy } from '@/db/helpers' // Importăm noul helper
 import { stylists } from '@/db/schema/stylists'
 
 import type { NewStylist, Stylist } from './stylist.types'
 
 export function createStylistRepository(db: DbClient) {
-  const defaultOrderBy = {
-    orderBy: (table: any, { desc }: any) => [desc(table.createdAt)],
-  } as const
+  const TABLE = stylists
+  const orderByCreatedAt = defaultOrderBy(TABLE.createdAt)
+
+  // Funcție privată, generică, pentru a găsi o singură înregistrare.
+  async function _findOneBy(field: keyof Stylist, value: string): Promise<Stylist | undefined> {
+    return db.query.stylists.findFirst({
+      where: eq(TABLE[field], value),
+    })
+  }
 
   return {
-    /** Găsește toți stiliștii, ordonați după data creării. */
     async findAll(): Promise<Stylist[]> {
-      return db.query.stylists.findMany(defaultOrderBy)
+      return db.query.stylists.findMany({ ...orderByCreatedAt })
     },
-
-    /** Găsește un stilist după ID. */
     async findById(id: string): Promise<Stylist | undefined> {
-      return db.query.stylists.findFirst({
-        where: eq(stylists.id, id),
-      })
+      return _findOneBy('id', id)
     },
-
-    /** Găsește un stilist după adresa de email. */
     async findByEmail(email: string): Promise<Stylist | undefined> {
-      return db.query.stylists.findFirst({
-        where: eq(stylists.email, email),
-      })
+      return _findOneBy('email', email)
     },
-
-    /** Găsește un stilist după numărul de telefon. */
     async findByPhone(phone: string): Promise<Stylist | undefined> {
-      return db.query.stylists.findFirst({
-        where: eq(stylists.phone, phone),
-      })
+      return _findOneBy('phone', phone)
     },
-
-    /** Creează un profil nou de stilist în baza de date. */
     async create(newStylist: NewStylist): Promise<Stylist> {
-      const [stylist] = await db.insert(stylists).values(newStylist).returning()
+      const [stylist] = await db.insert(TABLE).values(newStylist).returning()
       return stylist
     },
-
-    /** Actualizează profilul unui stilist. */
     async update(id: string, data: Partial<NewStylist>): Promise<Stylist> {
       const [stylist] = await db
-        .update(stylists)
+        .update(TABLE)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(stylists.id, id))
+        .where(eq(TABLE.id, id))
         .returning()
       return stylist
     },
-
-    /** Șterge un profil de stilist. */
     async delete(id: string): Promise<void> {
-      await db.delete(stylists).where(eq(stylists.id, id))
+      await db.delete(TABLE).where(eq(TABLE.id, id))
     },
   }
 }

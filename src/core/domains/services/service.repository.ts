@@ -3,72 +3,51 @@
 import { eq, ilike } from 'drizzle-orm'
 
 import { type DbClient } from '@/db'
+import { defaultOrderBy } from '@/db/helpers' // Importăm noul helper
 import { services } from '@/db/schema/services'
 
 import { type NewService, type Service, type ServiceCategory } from './service.types'
 
 export function createServiceRepository(db: DbClient) {
-  // 1. Extragem logica de sortare într-o constantă locală (DRY)
-  const defaultOrderBy = {
-    orderBy: (table: any, { desc }: any) => [desc(table.createdAt)],
-  } as const
+  const TABLE = services
+  const orderByCreatedAt = defaultOrderBy(TABLE.createdAt)
 
   return {
-    /** Găsește toate serviciile, ordonate implicit. */
     async findAll(): Promise<Service[]> {
-      return db.query.services.findMany(defaultOrderBy)
+      return db.query.services.findMany({ ...orderByCreatedAt })
     },
-
-    /** Găsește un serviciu după ID. */
     async findById(id: string): Promise<Service | undefined> {
-      return db.query.services.findFirst({
-        where: eq(services.id, id),
-      })
+      return db.query.services.findFirst({ where: eq(TABLE.id, id) })
     },
-
-    /** Găsește un serviciu după nume (case-insensitive). */
     async findByName(name: string): Promise<Service | undefined> {
-      return db.query.services.findFirst({
-        where: ilike(services.name, name),
-      })
+      return db.query.services.findFirst({ where: ilike(TABLE.name, name) })
     },
-
-    /** Găsește toate serviciile active. */
     async findActive(): Promise<Service[]> {
       return db.query.services.findMany({
-        where: eq(services.isActive, true),
-        ...defaultOrderBy, // 2. Refolosim constanta de sortare
+        where: eq(TABLE.isActive, true),
+        ...orderByCreatedAt,
       })
     },
-
-    /** Găsește toate serviciile dintr-o anumită categorie. */
     async findByCategory(category: ServiceCategory): Promise<Service[]> {
       return db.query.services.findMany({
-        where: eq(services.category, category),
-        ...defaultOrderBy, // 2. Refolosim constanta de sortare
+        where: eq(TABLE.category, category),
+        ...orderByCreatedAt,
       })
     },
-
-    /** Creează un serviciu nou în baza de date. */
     async create(newService: NewService): Promise<Service> {
-      // 3. Denumire corectată
-      const [service] = await db.insert(services).values(newService).returning()
+      const [service] = await db.insert(TABLE).values(newService).returning()
       return service
     },
-
-    /** Actualizează un serviciu existent după ID. */
     async update(id: string, data: Partial<NewService>): Promise<Service> {
       const [service] = await db
-        .update(services)
+        .update(TABLE)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(services.id, id))
+        .where(eq(TABLE.id, id))
         .returning()
       return service
     },
-
-    /** Șterge un serviciu după ID. */
     async delete(id: string): Promise<void> {
-      await db.delete(services).where(eq(services.id, id))
+      await db.delete(TABLE).where(eq(TABLE.id, id))
     },
   }
 }
