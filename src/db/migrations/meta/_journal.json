@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1751198320382,
-      "tag": "0000_reflective_revanche",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1751204080770,
-      "tag": "0001_fearless_sheva_callister",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1751740363225,
-      "tag": "0002_new_the_liberteens",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1751740842780,
-      "tag": "0003_mature_gertrude_yorkes",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1751740887533,
-      "tag": "0004_loud_venom",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1751785079271,
-      "tag": "0005_tan_trauma",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1751798955280,
-      "tag": "0006_groovy_darkhawk",
+      "when": 1752397778489,
+      "tag": "0000_ancient_wallop",
       "breakpoints": true
     }
   ]

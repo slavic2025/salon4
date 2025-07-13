@@ -4,6 +4,7 @@
 import { MoreHorizontal } from 'lucide-react'
 import { useState } from 'react'
 
+import { ManageStylistServicesDialog } from '@/components/features/stylist-services/ManageStylistServicesDialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -57,6 +58,9 @@ export function StylistTableRow({ stylist }: StylistTableRowProps) {
               <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>Editează</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <ManageStylistServicesDialog stylistId={stylist.id} stylistName={stylist.fullName} />
+              </DropdownMenuItem>
               <DeleteStylistMenuItem stylistId={stylist.id} stylistName={stylist.fullName} />
             </DropdownMenuContent>
           </DropdownMenu>

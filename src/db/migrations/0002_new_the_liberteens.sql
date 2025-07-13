@@ -1,1 +1,0 @@
-ALTER TABLE "stylists" ALTER COLUMN "phone" SET NOT NULL;
