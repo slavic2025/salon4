@@ -10,9 +10,12 @@ export const APP_ROUTES = {
   ADMIN_DASHBOARD: '/admin',
   STYLIST_DASHBOARD: '/stylist',
   ADMIN_STYLISTS_PAGE: '/admin/stylists',
+  ADMIN_SERVICES_PAGE: '/admin/services',
   ACCOUNT_SETUP: '/account-setup',
   LANDING: '/',
 } as const
 
 // Definim și tipurile pe baza constantelor pentru a le folosi în cod
 export type UserRole = keyof typeof ROLES | null
+
+export const DEFAULT_CURRENCY = 'MDL'

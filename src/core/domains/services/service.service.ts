@@ -11,10 +11,9 @@ export function createServiceService(repository: ServiceRepository) {
   const logger = createLogger('ServiceService')
 
   /**
-   * Verifică proactiv unicitatea numelui serviciului folosind o interogare la țintă.
+   * Verifică proactiv unicitatea pentru nume de serviciu.
    */
   async function _ensureUniqueness(data: { name: string }, idToExclude?: string) {
-    logger.debug('Ensuring uniqueness for service name...', { name: data.name, idToExclude })
     const existingByName = await repository.findByName(data.name)
     if (existingByName && existingByName.id !== idToExclude) {
       throw new UniquenessError(SERVICE_MESSAGES.ERROR.ALREADY_EXISTS, [
@@ -23,27 +22,13 @@ export function createServiceService(repository: ServiceRepository) {
     }
   }
 
-  /**
-   * Funcție privată pentru a traduce erorile tehnice în erori de business.
-   */
-  function _handleDatabaseError(error: unknown, operation: string): never {
-    logger.error(`Database error during ${operation}`, { error })
-    // Verificare robustă a codului de eroare pentru unicitate
-    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
-      throw new UniquenessError(SERVICE_MESSAGES.ERROR.ALREADY_EXISTS, [
-        { field: 'name', message: SERVICE_MESSAGES.ERROR.ALREADY_EXISTS },
-      ])
-    }
-    throw new DatabaseError(`Failed to ${operation} service`, { cause: error })
-  }
-
   return {
     getAllServices: () => repository.findAll(),
 
     async getServiceById(id: string) {
       const service = await repository.findById(id)
       if (!service) {
-        throw new NotFoundError(`Service with id ${id} not found`)
+        throw new NotFoundError(SERVICE_MESSAGES.ERROR.NOT_FOUND)
       }
       return service
     },
@@ -54,8 +39,10 @@ export function createServiceService(repository: ServiceRepository) {
         const newService = await repository.create({ ...payload, price: String(payload.price) })
         logger.info('Service created successfully.', { serviceId: newService.id })
         return { success: true, message: SERVICE_MESSAGES.SUCCESS.CREATED, data: newService }
-      } catch (error) {
-        _handleDatabaseError(error, 'create')
+      } catch (error: any) {
+        if (error instanceof UniquenessError) throw error
+        logger.error('Failed to create service.', { error })
+        throw new DatabaseError(SERVICE_MESSAGES.ERROR.CREATE_FAILED, { cause: error })
       }
     },
 
@@ -63,14 +50,16 @@ export function createServiceService(repository: ServiceRepository) {
       const { id, ...data } = payload
       await _ensureUniqueness(data, id)
       try {
-        await repository.update(id, {
+        const updatedService = await repository.update(id, {
           ...data,
           price: data.price ? String(data.price) : undefined,
         })
         logger.info('Service updated successfully.', { serviceId: id })
-        return { success: true, message: SERVICE_MESSAGES.SUCCESS.UPDATED }
-      } catch (error) {
-        _handleDatabaseError(error, 'update')
+        return { success: true, message: SERVICE_MESSAGES.SUCCESS.UPDATED, data: updatedService }
+      } catch (error: any) {
+        if (error instanceof UniquenessError) throw error
+        logger.error('Failed to update service.', { error })
+        throw new DatabaseError(SERVICE_MESSAGES.ERROR.UPDATE_FAILED, { cause: error })
       }
     },
 
@@ -80,8 +69,9 @@ export function createServiceService(repository: ServiceRepository) {
         await repository.delete(serviceId)
         logger.info('Service deleted successfully.', { serviceId })
         return { success: true, message: SERVICE_MESSAGES.SUCCESS.DELETED }
-      } catch (error) {
-        _handleDatabaseError(error, 'delete')
+      } catch (error: any) {
+        logger.error('Failed to delete service.', { error })
+        throw new DatabaseError(SERVICE_MESSAGES.ERROR.DELETE_FAILED, { cause: error })
       }
     },
 

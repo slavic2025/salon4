@@ -22,8 +22,8 @@ export type NewService = typeof services.$inferInsert
 export const serviceFormSchema = z.object({
   name: z.string().min(3, SERVICE_MESSAGES.VALIDATION.NAME_MIN_LENGTH),
   description: z.string(),
-  price: z.number().positive(SERVICE_MESSAGES.VALIDATION.PRICE_POSITIVE),
-  duration: z.number().int().positive(SERVICE_MESSAGES.VALIDATION.DURATION_POSITIVE),
+  price: z.coerce.number().positive(SERVICE_MESSAGES.VALIDATION.PRICE_POSITIVE),
+  duration: z.coerce.number().int().positive(SERVICE_MESSAGES.VALIDATION.DURATION_POSITIVE),
   category: z.enum(SERVICE_CATEGORIES),
   isActive: z.boolean(),
 })
