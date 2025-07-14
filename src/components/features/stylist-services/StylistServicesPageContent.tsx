@@ -8,7 +8,7 @@ import type { StylistServiceLinkWithService } from '@/core/domains/stylist-servi
 import { AddStylistServiceDialog } from './AddStylistServiceDialog'
 import { StylistServicesTable } from './StylistServicesTable'
 
-interface StylistServicesPageContentProps {
+type StylistServicesPageContentProps = {
   services: StylistServiceLinkWithService[]
   stylistId: string
   stylistName: string

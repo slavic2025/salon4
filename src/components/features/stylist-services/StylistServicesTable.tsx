@@ -6,7 +6,7 @@ import type { StylistServiceLinkWithService } from '@/core/domains/stylist-servi
 
 import { StylistServiceTableRow } from './StylistServiceTableRow'
 
-interface StylistServicesTableProps {
+type StylistServicesTableProps = {
   services: StylistServiceLinkWithService[]
   stylistId: string
 }

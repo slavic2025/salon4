@@ -8,7 +8,7 @@ import type { Stylist } from '@/core/domains/stylists/stylist.types'
 import { AddStylistDialog } from './AddStylistDialog' // Importăm dialogul de adăugare
 import { StylistsTable } from './StylistsTable'
 
-interface StylistsPageContentProps {
+type StylistsPageContentProps = {
   stylists: Stylist[]
 }
 

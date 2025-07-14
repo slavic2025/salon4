@@ -6,7 +6,7 @@ import React from 'react'
 import { Button, type ButtonProps } from '@/components/ui/button'
 
 // Pasul 1: Definim proprietățile. `isPending` este acum singura sursă de adevăr pentru starea butonului.
-interface SubmitButtonProps extends ButtonProps {
+type SubmitButtonProps = ButtonProps & {
   isPending: boolean
   pendingText?: string
   children: React.ReactNode

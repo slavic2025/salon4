@@ -70,7 +70,14 @@ export function StylistServiceForm({
             <FormItem>
               <FormLabel>Preț personalizat</FormLabel>
               <FormControl>
-                <Input type="number" min={0} step={1} placeholder="Lasă necompletat pentru preț standard" {...field} />
+                <Input
+                  type="number"
+                  min={0}
+                  step={1}
+                  placeholder="Lasă necompletat pentru preț standard"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,6 +96,7 @@ export function StylistServiceForm({
                   step={1}
                   placeholder="Lasă necompletat pentru durata standard"
                   {...field}
+                  value={field.value ?? ''}
                 />
               </FormControl>
               <FormMessage />

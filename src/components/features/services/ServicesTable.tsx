@@ -6,7 +6,7 @@ import type { Service } from '@/core/domains/services/service.types'
 
 import { ServiceTableRow } from './ServiceTableRow'
 
-interface ServicesTableProps {
+type ServicesTableProps = {
   services: Service[]
 }
 

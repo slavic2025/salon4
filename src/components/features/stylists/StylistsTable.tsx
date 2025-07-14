@@ -6,7 +6,7 @@ import type { Stylist } from '@/core/domains/stylists/stylist.types'
 
 import { StylistTableRow } from './StylistTableRow'
 
-interface StylistsTableProps {
+type StylistsTableProps = {
   stylists: Stylist[]
 }
 

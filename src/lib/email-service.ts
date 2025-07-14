@@ -11,7 +11,7 @@ const logger = createLogger('EmailService')
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Definim un tip pentru o mai bună organizare
-interface EmailOptions {
+type EmailOptions = {
   to: string | string[]
   subject: string
   html: string

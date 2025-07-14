@@ -21,7 +21,7 @@ import { DEFAULT_CURRENCY } from '@/lib/constants'
 import { DeleteStylistServiceMenuItem } from './DeleteStylistServiceMenuItem'
 import { EditStylistServiceDialog } from './EditStylistServiceDialog'
 
-interface StylistServiceTableRowProps {
+type StylistServiceTableRowProps = {
   link: StylistServiceLinkWithService
   stylistId: string
 }

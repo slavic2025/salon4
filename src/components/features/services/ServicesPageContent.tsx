@@ -8,7 +8,7 @@ import type { Service } from '@/core/domains/services/service.types'
 import { AddServiceDialog } from './AddServiceDialog'
 import { ServicesTable } from './ServicesTable'
 
-interface ServicesPageContentProps {
+type ServicesPageContentProps = {
   services: Service[]
 }
 

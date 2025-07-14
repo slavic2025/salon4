@@ -6,7 +6,7 @@ import { type ReactNode } from 'react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-interface EmptyStateProps {
+type EmptyStateProps = {
   title: string
   description: string
   icon?: ReactNode

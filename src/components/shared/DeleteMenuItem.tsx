@@ -28,14 +28,14 @@ export type DeleteMenuItemMessages = {
 
 export type DeleteMenuItemProps = {
   id: string
-  name: string
+  // name: string // eliminat, nu este folosit
   onDelete: (id: string) => Promise<any>
   messages: DeleteMenuItemMessages
   icon?: ReactNode
   disabled?: boolean
 }
 
-export function DeleteMenuItem({ id, name, onDelete, messages, icon, disabled }: DeleteMenuItemProps) {
+export function DeleteMenuItem({ id, onDelete, messages, icon, disabled }: DeleteMenuItemProps) {
   const [isPending, startTransition] = useTransition()
 
   const handleDelete = () => {
@@ -61,7 +61,7 @@ export function DeleteMenuItem({ id, name, onDelete, messages, icon, disabled }:
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <DropdownMenuItem
-          onSelect={(e) => e.preventDefault()}
+          onSelect={(event) => event.preventDefault()}
           className="text-red-600 focus:text-red-600"
           disabled={disabled || isPending}
         >

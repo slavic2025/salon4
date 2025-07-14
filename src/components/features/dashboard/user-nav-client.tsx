@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { signOutAction } from '@/features/auth/actions'
 
-interface UserNavClientProps {
+type UserNavClientProps = {
   user: User | null
 }
 

@@ -4,6 +4,7 @@
 import { MoreHorizontal } from 'lucide-react'
 import { useState } from 'react'
 
+import { StylistServicesLink } from '@/components/features/stylist-services/StylistServicesLink'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,7 @@ import type { Stylist } from '@/core/domains/stylists/stylist.types'
 import { DeleteStylistMenuItem } from './DeleteStylistMenuItem'
 import { EditStylistDialog } from './EditStylistDialog'
 
-interface StylistTableRowProps {
+type StylistTableRowProps = {
   stylist: Stylist
 }
 
@@ -57,7 +58,10 @@ export function StylistTableRow({ stylist }: StylistTableRowProps) {
               <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>Editează</DropdownMenuItem>
-              <DropdownMenuItem asChild></DropdownMenuItem>
+              {/* Buton către pagina de servicii */}
+              <DropdownMenuItem asChild>
+                <StylistServicesLink stylistId={stylist.id} />
+              </DropdownMenuItem>
               <DeleteStylistMenuItem stylistId={stylist.id} stylistName={stylist.fullName} />
             </DropdownMenuContent>
           </DropdownMenu>

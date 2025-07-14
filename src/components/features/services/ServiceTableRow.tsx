@@ -21,7 +21,7 @@ import { DEFAULT_CURRENCY } from '@/lib/constants'
 import { DeleteServiceMenuItem } from './DeleteServiceMenuItem'
 import { EditServiceDialog } from './EditServiceDialog'
 
-interface ServiceTableRowProps {
+type ServiceTableRowProps = {
   service: Service
 }
 

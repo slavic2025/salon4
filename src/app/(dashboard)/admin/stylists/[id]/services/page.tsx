@@ -7,7 +7,7 @@ import { createStylistServiceLinkRepository } from '@/core/domains/stylist-servi
 import { createStylistServiceLinkService } from '@/core/domains/stylist-services/stylist-service.service'
 import { db } from '@/db'
 
-interface PageProps {
+type PageProps = {
   params: { id: string }
 }
 
