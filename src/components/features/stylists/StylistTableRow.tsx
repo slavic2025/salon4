@@ -1,7 +1,7 @@
 // src/components/features/stylists/StylistTableRow.tsx
 'use client'
 
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, Pencil } from 'lucide-react'
 import { useState } from 'react'
 
 import { StylistServicesLink } from '@/components/features/stylist-services/StylistServicesLink'
@@ -55,14 +55,21 @@ export function StylistTableRow({ stylist }: StylistTableRowProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acțiuni</DropdownMenuLabel>
+              <DropdownMenuLabel className="bg-muted/60 rounded px-2 py-1 text-xs text-muted-foreground font-semibold">
+                Acțiuni
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>Editează</DropdownMenuItem>
-              {/* Buton către pagina de servicii */}
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)} className="flex items-center gap-2">
+                <Pencil className="h-4 w-4 text-muted-foreground" />
+                <span>Editează</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="flex items-center gap-2">
                 <StylistServicesLink stylistId={stylist.id} />
               </DropdownMenuItem>
-              <DeleteStylistMenuItem stylistId={stylist.id} stylistName={stylist.fullName} />
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild className="flex items-center gap-2 text-destructive">
+                <DeleteStylistMenuItem stylistId={stylist.id} stylistName={stylist.fullName} />
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </TableCell>

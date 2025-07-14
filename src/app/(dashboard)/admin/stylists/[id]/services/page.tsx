@@ -12,7 +12,7 @@ type PageProps = {
 }
 
 export default async function StylistServicesPage({ params }: PageProps) {
-  const stylistId = params.id
+  const stylistId = (await params).id
 
   // Asamblăm dependențele: db -> repository -> service
   const serviceRepository = createServiceRepository(db)

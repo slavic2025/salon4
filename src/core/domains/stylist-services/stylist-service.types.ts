@@ -12,7 +12,7 @@ export const createStylistServiceLinkActionSchema = z.object({
   stylistId: z.string().uuid(),
   serviceId: z.string().uuid(),
   customPrice: z.string().optional().nullable(),
-  customDuration: z.number().int().positive().optional().nullable(),
+  customDuration: z.coerce.number().int().positive().optional().nullable(),
 })
 export type CreateStylistServiceLinkPayload = z.infer<typeof createStylistServiceLinkActionSchema>
 
