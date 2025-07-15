@@ -1,111 +1,380 @@
-# Reguli și Principii Arhitecturale pentru Proiectul "Salon"
-# Acest fișier servește ca un ghid pentru AI și dezvoltatori pentru a menține
-# consistența, calitatea și securitatea codului.
-# Versiunea: 1.1
+# .cursorrules - Salon Project Architecture & Development Guidelines
 
-# 1. Persona și Obiective de Nivel Înalt
-persona: >
-  Acționezi ca un inginer software senior, expert în clean code, arhitectură scalabilă și securitate.
-  Prioritizezi mentenabilitatea, testabilitatea și o experiență de utilizare fluidă.
-  Codul scris trebuie să fie robust, eficient și ușor de înțeles.
+## 🎯 AI Assistant Role & Mindset
+You are a **senior software engineer** with deep expertise in:
+- Clean architecture & SOLID principles
+- TypeScript/Next.js ecosystem
+- Security-first development
+- Performance optimization
+- Code maintainability
 
-# 2. Stack Tehnologic și Convenții
-stack:
-  - name: Next.js
-    version: 15+ (App Router)
-    notes: Folosim exclusiv App Router. Toate paginile noi vor fi Server Components by default.
-  - name: TypeScript
-    notes: Tipare strictă. Fără `any` explicit, cu excepția cazurilor bine justificate.
-  - name: Supabase
-    notes: Folosit ca BaaS (Backend as a Service). Interacțiunea se face prin clienți specializați (server, client, admin, middleware).
-  - name: Drizzle ORM
-    notes: Singura sursă de adevăr pentru schema bazei de date. Toate interogările se fac prin Drizzle.
-  - name: Tailwind CSS
-    version: v4+
-    notes: Utility-first. Fără CSS custom, cu excepția cazurilor unde este absolut necesar în `globals.css`.
-  - name: Zod
-    notes: Pentru validarea datelor la toate nivelurile.
-  - name: shadcn/ui
-    notes: Ca bază pentru componentele UI. Componentele brute se instalează în `src/components/ui`.
-  - name: pnpm
-    notes: Singurul manager de pachete folosit. Nu se va folosi `npm` sau `yarn`.
+**Core Principles:**
+- Write production-ready, scalable code
+- Prioritize security at every layer
+- Maintain consistency across the codebase
+- Prefer explicit over implicit
+- Always consider the maintenance burden
 
-# 3. Arhitectura Stratificată (Layered Architecture)
-architecture:
-  layers:
-    - name: UI Layer (src/app, src/components)
-      responsibility: >
-        Prezentarea informației și captarea interacțiunilor de la utilizator.
-        Folosim un pattern "Smart Page / Dumb Component". Paginile (Server Components) preiau datele și le pasează componentelor de client.
-    - name: Features Layer (src/features)
-      responsibility: >
-        "Lipiciul" dintre UI și logica de business. Conține exclusiv Server Actions.
-        Acțiunile sunt "thin controllers": validează input-ul și deleagă munca către servicii.
-    - name: Domain Layer (src/core/domains)
-      responsibility: >
-        "Creierul" aplicației. Conține logica de business pură, decuplată de framework.
-        Fiecare domeniu (ex: 'stylists', 'auth') conține un Service și un Repository.
-    - name: Data Layer (src/db)
-      responsibility: >
-        Interacțiunea cu baza de date. Conține schema Drizzle și instanța clientului `db`.
+## 📋 Project Context & Tech Stack
 
-# 4. Pattern-uri de Design și Convenții de Cod
-patterns:
-  - name: Dependency Injection (DI) cu Funcții-Fabrică
-    rule: >
-      Serviciile și Repository-urile vor fi create **exclusiv** prin funcții-fabrică (ex: `createAuthService`).
-      Toate dependențele externe (clientul `db`, clientul `supabase`, alte repository-uri) vor fi "injectate" ca parametri, niciodată importate direct în funcțiile de business.
-    example: '`createAuthService(repository, supabase)` este corect. `createAuthService()` care importă `db` intern este incorect.'
+### Technology Stack (Non-Negotiable)
+```typescript
+// Core Stack - DO NOT DEVIATE
+Next.js: 15+ (App Router ONLY)
+TypeScript: Strict mode, no `any` unless justified
+Supabase: BaaS with RLS policies
+Drizzle ORM: Single source of truth for DB schema
+Tailwind CSS: v4+, utility-first approach
+Zod: Data validation at all levels
+shadcn/ui: Base UI components
+pnpm: Package manager (never npm/yarn)
+```
 
-  - name: Separarea Schemelor Zod
-    rule: >
-      Pentru fiecare operațiune, vom avea scheme Zod distincte pentru UI și pentru server.
-      - `...FormSchema`: Pentru validarea pe client, în formulare. Conține mesaje de eroare prietenoase.
-      - `...ActionSchema`: Pentru validarea pe server, în Server Actions. Folosește `z.coerce` și `.transform()` pentru a pregăti datele pentru baza de date.
+### Architecture Overview
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🎨 UI Layer (src/app, src/components)                      │
+│ ├─ Server Components (data fetching)                        │
+│ ├─ Client Components (interactivity)                        │
+│ └─ Smart Page / Dumb Component pattern                      │
+├─────────────────────────────────────────────────────────────┤
+│ ⚡ Features Layer (src/features)                           │
+│ ├─ Server Actions only                                      │
+│ ├─ Thin controllers (validate → delegate)                   │
+│ └─ No business logic here                                   │
+├─────────────────────────────────────────────────────────────┤
+│ 🧠 Domain Layer (src/core/domains)                        │
+│ ├─ Pure business logic                                      │
+│ ├─ Services & Repositories                                  │
+│ └─ Framework-agnostic                                       │
+├─────────────────────────────────────────────────────────────┤
+│ 💾 Data Layer (src/db)                                     │
+│ ├─ Drizzle schema                                           │
+│ ├─ Database client                                          │
+│ └─ Type-safe queries                                        │
+└─────────────────────────────────────────────────────────────┘
+```
 
-  - name: Organizarea Componentelor UI
-    rule: >
-      Folosim o abordare hibridă, bazată pe funcționalități:
-      - `src/components/ui`: Componente brute, neatinse, de la shadcn/ui.
-      - `src/components/shared`: Componente custom, simple, reutilizabile în toată aplicația (ex: `PageHeader`, `SubmitButton`).
-      - `src/components/features/[nume-feature]`: Componente complexe, specifice unei singure funcționalități (ex: `LoginForm`, `StylistDashboard`).
+## 🔧 Critical Development Patterns
 
-  - name: Fără "Magic Strings"
-    rule: >
-      Toate string-urile care se repetă sau au o semnificație specială (rute, chei de cache, mesaje UI, nume de roluri, mesaje de logging, mesaje de eroare) trebuie centralizate în fișiere de constante conform domeniului din care fac parte (ex: `src/lib/constants.ts` pentru constante globale, `src/core/domains/auth/auth.constants.ts` pentru domeniul auth, etc.). Fiecare domeniu TREBUIE să-și aibă propriul fișier de constante care să conțină toate string-urile folosite în acel domeniu.
+### 1. Dependency Injection (Factory Pattern)
+```typescript
+// ✅ CORRECT - Dependencies injected
+export const createAuthService = (
+  repository: AuthRepository,
+  supabase: SupabaseClient
+) => ({
+  async login(credentials: LoginCredentials) {
+    // business logic here
+  }
+});
 
-# 5. Reguli de Securitate (Security by Design)
-security:
-  - rule: 'Autorizarea se face la fiecare nivel'
-    description: >
-      Nu ne bazăm niciodată doar pe ascunderea unui buton în UI.
-      1. **Middleware:** Protejează rutele pentru utilizatorii neautentificați.
-      2. **Layout-ul de Server:** Verifică rolul și face redirect dacă un utilizator nu are voie într-o anumită secțiune.
-      3. **Server Action:** Verifică **încă o dată** rolul utilizatorului la începutul fiecărei acțiuni critice.
-      4. **Baza de Date (RLS):** Politicile de Row Level Security sunt plasa finală de siguranță.
-  - rule: 'Clientul de Admin Supabase se folosește cu precauție'
-    description: >
-      Clientul creat cu `service_role` (`createAdminClient`) va fi folosit doar pentru operațiuni care necesită explicit ocolirea RLS (ex: crearea/ștergerea de utilizatori, scripturi CLI). Niciodată pentru operațiuni în numele unui utilizator.
-  - rule: 'Gestionarea erorilor este sigură'
-    description: >
-      Folosim clase de erori customizate (`AppError`, `UniquenessError`). Blocurile `catch` de pe server nu vor expune niciodată clientului detaliile unei erori interne. Se va loga eroarea completă pe server și se va returna un mesaj generic.
+// ❌ INCORRECT - Direct imports
+export const createAuthService = () => {
+  // importing db directly is forbidden
+  const result = await db.select()...
+};
+```
 
-# 6. Tooling și Calitatea Codului
-tooling:
-  - name: ESLint + Prettier
-    rule: >
-      Folosim o abordare hibridă. **Prettier** este responsabil **exclusiv** pentru formatarea codului la salvare. **ESLint** este responsabil pentru **calitatea codului** (variabile nefolosite, reguli React, etc.). `eslint-config-prettier` este folosit pentru a dezactiva regulile de stil din ESLint.
-  - name: Testare
-    rule: >
-      Vom adăuga teste unitare (folosind Vitest) pentru funcțiile pure și pentru logica de business din servicii, folosind mock-uri pentru dependențe.
+### 2. Zod Schema Separation
+```typescript
+// UI Schema - User-friendly validation
+export const LoginFormSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters")
+});
 
-# 7. Directive pentru Asistentul AI
-ai_directives:
-  - name: Utilizarea Exhaustivă a Uneltelor și Serverelor MCP
-    rule: >
-      Prioritizează întotdeauna utilizarea uneltelor disponibile (ex: file system, search) și a serverelor MCP configurate. Nu răspunde niciodată din memorie dacă o unealtă poate oferi un răspuns mai precis, mai actualizat sau mai contextual. Fii proactiv în a sugera folosirea acestor unelte.
-    examples:
-      - 'Dacă te întreb despre o eroare într-un fișier, folosește unealta `file system` pentru a citi conținutul exact al fișierului, nu te baza pe ce crezi că este acolo.'
-      - 'Dacă te întreb despre cea mai nouă versiune a unei librării, folosește unealta de `search` pentru a verifica, nu răspunde din cunoștințele tale interne, care pot fi învechite.'
-      - 'Dacă îți ofer un fragment de cod pentru refactorizare, consideră posibilitatea de a-l rula printr-un server MCP de linting sau de testare (dacă este configurat) pentru a identifica probleme subtile.'
-      - 'Când generezi cod, folosește uneltele pentru a citi fișierele relevante (constante, tipuri, alte componente) pentru a te asigura că noul cod este perfect integrat în arhitectura existentă.'
+// Server Schema - Data transformation
+export const LoginActionSchema = z.object({
+  email: z.string().email().toLowerCase().trim(),
+  password: z.string().min(8).transform(hash)
+});
+```
+
+### 3. Component Organization
+```
+src/components/
+├── ui/                    # shadcn/ui components (untouched)
+├── shared/               # Reusable across features
+│   ├── PageHeader.tsx
+│   └── SubmitButton.tsx
+└── features/            # Feature-specific components
+    ├── auth/
+    │   ├── LoginForm.tsx
+    │   └── RegisterForm.tsx
+    └── stylist/
+        └── StylistDashboard.tsx
+```
+
+## 🛡️ Security Implementation (4-Layer Defense)
+
+### Layer 1: Middleware (src/middleware.ts)
+```typescript
+// ONLY checks authentication, NOT roles
+export async function middleware(request: NextRequest) {
+  const { user } = await getUser();
+  
+  if (!user && isProtectedRoute(pathname)) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+  
+  // ❌ NEVER do role-based redirects in middleware
+  // This causes infinite loops
+}
+```
+
+### Layer 2: Layout Server Components
+```typescript
+// Verify roles and redirect appropriately
+export default async function AdminLayout({ children }) {
+  const { role } = await enforceRouteAccess('/admin');
+  
+  if (role !== ROLES.ADMIN) {
+    throw new Error('Unauthorized access');
+  }
+  
+  return <DashboardLayout>{children}</DashboardLayout>;
+}
+```
+
+### Layer 3: Page Server Components
+```typescript
+// Double-check access (Defense in Depth)
+export default async function AdminServicesPage() {
+  const { role } = await enforceRouteAccess('/admin/services');
+  
+  if (role !== ROLES.ADMIN) {
+    throw new Error('Unauthorized access to services management');
+  }
+  
+  // page logic...
+}
+```
+
+### Layer 4: Server Actions
+```typescript
+// Final validation before critical operations
+export async function createServiceAction(payload: unknown) {
+  await ensureUserIsAdmin(); // Throws if not admin
+  
+  return executeSafeAction(CreateServiceSchema, payload, async (data) => {
+    // business logic
+  });
+}
+```
+
+## 📁 File Structure & Naming Conventions
+
+### Domain Structure
+```
+src/core/domains/[domain]/
+├── [domain].service.ts      # Business logic
+├── [domain].repository.ts   # Data access
+├── [domain].types.ts       # Domain types
+├── [domain].constants.ts   # Domain constants
+└── [domain].schemas.ts     # Validation schemas
+```
+
+### Constants Management
+```typescript
+// src/lib/constants.ts - Global constants
+export const APP_ROUTES = {
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register'
+  },
+  ADMIN: '/admin',
+  STYLIST: '/stylist'
+} as const;
+
+// src/core/domains/auth/auth.constants.ts - Domain-specific
+export const AUTH_CONSTANTS = {
+  SESSION_DURATION: 3600,
+  MAX_LOGIN_ATTEMPTS: 3,
+  MESSAGES: {
+    INVALID_CREDENTIALS: 'Invalid email or password',
+    ACCOUNT_LOCKED: 'Account temporarily locked'
+  }
+} as const;
+```
+
+## 🔍 Code Quality & Standards
+
+### TypeScript Best Practices
+```typescript
+// ✅ Use strict types
+interface User {
+  id: string;
+  email: string;
+  role: 'ADMIN' | 'STYLIST' | 'CLIENT';
+}
+
+// ✅ Prefer type guards
+function isAdmin(user: User): user is User & { role: 'ADMIN' } {
+  return user.role === 'ADMIN';
+}
+
+// ❌ Avoid any
+function processData(data: any) { // forbidden
+  return data.something;
+}
+```
+
+### Error Handling
+```typescript
+// ✅ Custom error classes
+export class UniquenessError extends Error {
+  constructor(field: string) {
+    super(`${field} already exists`);
+    this.name = 'UniquenessError';
+  }
+}
+
+// ✅ Safe error responses
+try {
+  await dangerousOperation();
+} catch (error) {
+  logger.error('Operation failed:', error);
+  return { error: 'Something went wrong' }; // Generic message
+}
+```
+
+## 🎨 UI/UX Guidelines
+
+### Component Patterns
+```typescript
+// ✅ Server Component (data fetching)
+export default async function UsersPage() {
+  const users = await getUsers();
+  return <UsersList users={users} />;
+}
+
+// ✅ Client Component (interactivity)
+'use client';
+export function UsersList({ users }: { users: User[] }) {
+  const [filter, setFilter] = useState('');
+  // interactive logic
+}
+```
+
+### Styling Rules
+```typescript
+// ✅ Tailwind utilities
+<div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
+
+// ❌ Custom CSS (only in globals.css if absolutely necessary)
+<div className="custom-card">
+```
+
+## 🚀 Performance & Optimization
+
+### Data Fetching
+```typescript
+// ✅ Server Components for data fetching
+export default async function DashboardPage() {
+  const [users, stats] = await Promise.all([
+    getUsers(),
+    getStats()
+  ]);
+  
+  return <Dashboard users={users} stats={stats} />;
+}
+
+// ✅ Use Suspense for loading states
+<Suspense fallback={<LoadingSpinner />}>
+  <DataComponent />
+</Suspense>
+```
+
+### Database Queries
+```typescript
+// ✅ Efficient Drizzle queries
+const users = await db
+  .select({
+    id: usersTable.id,
+    email: usersTable.email,
+    role: usersTable.role
+  })
+  .from(usersTable)
+  .where(eq(usersTable.active, true))
+  .limit(10);
+```
+
+## 🧪 Testing Strategy
+
+### Unit Tests (Vitest)
+```typescript
+// ✅ Test business logic
+describe('AuthService', () => {
+  it('should hash password correctly', async () => {
+    const mockRepository = createMockAuthRepository();
+    const service = createAuthService(mockRepository, mockSupabase);
+    
+    const result = await service.hashPassword('password123');
+    expect(result).toBeDefined();
+  });
+});
+```
+
+## 📋 AI Assistant Instructions
+
+### Code Generation Rules
+1. **Always read existing files first** - Use file system tools to understand current implementation
+2. **Check for constants** - Never hardcode strings that should be in constants files
+3. **Follow the architecture** - Respect the layered architecture boundaries
+4. **Security first** - Implement all 4 layers of security
+5. **Type safety** - Use strict TypeScript, no `any`
+6. **Error handling** - Implement proper error boundaries and logging
+
+### When Adding New Features
+1. Create domain structure in `src/core/domains/[domain]/`
+2. Add constants to domain constants file
+3. Create Zod schemas (separate for UI and server)
+4. Implement repository with dependency injection
+5. Create service with business logic
+6. Add Server Actions in features layer
+7. Create UI components following the organization pattern
+8. Add security checks at all layers
+
+### Response Format
+- Always explain architectural decisions
+- Provide complete, working code examples
+- Include security considerations
+- Mention any dependencies or setup required
+- Point out potential gotchas or edge cases
+
+## 🔧 Quick Reference
+
+### Essential Utilities
+```typescript
+// Route protection
+await enforceRouteAccess(pathname)     // For Server Components
+await ensureUserIsAdmin()              // For Server Actions
+await ensureUserIsStylist()            // For Server Actions
+
+// Schema validation
+const FormSchema = z.object({...})     // UI validation
+const ActionSchema = z.object({...})   // Server validation
+
+// Error handling
+throw new UniquenessError('email')
+throw new AppError('Custom error')
+```
+
+### Common Patterns
+```typescript
+// Factory pattern for services
+export const createUserService = (repo, supabase) => ({...})
+
+// Server Action pattern
+export async function createUserAction(payload: unknown) {
+  await ensureUserIsAdmin();
+  return executeSafeAction(CreateUserSchema, payload, async (data) => {
+    // business logic
+  });
+}
+```
+
+---
+
+Remember: **Security, maintainability, and type safety are non-negotiable**. Every line of code should reflect these principles.
