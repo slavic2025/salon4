@@ -1,68 +1,31 @@
-// src/core/domains/auth/auth.service.ts - Varianta finală, "best practice"
+// src/core/domains/auth/auth.service.ts
 import { SupabaseClient, type User } from '@supabase/supabase-js'
 
-import { APP_ROUTES, type UserRole } from '@/lib/constants'
+import { type UserRole } from '@/lib/constants'
 import { createLogger } from '@/lib/logger'
 
-import { AUTH_MESSAGES, ROLE_DASHBOARD_MAP } from './auth.constants'
+import { AUTH_MESSAGES } from './auth.constants'
 import { AuthRepository } from './auth.repository'
 import { SignInFormValues } from './auth.types'
-
-// Definim stările posibile pe care le poate returna logica de autorizare
-type AuthDecision = { status: 'PROCEED' } | { status: 'REDIRECT'; path: string } | { status: 'ERROR'; code: string }
 
 export function createAuthService(repository: AuthRepository, supabase: SupabaseClient) {
   const logger = createLogger('AuthService')
 
   return {
     /**
-     * Punctul central de decizie pentru autorizare.
-     * Returnează un obiect de decizie, nu un NextResponse.
+     * Obține rolul utilizatorului autentificat din baza de date.
+     * Returnează null dacă utilizatorul nu este autentificat sau nu are rol asignat.
      */
-    getAuthorizationDecision(pathname: string, user: User | null, role: UserRole): AuthDecision {
-      const isProtectedRoute =
-        pathname.startsWith(APP_ROUTES.ADMIN_DASHBOARD) || pathname.startsWith(APP_ROUTES.STYLIST_DASHBOARD)
-
-      // Cazul 1: Utilizator logat, dar fără rol.
-      if (user && !role) {
-        logger.warn(AUTH_MESSAGES.LOG.USER_NO_ROLE_WARNING, { userId: user.id })
-        return { status: 'ERROR', code: AUTH_MESSAGES.SERVER.NO_ROLE_ASSIGNED.code }
-      }
-
-      // Cazul 2: Ruta nu este protejată.
-      if (!isProtectedRoute) {
-        return { status: 'PROCEED' }
-      }
-
-      // De aici, ruta este protejată.
-      // Cazul 3: Utilizator nelogat.
-      if (!user) {
-        return { status: 'REDIRECT', path: APP_ROUTES.LOGIN }
-      }
-
-      // Cazul 4: Utilizator logat cu rol, dar pe calea greșită.
-      const expectedDashboard = ROLE_DASHBOARD_MAP[role!] // Folosim ! deoarece am validat `role` mai sus
-      if (expectedDashboard && !pathname.startsWith(expectedDashboard)) {
-        return { status: 'REDIRECT', path: expectedDashboard }
-      }
-
-      // Cazul 5: "Happy path" - utilizatorul este la locul potrivit.
-      return { status: 'PROCEED' }
-    },
-
     async ensureUserRole(user: User | null): Promise<UserRole> {
-      // Dacă nu există un utilizator autentificat, nu există nici rol.
       if (!user) {
         return null
       }
 
       logger.info(AUTH_MESSAGES.LOG.FETCHING_USER_ROLE, { userId: user.id })
 
-      // Delegăm căutarea către repository, care știe cum să interogheze tabelele.
       const role = await repository.getUserRole(user.id)
 
       if (!role) {
-        // Logăm un avertisment dacă un utilizator autentificat nu are un rol în tabelele noastre.
         logger.warn(AUTH_MESSAGES.LOG.USER_NO_ROLE_IN_DB_WARNING, { userId: user.id })
         return null
       }
@@ -75,7 +38,6 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
      * Autentifică un utilizator folosind email și parolă.
      */
     async signInWithPassword(credentials: SignInFormValues) {
-      // Folosește clientul injectat, nu mai crează unul nou.
       const { error } = await supabase.auth.signInWithPassword(credentials)
 
       if (error) {
@@ -88,10 +50,9 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
     },
 
     /**
-     * Setează parola utilizatorului curent.
+     * Setează parola utilizatorului curent autentificat.
      */
     async setPassword(password: string) {
-      // Folosește clientul injectat.
       const { error } = await supabase.auth.updateUser({ password })
 
       if (error) {
@@ -105,11 +66,17 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
 
     /**
      * Setează parola unui utilizator invitat folosind tokenul de invitație.
-     * NOTĂ: Din motive de securitate, acest flow trebuie finalizat pe client, nu pe server.
+     *
+     * NOTĂ IMPORTANTĂ: Din motive de securitate, acest flow trebuie finalizat pe client, nu pe server.
      * Pe server nu avem acces la access_token/refresh_token din URL.
-     * Recomandare: logica de setare a parolei după invitație să fie pe client, folosind supabase.auth.setSession + updateUser.
+     *
+     * Recomandare: Implementați această funcționalitate pe client folosind:
+     * - supabase.auth.setSession() cu token-urile din URL
+     * - supabase.auth.updateUser({ password }) după setarea sesiunii
      */
     async setPasswordWithToken(password: string, token_hash: string) {
+      logger.warn(AUTH_MESSAGES.LOG.SET_PASSWORD_WITH_TOKEN_ATTEMPTED, { token_hash })
+
       return {
         success: false,
         message: AUTH_MESSAGES.SERVER.SET_PASSWORD_WITH_TOKEN_ERROR.message,
@@ -120,12 +87,13 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
      * Deloghează utilizatorul curent.
      */
     async signOut() {
-      // Folosește clientul injectat.
       const { error } = await supabase.auth.signOut()
+
       if (error) {
         logger.error(AUTH_MESSAGES.LOG.SIGN_OUT_FAILED, { error })
         throw new Error(AUTH_MESSAGES.SERVER.SIGN_OUT_ERROR.message)
       }
+
       logger.info(AUTH_MESSAGES.LOG.SIGN_OUT_SUCCESS)
     },
   }

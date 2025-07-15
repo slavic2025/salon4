@@ -50,6 +50,8 @@ export const AUTH_MESSAGES = {
     SIGN_IN_SUCCESS: 'User signed in successfully.',
     SET_PASSWORD_FAILED: 'Failed to set password.',
     SET_PASSWORD_SUCCESS: 'Password set successfully for current user.',
+    SET_PASSWORD_WITH_TOKEN_ATTEMPTED:
+      'Attempt to set password with token on server - this operation should be performed on client.',
     SIGN_OUT_FAILED: 'Failed to sign out.',
     SIGN_OUT_SUCCESS: 'User signed out successfully.',
   },
