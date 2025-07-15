@@ -14,20 +14,14 @@ import {
   type DeleteStylistServiceLinkPayload,
 } from '@/core/domains/stylist-services/stylist-service.types'
 import { db } from '@/db'
-import { APP_ROUTES, ROLES } from '@/lib/constants'
+import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
+import { ensureUserIsAdmin } from '@/lib/route-protection'
 import { executeSafeAction } from '@/lib/safe-action'
-import { createClient } from '@/lib/supabase/server'
 
 async function _ensureUserIsAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user?.app_metadata.role !== ROLES.ADMIN) {
-    throw new Error('Not authorized')
-  }
+  // Folosim utilitarul centralizat pentru verificarea rolului
+  await ensureUserIsAdmin()
 }
 
 function createAdminStylistServiceLinkAction<T extends z.ZodType<any, any, any>>(

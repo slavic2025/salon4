@@ -6,6 +6,8 @@ import { createServiceService } from '@/core/domains/services/service.service'
 import { createStylistServiceLinkRepository } from '@/core/domains/stylist-services/stylist-service.repository'
 import { createStylistServiceLinkService } from '@/core/domains/stylist-services/stylist-service.service'
 import { db } from '@/db'
+import { ROLES } from '@/lib/constants'
+import { enforceRouteAccess } from '@/lib/route-protection'
 
 type PageProps = {
   params: Promise<{ id: string }>
@@ -13,6 +15,14 @@ type PageProps = {
 
 export default async function StylistServicesPage({ params }: PageProps) {
   const stylistId = (await params).id
+
+  // Verificare suplimentară la nivel de pagină (Defence in Depth)
+  const { role } = await enforceRouteAccess('/admin/stylists')
+
+  // Double check - ar trebui să fie admin
+  if (role !== ROLES.ADMIN) {
+    throw new Error('Acces neautorizat la gestionarea serviciilor stiliștilor')
+  }
 
   // Asamblăm dependențele: db -> repository -> service
   const serviceRepository = createServiceRepository(db)

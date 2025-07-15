@@ -15,11 +15,11 @@ import {
   type UpdateStylistPayload,
 } from '@/core/domains/stylists/stylist.types'
 import { db } from '@/db'
-import { APP_ROUTES, ROLES } from '@/lib/constants'
+import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
+import { ensureUserIsAdmin } from '@/lib/route-protection'
 import { executeSafeAction } from '@/lib/safe-action'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 
 /**
  * Instanțiem serviciul o singură dată la nivel de modul.
@@ -29,18 +29,12 @@ const stylistService = createStylistService(createStylistRepository(db), createA
 
 /**
  * Helper intern pentru a verifica dacă utilizatorul este admin.
- * Aruncă o eroare dacă nu este autorizat. Numele este mai explicit.
+ * Folosește noile utilitare centralizate pentru verificarea rolurilor.
  * @private
  */
 async function _ensureUserIsAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user?.app_metadata.role !== ROLES.ADMIN) {
-    throw new Error('Not authorized')
-  }
+  // Folosim utilitarul centralizat pentru verificarea rolului
+  await ensureUserIsAdmin()
 }
 
 /**
