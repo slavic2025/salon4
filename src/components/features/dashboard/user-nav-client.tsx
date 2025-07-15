@@ -33,9 +33,15 @@ export function UserNavClient({ user }: UserNavClientProps) {
   }
 
   const handleSignOut = () => {
-    startTransition(() => {
+    startTransition(async () => {
       toast.info('Deconectare în curs...')
-      void signOutAction()
+      try {
+        await signOutAction()
+        toast.success('Deconectare reușită!')
+      } catch (error) {
+        toast.error('Deconectarea a eșuat. Te rog încearcă din nou.')
+        console.error('Eroare la deconectare:', error)
+      }
     })
   }
 

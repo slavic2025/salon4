@@ -14,7 +14,6 @@ export function DeleteStylistMenuItem({ stylistId, stylistName }: DeleteStylistM
   return (
     <DeleteMenuItem
       id={stylistId}
-      name={stylistName}
       onDelete={(id) => deleteStylistAction({ id })}
       messages={{
         confirmTitle: 'Ești absolut sigur?',

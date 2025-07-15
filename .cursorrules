@@ -72,7 +72,7 @@ patterns:
 
   - name: Fără "Magic Strings"
     rule: >
-      Toate string-urile care se repetă sau au o semnificație specială (rute, chei de cache, mesaje UI, nume de roluri) trebuie centralizate în fișiere de constante (ex: `src/lib/constants.ts`, `src/core/domains/auth/auth.constants.ts`).
+      Toate string-urile care se repetă sau au o semnificație specială (rute, chei de cache, mesaje UI, nume de roluri, mesaje de logging, mesaje de eroare) trebuie centralizate în fișiere de constante conform domeniului din care fac parte (ex: `src/lib/constants.ts` pentru constante globale, `src/core/domains/auth/auth.constants.ts` pentru domeniul auth, etc.). Fiecare domeniu TREBUIE să-și aibă propriul fișier de constante care să conțină toate string-urile folosite în acel domeniu.
 
 # 5. Reguli de Securitate (Security by Design)
 security:

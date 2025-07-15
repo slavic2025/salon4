@@ -8,7 +8,7 @@ import { createStylistServiceLinkService } from '@/core/domains/stylist-services
 import { db } from '@/db'
 
 type PageProps = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function StylistServicesPage({ params }: PageProps) {

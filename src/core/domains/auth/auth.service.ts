@@ -25,7 +25,7 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
 
       // Cazul 1: Utilizator logat, dar fără rol.
       if (user && !role) {
-        logger.warn('User is authenticated but has no role.', { userId: user.id })
+        logger.warn(AUTH_MESSAGES.LOG.USER_NO_ROLE_WARNING, { userId: user.id })
         return { status: 'ERROR', code: AUTH_MESSAGES.SERVER.NO_ROLE_ASSIGNED.code }
       }
 
@@ -56,18 +56,18 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
         return null
       }
 
-      logger.info('Fetching user role directly from the database...', { userId: user.id })
+      logger.info(AUTH_MESSAGES.LOG.FETCHING_USER_ROLE, { userId: user.id })
 
       // Delegăm căutarea către repository, care știe cum să interogheze tabelele.
       const role = await repository.getUserRole(user.id)
 
       if (!role) {
         // Logăm un avertisment dacă un utilizator autentificat nu are un rol în tabelele noastre.
-        logger.warn('Authenticated user has no role assigned in the database.', { userId: user.id })
+        logger.warn(AUTH_MESSAGES.LOG.USER_NO_ROLE_IN_DB_WARNING, { userId: user.id })
         return null
       }
 
-      logger.debug('Role successfully fetched from database.', { userId: user.id, role })
+      logger.debug(AUTH_MESSAGES.LOG.ROLE_FETCHED_SUCCESS, { userId: user.id, role })
       return role
     },
 
@@ -79,11 +79,11 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
       const { error } = await supabase.auth.signInWithPassword(credentials)
 
       if (error) {
-        logger.warn('Failed sign-in attempt.', { email: credentials.email, error: error.message })
+        logger.warn(AUTH_MESSAGES.LOG.SIGN_IN_FAILED, { email: credentials.email, error: error.message })
         return { success: false, message: AUTH_MESSAGES.SERVER.INVALID_CREDENTIALS.message }
       }
 
-      logger.info('User signed in successfully.', { email: credentials.email })
+      logger.info(AUTH_MESSAGES.LOG.SIGN_IN_SUCCESS, { email: credentials.email })
       return { success: true, message: AUTH_MESSAGES.SERVER.LOGIN_SUCCESS.message }
     },
 
@@ -95,12 +95,25 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
       const { error } = await supabase.auth.updateUser({ password })
 
       if (error) {
-        logger.error('Failed to set password.', { error })
+        logger.error(AUTH_MESSAGES.LOG.SET_PASSWORD_FAILED, { error })
         return { success: false, message: error.message }
       }
 
-      logger.info('Password set successfully for current user.')
+      logger.info(AUTH_MESSAGES.LOG.SET_PASSWORD_SUCCESS)
       return { success: true, message: AUTH_MESSAGES.SERVER.PASSWORD_SET_SUCCESS.message }
+    },
+
+    /**
+     * Setează parola unui utilizator invitat folosind tokenul de invitație.
+     * NOTĂ: Din motive de securitate, acest flow trebuie finalizat pe client, nu pe server.
+     * Pe server nu avem acces la access_token/refresh_token din URL.
+     * Recomandare: logica de setare a parolei după invitație să fie pe client, folosind supabase.auth.setSession + updateUser.
+     */
+    async setPasswordWithToken(password: string, token_hash: string) {
+      return {
+        success: false,
+        message: AUTH_MESSAGES.SERVER.SET_PASSWORD_WITH_TOKEN_ERROR.message,
+      }
     },
 
     /**
@@ -110,8 +123,10 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
       // Folosește clientul injectat.
       const { error } = await supabase.auth.signOut()
       if (error) {
-        logger.error('Failed to sign out.', { error })
+        logger.error(AUTH_MESSAGES.LOG.SIGN_OUT_FAILED, { error })
+        throw new Error(AUTH_MESSAGES.SERVER.SIGN_OUT_ERROR.message)
       }
+      logger.info(AUTH_MESSAGES.LOG.SIGN_OUT_SUCCESS)
     },
   }
 }

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "typecheck": "tsc --noEmit",
     "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
     "db:push": "DEBUG=* dotenv -e .env.local -- drizzle-kit push",
     "promote:admin": "dotenv -e .env.local -- tsx src/lib/cli/promote-to-admin.ts",
@@ -51,6 +52,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@next/eslint-plugin-next": "^15.3.5",
+    "@playwright/test": "^1.54.1",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/lodash": "^4.17.20",
     "@types/node": "^20.19.7",

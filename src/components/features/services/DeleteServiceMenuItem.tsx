@@ -14,7 +14,6 @@ export function DeleteServiceMenuItem({ serviceId, serviceName }: DeleteServiceM
   return (
     <DeleteMenuItem
       id={serviceId}
-      name={serviceName}
       onDelete={(id) => deleteServiceAction({ id })}
       messages={{
         confirmTitle: 'Ești absolut sigur?',

@@ -56,3 +56,13 @@ export const setPasswordActionSchema = baseSetPasswordSchema.pick({
 
 // Tipul pentru payload-ul acțiunii de setare a parolei
 export type SetPasswordPayload = z.infer<typeof setPasswordActionSchema>
+
+export const setPasswordWithTokenActionSchema = z.object({
+  password: z.string().min(8),
+  token_hash: z.string().min(10),
+})
+
+export type SetPasswordWithTokenPayload = {
+  password: string
+  token_hash: string
+}

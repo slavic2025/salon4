@@ -2,6 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import { APP_ROUTES } from '@/lib/constants'
 import { DatabaseError, UniquenessError } from '@/lib/errors'
 import { createLogger } from '@/lib/logger'
 
@@ -45,7 +46,9 @@ export function createStylistService(repository: StylistRepository, supabaseAdmi
       const {
         data: { user },
         error: inviteError,
-      } = await supabaseAdmin.auth.admin.inviteUserByEmail(payload.email)
+      } = await supabaseAdmin.auth.admin.inviteUserByEmail(payload.email, {
+        redirectTo: APP_ROUTES.AUTH_CONFIRM, // asigură-te că această constantă este definită ca URL complet (ex: http://localhost:3000/auth/confirm)
+      })
 
       if (inviteError || !user) {
         logger.error('Failed to create auth user.', { error: inviteError })

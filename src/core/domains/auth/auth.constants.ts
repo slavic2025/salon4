@@ -29,6 +29,29 @@ export const AUTH_MESSAGES = {
       code: 'PASSWORD_SET_SUCCESS',
       message: 'Parola a fost setată cu succes!',
     },
+    SIGN_OUT_ERROR: {
+      code: 'SIGN_OUT_ERROR',
+      message: 'Deconectarea a eșuat. Te rog încearcă din nou.',
+    },
+    SET_PASSWORD_WITH_TOKEN_ERROR: {
+      code: 'SET_PASSWORD_WITH_TOKEN_ERROR',
+      message:
+        'Setarea parolei după invitație trebuie finalizată pe client, folosind access_token și refresh_token din URL.',
+    },
+  },
+
+  // Mesajele pentru logging
+  LOG: {
+    USER_NO_ROLE_WARNING: 'User is authenticated but has no role.',
+    FETCHING_USER_ROLE: 'Fetching user role directly from the database...',
+    USER_NO_ROLE_IN_DB_WARNING: 'Authenticated user has no role assigned in the database.',
+    ROLE_FETCHED_SUCCESS: 'Role successfully fetched from database.',
+    SIGN_IN_FAILED: 'Failed sign-in attempt.',
+    SIGN_IN_SUCCESS: 'User signed in successfully.',
+    SET_PASSWORD_FAILED: 'Failed to set password.',
+    SET_PASSWORD_SUCCESS: 'Password set successfully for current user.',
+    SIGN_OUT_FAILED: 'Failed to sign out.',
+    SIGN_OUT_SUCCESS: 'User signed out successfully.',
   },
 } as const
 

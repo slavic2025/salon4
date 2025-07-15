@@ -15,7 +15,6 @@ export function DeleteStylistServiceMenuItem({ stylistId, serviceId, serviceName
   return (
     <DeleteMenuItem
       id={serviceId}
-      name={serviceName}
       onDelete={() => deleteStylistServiceLinkAction({ stylistId, serviceId })}
       messages={{
         confirmTitle: STYLIST_SERVICE_LINK_MESSAGES.UI.DELETE_CONFIRM_TITLE,
