@@ -47,6 +47,11 @@ export const WORK_SCHEDULE_MESSAGES = {
     UNAUTHORIZED_MODIFY: 'Nu aveți permisiunea să modificați programul altor stiliști.',
   },
   UI: {
+    PAGE_TITLE: 'Programul meu de lucru',
+    PAGE_DESCRIPTION: 'Gestionează intervalele tale de lucru pentru fiecare zi a săptămânii.',
+    SCHEDULE_OVERVIEW_TITLE: 'Programul săptămânal',
+    INTERVALS_COUNT: (count: number) => `${count} ${count === 1 ? 'interval configurat' : 'intervale configurate'}`,
+    NO_INTERVALS_SET: 'Niciun interval configurat încă',
     ADD_BUTTON: 'Adaugă Interval',
     EDIT_BUTTON: 'Editează',
     DELETE_BUTTON: 'Șterge',

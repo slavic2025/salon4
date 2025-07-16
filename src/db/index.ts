@@ -23,23 +23,31 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is not set in the environment variables.')
 }
 
+// Configurația optimizată pentru Supabase
+const supabaseConfig = {
+  prepare: false,
+  ssl: 'require',
+  // Timeout-uri pentru Supabase (în secunde)
+  connect_timeout: 30,
+  idle_timeout: 30,
+  max_lifetime: 300, // 5 minute
+  // Connection pooling pentru stabilitate
+  max: 10,
+  // Pentru debugging - poate fi înlăturat după testare
+  onnotice: process.env.NODE_ENV === 'development' ? console.log : undefined,
+} as const
+
 // În producție, folosim variabila globală pentru a partaja aceeași conexiune
 // între diferite invocații de funcții serverless, prevenind epuizarea conexiunilor.
 if (process.env.NODE_ENV === 'production') {
   if (!global.client) {
-    global.client = postgres(connectionString, {
-      prepare: false,
-      ssl: 'require',
-    })
+    global.client = postgres(connectionString, supabaseConfig)
   }
   client = global.client
 } else {
   // În dezvoltare, creăm o nouă conexiune la fiecare reîncărcare a codului
   // pentru a ne asigura că vedem mereu cele mai noi modificări.
-  client = postgres(connectionString, {
-    prepare: false,
-    ssl: 'require', // Este bine să folosim SSL și local pentru consistență
-  })
+  client = postgres(connectionString, supabaseConfig)
 }
 
 // Injectăm schema pentru a avea type-safety și autocomplete.

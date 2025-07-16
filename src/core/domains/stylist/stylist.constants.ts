@@ -13,6 +13,11 @@ export const STYLIST_NAV_ITEMS: NavItem[] = [
     icon: 'calendar',
   },
   {
+    title: 'Programul meu de lucru',
+    href: '/stylist/work-schedule',
+    icon: 'clock',
+  },
+  {
     title: 'Serviciile mele',
     href: '/stylist/services',
     icon: 'scissors',
@@ -40,5 +45,9 @@ export const STYLIST_MESSAGES = {
   APPOINTMENTS: {
     TITLE: 'Programările mele',
     DESCRIPTION: 'Vezi și gestionează programările tale.',
+  },
+  WORK_SCHEDULE: {
+    TITLE: 'Programul meu de lucru',
+    DESCRIPTION: 'Configurează intervalele tale de lucru pentru fiecare zi a săptămânii.',
   },
 } as const

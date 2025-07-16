@@ -53,10 +53,21 @@ const validateTimeOrder = (data: { startTime: string; endTime: string }) => {
 }
 
 // --- Schema pentru Formularul din UI (Adăugare / Editare) ---
-export const workScheduleFormSchema = baseWorkScheduleSchema.refine(validateTimeOrder, {
-  message: WORK_SCHEDULE_MESSAGES.VALIDATION.END_TIME_AFTER_START,
-  path: ['endTime'],
-})
+// Excludem stylistId din formular pentru că se va adăuga automat
+export const workScheduleFormSchema = z
+  .object({
+    dayOfWeek: z.coerce
+      .number()
+      .int()
+      .min(0, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID)
+      .max(6, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID),
+    startTime: timeSchema,
+    endTime: timeSchema,
+  })
+  .refine(validateTimeOrder, {
+    message: WORK_SCHEDULE_MESSAGES.VALIDATION.END_TIME_AFTER_START,
+    path: ['endTime'],
+  })
 
 export type WorkScheduleFormValues = z.infer<typeof workScheduleFormSchema>
 

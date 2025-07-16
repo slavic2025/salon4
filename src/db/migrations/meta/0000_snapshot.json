@@ -1,5 +1,5 @@
 {
-  "id": "97ed36e8-1089-4bd0-98a9-895a4ed95d78",
+  "id": "aaaffd52-0a9b-485c-91b3-2ca1f5257f59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -281,25 +281,72 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "auth.users": {
-      "name": "users",
-      "schema": "auth",
+    "public.work_schedules": {
+      "name": "work_schedules",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "stylist_id": {
+          "name": "stylist_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day_of_week": {
+          "name": "day_of_week",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_time": {
+          "name": "start_time",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_time": {
+          "name": "end_time",
+          "type": "time",
+          "primaryKey": false,
           "notNull": true
         },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "work_schedules_stylist_id_stylists_id_fk": {
+          "name": "work_schedules_stylist_id_stylists_id_fk",
+          "tableFrom": "work_schedules",
+          "tableTo": "stylists",
+          "columnsFrom": [
+            "stylist_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -320,9 +367,7 @@
       ]
     }
   },
-  "schemas": {
-    "auth": "auth"
-  },
+  "schemas": {},
   "sequences": {},
   "roles": {},
   "policies": {},
