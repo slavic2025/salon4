@@ -1,0 +1,245 @@
+// src/core/domains/unavailability/unavailability.service.ts
+
+import {
+  UNAVAILABILITY_ERROR_MESSAGES,
+  UNAVAILABILITY_LIMITS,
+  UNAVAILABILITY_VALIDATION_MESSAGES,
+} from './unavailability.constants'
+import {
+  type CreateUnavailabilityData,
+  type Unavailability,
+  type UnavailabilityFilters,
+  type UnavailabilityRepository,
+  type UnavailabilityService,
+  type UnavailabilityWithStylist,
+  type UpdateUnavailabilityData,
+} from './unavailability.types'
+
+/**
+ * Funcție helper pentru conversia timpului în minute
+ */
+function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number)
+  return hours * 60 + minutes
+}
+
+/**
+ * Business logic pentru gestionarea indisponibilităților
+ * Folosește Dependency Injection pattern
+ */
+export const createUnavailabilityService = (repository: UnavailabilityRepository): UnavailabilityService => {
+  return {
+    /**
+     * Găsește o indisponibilitate după ID
+     */
+    async getUnavailabilityById(id: string): Promise<Unavailability | null> {
+      if (!id?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
+      }
+
+      return await repository.findById(id)
+    },
+
+    /**
+     * Găsește indisponibilități după filtru
+     */
+    async getUnavailabilitiesByFilters(filters: UnavailabilityFilters): Promise<Unavailability[]> {
+      // Validare basic pentru filtru
+      if (filters.dateFrom && filters.dateTo && filters.dateFrom > filters.dateTo) {
+        throw new Error('Data de început nu poate fi după data de sfârșit')
+      }
+
+      return await repository.findByFilters(filters)
+    },
+
+    /**
+     * Găsește indisponibilități pentru un stylist
+     */
+    async getUnavailabilitiesByStylist(
+      stylistId: string,
+      dateFrom?: string,
+      dateTo?: string,
+    ): Promise<Unavailability[]> {
+      if (!stylistId?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
+      }
+
+      // Validare interval de date
+      if (dateFrom && dateTo && dateFrom > dateTo) {
+        throw new Error('Data de început nu poate fi după data de sfârșit')
+      }
+
+      return await repository.findByStylistId(stylistId, dateFrom, dateTo)
+    },
+
+    /**
+     * Găsește indisponibilități cu detalii stylist
+     */
+    async getUnavailabilitiesWithStylistDetails(filters: UnavailabilityFilters): Promise<UnavailabilityWithStylist[]> {
+      return await repository.findWithStylistDetails(filters)
+    },
+
+    /**
+     * Creează o nouă indisponibilitate
+     */
+    async createUnavailability(data: CreateUnavailabilityData): Promise<Unavailability> {
+      // Validare date de intrare
+      await this.validateUnavailabilityData(data)
+
+      // Verificare pentru conflicte
+      await this.checkForConflicts(data.stylistId, data.date, data.startTime || undefined, data.endTime || undefined)
+
+      // Creare indisponibilitate
+      try {
+        return await repository.create(data)
+      } catch (error) {
+        console.error('Eroare la crearea indisponibilității:', error)
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED)
+      }
+    },
+
+    /**
+     * Actualizează o indisponibilitate existentă
+     */
+    async updateUnavailability(id: string, data: UpdateUnavailabilityData): Promise<Unavailability | null> {
+      if (!id?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
+      }
+
+      // Verificare existență
+      const existing = await repository.findById(id)
+      if (!existing) {
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.NOT_FOUND)
+      }
+
+      // Validare date de intrare (doar câmpurile prezente)
+      if (Object.keys(data).length > 0) {
+        await this.validateUnavailabilityData({
+          stylistId: data.stylistId || existing.stylistId,
+          date: data.date || existing.date,
+          startTime: data.startTime ?? existing.startTime,
+          endTime: data.endTime ?? existing.endTime,
+          cause: data.cause || existing.cause,
+          allDay: data.allDay ?? existing.allDay,
+          description: data.description ?? existing.description,
+        })
+      }
+
+      // Verificare pentru conflicte (dacă se schimbă date relevante)
+      if (data.date || data.startTime !== undefined || data.endTime !== undefined || data.allDay !== undefined) {
+        await this.checkForConflicts(
+          data.stylistId || existing.stylistId,
+          data.date || existing.date,
+          (data.startTime ?? existing.startTime) || undefined,
+          (data.endTime ?? existing.endTime) || undefined,
+          id, // excludem ID-ul curent
+        )
+      }
+
+      // Actualizare
+      try {
+        return await repository.update(id, data)
+      } catch (error) {
+        console.error('Eroare la actualizarea indisponibilității:', error)
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.UPDATE_FAILED)
+      }
+    },
+
+    /**
+     * Șterge o indisponibilitate
+     */
+    async deleteUnavailability(id: string): Promise<boolean> {
+      if (!id?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
+      }
+
+      // Verificare existență
+      const existing = await repository.findById(id)
+      if (!existing) {
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.NOT_FOUND)
+      }
+
+      try {
+        return await repository.delete(id)
+      } catch (error) {
+        console.error('Eroare la ștergerea indisponibilității:', error)
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.DELETE_FAILED)
+      }
+    },
+
+    /**
+     * Validează datele unei indisponibilități
+     */
+    async validateUnavailabilityData(data: CreateUnavailabilityData | UpdateUnavailabilityData): Promise<void> {
+      // Validare stylist ID
+      if (!data.stylistId?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
+      }
+
+      // Validare dată
+      if (!data.date?.trim()) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.DATE_REQUIRED)
+      }
+
+      // Verificare dacă data este în trecut (doar pentru create)
+      const today = new Date().toISOString().split('T')[0]
+      if (data.date < today) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.DATE_IN_PAST)
+      }
+
+      // Validare timp dacă nu este toată ziua
+      if (!data.allDay) {
+        if (!data.startTime?.trim()) {
+          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.START_TIME_REQUIRED)
+        }
+
+        if (!data.endTime?.trim()) {
+          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.END_TIME_REQUIRED)
+        }
+
+        // Validare că end_time > start_time
+        if (data.startTime && data.endTime && data.endTime <= data.startTime) {
+          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.END_TIME_AFTER_START)
+        }
+
+        // Validare durata minimă (15 minute)
+        if (data.startTime && data.endTime) {
+          const startMinutes = timeToMinutes(data.startTime)
+          const endMinutes = timeToMinutes(data.endTime)
+          const durationMinutes = endMinutes - startMinutes
+
+          if (durationMinutes < UNAVAILABILITY_LIMITS.MIN_DURATION_MINUTES) {
+            throw new Error(`Durata minimă este ${UNAVAILABILITY_LIMITS.MIN_DURATION_MINUTES} minute`)
+          }
+        }
+      }
+
+      // Validare cauza
+      if (!data.cause) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.CAUSE_REQUIRED)
+      }
+
+      // Validare lungime descriere
+      if (data.description && data.description.length > UNAVAILABILITY_LIMITS.MAX_DESCRIPTION_LENGTH) {
+        throw new Error(`Descrierea nu poate depăși ${UNAVAILABILITY_LIMITS.MAX_DESCRIPTION_LENGTH} caractere`)
+      }
+    },
+
+    /**
+     * Verifică conflicte cu alte indisponibilități
+     */
+    async checkForConflicts(
+      stylistId: string,
+      date: string,
+      startTime?: string,
+      endTime?: string,
+      excludeId?: string,
+    ): Promise<void> {
+      const conflicts = await repository.checkConflicts(stylistId, date, startTime, endTime, excludeId)
+
+      if (conflicts.length > 0) {
+        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.TIME_CONFLICT)
+      }
+    },
+  }
+}
