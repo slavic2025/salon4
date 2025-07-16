@@ -198,6 +198,31 @@ export const AUTH_CONSTANTS = {
 } as const;
 ```
 
+### User-Facing Strings Rule
+**CRITICAL: Toate stringurile vizibile utilizatorului TREBUIE să fie în fișiere de constante.**
+
+```typescript
+// ✅ CORRECT - User messages in constants
+export const VALIDATION_MESSAGES = {
+  EMAIL_REQUIRED: 'Adresa de email este obligatorie',
+  PASSWORD_TOO_SHORT: 'Parola trebuie să aibă cel puțin 8 caractere'
+} as const;
+
+// ✅ CORRECT - Log messages can be inline
+logger.info('User authentication attempt', { userId });
+logger.error('Database connection failed', { error });
+
+// ❌ INCORRECT - User-facing string hardcoded
+return { error: 'Eroare la validare' }; // Should be in constants
+
+// ✅ CORRECT - Use constants instead
+return { error: VALIDATION_MESSAGES.VALIDATION_ERROR };
+```
+
+**Scope:**
+- **În constante:** Mesaje de eroare pentru utilizatori, etichete UI, notificări, validări
+- **Inline permis:** Log messages, debug info, developer errors, internal comments
+
 ## 🔍 Code Quality & Standards
 
 ### TypeScript Best Practices
