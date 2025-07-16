@@ -14,6 +14,12 @@ export const STYLIST_SERVICE_LINK_MESSAGES = {
     UPDATE_FAILED: 'Nu s-a putut actualiza legătura stilist-serviciu.',
     VALIDATION: 'Eroare de validare la ștergere.',
     GENERIC: 'A apărut o eroare la ștergere.',
+    UNAUTHORIZED_ACCESS: 'Acces neautorizat la gestionarea serviciilor stilistului',
+    UNAUTHORIZED_ADD: 'Nu poți adăuga servicii pentru alți stiliști',
+    UNAUTHORIZED_DELETE: 'Nu poți șterge servicii de la alți stiliști',
+    UNAUTHORIZED_UPDATE: 'Nu poți actualiza servicii de la alți stiliști',
+    SERVICES_LOAD_FAILED: 'Nu s-au putut încărca serviciile',
+    SERVICES_LOAD_ERROR: 'Eroare la încărcarea serviciilor:',
   },
   UI: {
     ADD_BUTTON: 'Adaugă Serviciu',
@@ -37,5 +43,32 @@ export const STYLIST_SERVICE_LINK_MESSAGES = {
     TABLE_HEADER_CUSTOM_PRICE: 'Preț personalizat',
     TABLE_HEADER_CUSTOM_DURATION: 'Durată personalizată',
     TABLE_HEADER_ACTIONS: 'Acțiuni',
+    // Constante noi pentru pagina stilistului
+    PAGE_TITLE: 'Serviciile Mele',
+    PAGE_DESCRIPTION: 'Gestionează serviciile pe care le oferi clienților.',
+    SERVICES_COUNT: (count: number) => `${count} servicii asociate.`,
+    SERVICES_LIST_TITLE: 'Lista Serviciilor',
+    EMPTY_STATE_TITLE: 'Niciun serviciu asociat',
+    EMPTY_STATE_DESCRIPTION: 'Adaugă primul tău serviciu pentru a începe să lucrezi cu clienții.',
+    // Constante pentru dialog-uri
+    ADD_DIALOG_TITLE: 'Adaugă un serviciu nou la lista ta de servicii oferite.',
+    EDIT_DIALOG_DESCRIPTION: (serviceName: string) =>
+      `Editează prețul și durata personalizată pentru serviciul "${serviceName}".`,
+    SERVICE_DETAILS_TITLE: 'Serviciu selectat:',
+    SERVICE_DETAILS_LABEL: 'Detalii serviciu:',
+    PRICE_STANDARD_LABEL: 'Preț standard:',
+    DURATION_STANDARD_LABEL: 'Durată standard:',
+    TIME_UNIT: 'min',
+    CURRENCY_UNIT: 'MDL',
+    // Constante pentru butoane și acțiuni
+    CANCEL_BUTTON: 'Anulează',
+    DELETE_BUTTON: 'Șterge',
+    SAVE_BUTTON: 'Salvează',
+    SELECT_SERVICE_PLACEHOLDER: 'Selectează un serviciu',
+    // Constante pentru loading states
+    LOADING_ADD: 'Se adaugă...',
+    LOADING_DELETE: 'Se șterge...',
+    LOADING_UPDATE: 'Se actualizează serviciul...',
+    LOADING_SAVE: 'Se salvează...',
   },
 }
