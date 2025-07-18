@@ -9,13 +9,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DAY_NAMES, WORK_SCHEDULE_MESSAGES } from '@/core/domains/work-schedule/workSchedule.constants'
-import { workScheduleFormSchema, type WorkScheduleFormValues } from '@/core/domains/work-schedule/workSchedule.types'
+import {
+  type CreateWorkScheduleFormData,
+  CreateWorkScheduleFormValidator,
+} from '@/core/domains/work-schedule/workSchedule.validators'
 
 type WorkScheduleFormProps = {
-  onSubmit: (values: WorkScheduleFormValues) => void
+  onSubmit: (values: CreateWorkScheduleFormData) => void
   isPending: boolean
   submitButtonText?: string
-  defaultValues?: Partial<WorkScheduleFormValues>
+  defaultValues?: Partial<CreateWorkScheduleFormData>
 }
 
 export function WorkScheduleForm({
@@ -24,8 +27,8 @@ export function WorkScheduleForm({
   submitButtonText = WORK_SCHEDULE_MESSAGES.UI.SAVE_BUTTON,
   defaultValues,
 }: WorkScheduleFormProps) {
-  const form = useForm<WorkScheduleFormValues>({
-    resolver: zodResolver(workScheduleFormSchema),
+  const form = useForm<CreateWorkScheduleFormData>({
+    resolver: zodResolver(CreateWorkScheduleFormValidator),
     defaultValues: defaultValues || {
       dayOfWeek: 0,
       startTime: '',

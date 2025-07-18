@@ -7,11 +7,11 @@ import { z } from 'zod'
 import { createWorkScheduleRepository } from '@/core/domains/work-schedule/workSchedule.repository'
 import { createWorkScheduleService } from '@/core/domains/work-schedule/workSchedule.service'
 import {
-  createWorkScheduleActionSchema,
+  CreateWorkScheduleActionSchema,
   type CreateWorkSchedulePayload,
-  deleteWorkScheduleActionSchema,
+  DeleteWorkScheduleActionSchema,
   type DeleteWorkSchedulePayload,
-  updateWorkScheduleActionSchema,
+  UpdateWorkScheduleActionSchema,
   type UpdateWorkSchedulePayload,
 } from '@/core/domains/work-schedule/workSchedule.types'
 import { db } from '@/db'
@@ -46,7 +46,7 @@ async function _ensureUserIsAdmin() {
 function createAdminWorkScheduleAction<T extends z.ZodType<any, any, any>>(
   schema: T,
   actionLogic: (payload: z.infer<T>) => Promise<any>,
-  revalidatePaths: string[] = [APP_ROUTES.ADMIN_STYLISTS_PAGE],
+  revalidatePaths: string[] = [APP_ROUTES.ADMIN],
 ) {
   return (payload: z.infer<T>) => {
     return executeSafeAction(schema, payload, async (validatedPayload) => {
@@ -91,7 +91,7 @@ function createStylistOwnScheduleActionFactory<T extends z.ZodType<any, any, any
 
       try {
         const result = await actionLogic(validatedPayload, user.id)
-        revalidatePath(APP_ROUTES.STYLIST_DASHBOARD + '/schedule')
+        revalidatePath(APP_ROUTES.STYLIST + '/schedule')
         return { data: result }
       } catch (error) {
         if (error instanceof UniquenessError) {
@@ -108,17 +108,17 @@ function createStylistOwnScheduleActionFactory<T extends z.ZodType<any, any, any
 // --- ADMIN SERVER ACTIONS ---
 
 export const createWorkScheduleAction = createAdminWorkScheduleAction(
-  createWorkScheduleActionSchema,
+  CreateWorkScheduleActionSchema,
   async (payload: CreateWorkSchedulePayload) => workScheduleService.createSchedule(payload),
 )
 
 export const updateWorkScheduleAction = createAdminWorkScheduleAction(
-  updateWorkScheduleActionSchema,
+  UpdateWorkScheduleActionSchema,
   async (payload: UpdateWorkSchedulePayload) => workScheduleService.updateSchedule(payload),
 )
 
 export const deleteWorkScheduleAction = createAdminWorkScheduleAction(
-  deleteWorkScheduleActionSchema,
+  DeleteWorkScheduleActionSchema,
   async (payload: DeleteWorkSchedulePayload) => workScheduleService.deleteSchedule(payload.id),
 )
 
@@ -128,7 +128,7 @@ export const deleteWorkScheduleAction = createAdminWorkScheduleAction(
  * Action pentru ca un stylist să-și adauge un interval nou la program
  */
 export const createStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
-  createWorkScheduleActionSchema,
+  CreateWorkScheduleActionSchema,
   async (payload: CreateWorkSchedulePayload, userId: string) => {
     // Verificăm că stilistul încearcă să adauge interval pentru el însuși
     if (payload.stylistId !== userId) {
@@ -143,11 +143,11 @@ export const createStylistOwnScheduleAction = createStylistOwnScheduleActionFact
  * Action pentru ca un stylist să-și actualizeze un interval din program
  */
 export const updateStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
-  updateWorkScheduleActionSchema,
+  UpdateWorkScheduleActionSchema,
   async (payload: UpdateWorkSchedulePayload, userId: string) => {
     // Verificăm că stilistul încearcă să actualizeze interval pentru el însuși
     if (payload.stylistId !== userId) {
-      throw new Error('Nu poți actualiza intervale pentru alți stiliști')
+      throw new Error('Nu poți actualizeze intervale pentru alți stiliști')
     }
 
     return workScheduleService.updateSchedule(payload)
@@ -158,7 +158,7 @@ export const updateStylistOwnScheduleAction = createStylistOwnScheduleActionFact
  * Action pentru ca un stylist să-și șteargă un interval din program
  */
 export const deleteStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
-  deleteWorkScheduleActionSchema,
+  DeleteWorkScheduleActionSchema,
   async (payload: DeleteWorkSchedulePayload, userId: string) => {
     // Verificăm că intervalul aparține stilistului
     const schedule = await workScheduleService.getScheduleById(payload.id)
