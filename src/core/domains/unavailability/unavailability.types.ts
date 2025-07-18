@@ -64,106 +64,6 @@ export interface UnavailabilityFilters {
   allDay?: boolean
 }
 
-// --- FORM SCHEMAS ---
-
-/**
- * Schema de validare pentru formularul de creare/editare (UI)
- */
-export const UnavailabilityFormSchema = z
-  .object({
-    stylistId: z.string().uuid('ID stylist invalid'),
-    date: z.string().min(1, 'Data este obligatorie'),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
-    cause: z.enum(['pauza', 'programare_offline', 'alta_situatie'], {
-      required_error: 'Cauza este obligatorie',
-    }),
-    allDay: z.boolean().default(false),
-    description: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      // Validare: dacă nu este all_day, start_time și end_time sunt obligatorii
-      if (!data.allDay && (!data.startTime || !data.endTime)) {
-        return false
-      }
-      return true
-    },
-    {
-      message: 'Ora de început și sfârșitul sunt obligatorii când nu este toată ziua',
-      path: ['startTime'],
-    },
-  )
-  .refine(
-    (data) => {
-      // Validare: end_time > start_time dacă nu este all_day
-      if (!data.allDay && data.startTime && data.endTime) {
-        return data.endTime > data.startTime
-      }
-      return true
-    },
-    {
-      message: 'Ora de sfârșit trebuie să fie după ora de început',
-      path: ['endTime'],
-    },
-  )
-
-export type UnavailabilityFormData = z.infer<typeof UnavailabilityFormSchema>
-
-// --- ACTION SCHEMAS ---
-
-/**
- * Schema pentru server actions (cu transformări)
- */
-export const CreateUnavailabilityActionSchema = z
-  .object({
-    stylistId: z.string().uuid(),
-    date: z.string().transform((val) => val.trim()),
-    startTime: z.string().nullable().optional(),
-    endTime: z.string().nullable().optional(),
-    cause: z.enum(['pauza', 'programare_offline', 'alta_situatie']),
-    allDay: z.boolean().default(false),
-    description: z.string().nullable().optional(),
-  })
-  .refine(
-    (data) => {
-      if (!data.allDay && (!data.startTime || !data.endTime)) {
-        return false
-      }
-      return true
-    },
-    {
-      message: 'Ora de început și sfârșitul sunt obligatorii când nu este toată ziua',
-    },
-  )
-  .refine(
-    (data) => {
-      if (!data.allDay && data.startTime && data.endTime) {
-        return data.endTime > data.startTime
-      }
-      return true
-    },
-    {
-      message: 'Ora de sfârșit trebuie să fie după ora de început',
-    },
-  )
-
-export const UpdateUnavailabilityActionSchema = z.object({
-  stylistId: z.string().uuid().optional(),
-  date: z
-    .string()
-    .transform((val) => val.trim())
-    .optional(),
-  startTime: z.string().nullable().optional(),
-  endTime: z.string().nullable().optional(),
-  cause: z.enum(['pauza', 'programare_offline', 'alta_situatie']).optional(),
-  allDay: z.boolean().optional(),
-  description: z.string().nullable().optional(),
-})
-
-export type CreateUnavailabilityPayload = z.infer<typeof CreateUnavailabilityActionSchema>
-export type UpdateUnavailabilityPayload = z.infer<typeof UpdateUnavailabilityActionSchema>
-
 // --- REPOSITORY INTERFACE ---
 
 export interface UnavailabilityRepository {
@@ -202,3 +102,22 @@ export interface UnavailabilityService {
     excludeId?: string,
   ): Promise<void>
 }
+
+// --- RE-EXPORT VALIDATORS ---
+// Re-exportăm validatori din validators.ts pentru a păstra compatibilitatea
+
+import { CreateUnavailabilityActionSchema, UpdateUnavailabilityActionSchema } from './unavailability.validators'
+
+export type { CreateUnavailabilityFormData, UpdateUnavailabilityFormData } from './unavailability.validators'
+export {
+  CreateUnavailabilityActionSchema,
+  CreateUnavailabilityFormValidator,
+  UpdateUnavailabilityActionSchema,
+  UpdateUnavailabilityFormValidator,
+} from './unavailability.validators'
+
+// --- ACTION PAYLOAD TYPES ---
+// Derivate din validatori pentru type safety
+
+export type CreateUnavailabilityPayload = z.infer<typeof CreateUnavailabilityActionSchema>
+export type UpdateUnavailabilityPayload = z.infer<typeof UpdateUnavailabilityActionSchema>

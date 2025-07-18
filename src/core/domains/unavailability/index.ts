@@ -9,17 +9,11 @@ export type {
   UnavailabilityCause,
   UnavailabilityData,
   UnavailabilityFilters,
-  UnavailabilityFormData,
   UnavailabilityRepository,
   UnavailabilityService,
   UnavailabilityWithStylist,
   UpdateUnavailabilityData,
   UpdateUnavailabilityPayload,
-} from './unavailability.types'
-export {
-  CreateUnavailabilityActionSchema,
-  UnavailabilityFormSchema,
-  UpdateUnavailabilityActionSchema,
 } from './unavailability.types'
 
 // Constants
@@ -58,6 +52,7 @@ export {
   UuidValidator,
   validateFutureDate,
   validateTimeRange,
+  validateUnavailabilityData,
 } from './unavailability.validators'
 
 // Repository & Service Factory Functions

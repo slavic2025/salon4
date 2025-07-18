@@ -1,10 +1,6 @@
 // src/core/domains/unavailability/unavailability.service.ts
 
-import {
-  UNAVAILABILITY_ERROR_MESSAGES,
-  UNAVAILABILITY_LIMITS,
-  UNAVAILABILITY_VALIDATION_MESSAGES,
-} from './unavailability.constants'
+import { UNAVAILABILITY_ERROR_MESSAGES, UNAVAILABILITY_VALIDATION_MESSAGES } from './unavailability.constants'
 import {
   type CreateUnavailabilityData,
   type Unavailability,
@@ -14,18 +10,11 @@ import {
   type UnavailabilityWithStylist,
   type UpdateUnavailabilityData,
 } from './unavailability.types'
-
-/**
- * Funcție helper pentru conversia timpului în minute
- */
-function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number)
-  return hours * 60 + minutes
-}
+import { validateUnavailabilityData } from './unavailability.validators'
 
 /**
  * Business logic pentru gestionarea indisponibilităților
- * Folosește Dependency Injection pattern
+ * Folosește Dependency Injection pattern și validatori centralizați
  */
 export const createUnavailabilityService = (repository: UnavailabilityRepository): UnavailabilityService => {
   return {
@@ -83,7 +72,7 @@ export const createUnavailabilityService = (repository: UnavailabilityRepository
      * Creează o nouă indisponibilitate
      */
     async createUnavailability(data: CreateUnavailabilityData): Promise<Unavailability> {
-      // Validare date de intrare
+      // Validare folosind validatori centralizați
       await this.validateUnavailabilityData(data)
 
       // Verificare pentru conflicte
@@ -168,60 +157,16 @@ export const createUnavailabilityService = (repository: UnavailabilityRepository
     },
 
     /**
-     * Validează datele unei indisponibilități
+     * Validează datele unei indisponibilități folosind validatori centralizați
      */
     async validateUnavailabilityData(data: CreateUnavailabilityData | UpdateUnavailabilityData): Promise<void> {
-      // Validare stylist ID
-      if (!data.stylistId?.trim()) {
-        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.STYLIST_ID_REQUIRED)
-      }
+      // Folosim validarea centralizată din validators.ts
+      const validationResult = validateUnavailabilityData(data)
 
-      // Validare dată
-      if (!data.date?.trim()) {
-        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.DATE_REQUIRED)
-      }
-
-      // Verificare dacă data este în trecut (doar pentru create)
-      const today = new Date().toISOString().split('T')[0]
-      if (data.date < today) {
-        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.DATE_IN_PAST)
-      }
-
-      // Validare timp dacă nu este toată ziua
-      if (!data.allDay) {
-        if (!data.startTime?.trim()) {
-          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.START_TIME_REQUIRED)
-        }
-
-        if (!data.endTime?.trim()) {
-          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.END_TIME_REQUIRED)
-        }
-
-        // Validare că end_time > start_time
-        if (data.startTime && data.endTime && data.endTime <= data.startTime) {
-          throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.END_TIME_AFTER_START)
-        }
-
-        // Validare durata minimă (15 minute)
-        if (data.startTime && data.endTime) {
-          const startMinutes = timeToMinutes(data.startTime)
-          const endMinutes = timeToMinutes(data.endTime)
-          const durationMinutes = endMinutes - startMinutes
-
-          if (durationMinutes < UNAVAILABILITY_LIMITS.MIN_DURATION_MINUTES) {
-            throw new Error(`Durata minimă este ${UNAVAILABILITY_LIMITS.MIN_DURATION_MINUTES} minute`)
-          }
-        }
-      }
-
-      // Validare cauza
-      if (!data.cause) {
-        throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.CAUSE_REQUIRED)
-      }
-
-      // Validare lungime descriere
-      if (data.description && data.description.length > UNAVAILABILITY_LIMITS.MAX_DESCRIPTION_LENGTH) {
-        throw new Error(`Descrierea nu poate depăși ${UNAVAILABILITY_LIMITS.MAX_DESCRIPTION_LENGTH} caractere`)
+      if (!validationResult.success) {
+        // Luăm primul mesaj de eroare pentru a păstra compatibilitatea
+        const firstError = Object.values(validationResult.errors)[0]
+        throw new Error(String(firstError) || UNAVAILABILITY_VALIDATION_MESSAGES.DATE_REQUIRED)
       }
     },
 
