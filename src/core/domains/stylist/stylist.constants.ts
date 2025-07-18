@@ -13,6 +13,11 @@ export const STYLIST_NAV_ITEMS: NavItem[] = [
     icon: 'calendar',
   },
   {
+    title: 'Indisponibilitate',
+    href: '/stylist/unavailability',
+    icon: 'calendarX',
+  },
+  {
     title: 'Programul meu de lucru',
     href: '/stylist/work-schedule',
     icon: 'clock',

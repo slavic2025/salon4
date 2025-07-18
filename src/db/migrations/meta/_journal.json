@@ -8,6 +8,13 @@
       "when": 1752681848271,
       "tag": "0000_open_zaladane",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752853120318,
+      "tag": "0001_mighty_lady_vermin",
+      "breakpoints": true
     }
   ]
 }

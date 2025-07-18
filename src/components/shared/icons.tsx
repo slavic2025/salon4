@@ -2,6 +2,8 @@
 
 import {
   ArrowRight,
+  CalendarDays,
+  CalendarX,
   LayoutDashboard,
   LogIn,
   type LucideIcon,
@@ -14,7 +16,7 @@ import {
  * Definim un tip pentru numele iconițelor, pentru a beneficia de type-safety și autocomplete.
  * Când ai nevoie de o nouă iconiță, o adaugi mai întâi aici.
  */
-export type IconName = 'dashboard' | 'users' | 'scissors' | 'arrowRight' | 'login'
+export type IconName = 'dashboard' | 'users' | 'scissors' | 'arrowRight' | 'login' | 'calendarX' | 'calendarDays'
 
 /**
  * Obiectul `Icons` acționează ca o hartă (map) între numele simple
@@ -27,4 +29,6 @@ export const Icons: Record<IconName, LucideIcon> = {
   scissors: Scissors,
   arrowRight: ArrowRight,
   login: LogIn,
+  calendarX: CalendarX,
+  calendarDays: CalendarDays,
 }
