@@ -42,7 +42,6 @@ export function EditWorkScheduleDialog({ interval, isOpen, setIsOpen, stylistId 
         </DialogHeader>
         <WorkScheduleForm
           defaultValues={{
-            stylistId: interval.stylistId,
             dayOfWeek: interval.dayOfWeek,
             startTime: interval.startTime,
             endTime: interval.endTime,
