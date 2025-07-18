@@ -5,125 +5,144 @@ import { z } from 'zod'
 
 import { workSchedules } from '@/db/schema/work-schedules'
 
-import { WORK_SCHEDULE_MESSAGES } from './workSchedule.constants'
+// --- DATABASE TYPES ---
 
-// --- Tipuri de Bază generate din Schema Drizzle ---
+/**
+ * Tipuri de bază generate din Schema Drizzle
+ */
 export const selectWorkScheduleSchema = createSelectSchema(workSchedules)
 export const insertWorkScheduleSchema = createInsertSchema(workSchedules)
 
 export type WorkSchedule = typeof workSchedules.$inferSelect
 export type NewWorkSchedule = typeof workSchedules.$inferInsert
 
-// --- Tipuri pentru ziua săptămânii ---
+// --- BUSINESS TYPES ---
+
+/**
+ * Tipuri pentru ziua săptămânii
+ */
 export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
-// Validare customă pentru formatul timpului HH:MM
-const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
-
-const timeSchema = z
-  .string()
-  .regex(timeRegex, WORK_SCHEDULE_MESSAGES.VALIDATION.TIME_FORMAT_INVALID)
-  .refine((time) => {
-    // Verificăm că ora este validă (00:00 - 23:59)
-    const [hours, minutes] = time.split(':').map(Number)
-    return hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59
-  }, WORK_SCHEDULE_MESSAGES.VALIDATION.TIME_FORMAT_INVALID)
-
-// --- Schema de bază pentru interval de program ---
-const baseWorkScheduleSchema = z.object({
-  stylistId: z.string().uuid(WORK_SCHEDULE_MESSAGES.VALIDATION.STYLIST_ID_REQUIRED),
-  dayOfWeek: z.coerce
-    .number()
-    .int()
-    .min(0, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID)
-    .max(6, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID),
-  startTime: timeSchema,
-  endTime: timeSchema,
-})
-
-// Funcție pentru validarea timpului
-const validateTimeOrder = (data: { startTime: string; endTime: string }) => {
-  const [startHours, startMinutes] = data.startTime.split(':').map(Number)
-  const [endHours, endMinutes] = data.endTime.split(':').map(Number)
-
-  const startTotalMinutes = startHours * 60 + startMinutes
-  const endTotalMinutes = endHours * 60 + endMinutes
-
-  return endTotalMinutes > startTotalMinutes
+/**
+ * Date de bază pentru work schedule (fără ID și timestamps)
+ */
+export interface WorkScheduleData {
+  stylistId: string
+  dayOfWeek: DayOfWeek
+  startTime: string
+  endTime: string
 }
 
-// --- Schema pentru Formularul din UI (Adăugare / Editare) ---
-// Excludem stylistId din formular pentru că se va adăuga automat
-export const workScheduleFormSchema = z
-  .object({
-    dayOfWeek: z.coerce
-      .number()
-      .int()
-      .min(0, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID)
-      .max(6, WORK_SCHEDULE_MESSAGES.VALIDATION.DAY_OF_WEEK_INVALID),
-    startTime: timeSchema,
-    endTime: timeSchema,
-  })
-  .refine(validateTimeOrder, {
-    message: WORK_SCHEDULE_MESSAGES.VALIDATION.END_TIME_AFTER_START,
-    path: ['endTime'],
-  })
+/**
+ * Date pentru creare work schedule
+ */
+export interface CreateWorkScheduleData extends WorkScheduleData {}
 
-export type WorkScheduleFormValues = z.infer<typeof workScheduleFormSchema>
+/**
+ * Date pentru actualizare work schedule (toate câmpurile opționale)
+ */
+export interface UpdateWorkScheduleData extends Partial<WorkScheduleData> {}
 
-// --- Scheme pentru Acțiunile de pe Server ---
+// --- REPOSITORY INTERFACE ---
 
-// Schema pentru acțiunea de ADĂUGARE
-export const createWorkScheduleActionSchema = baseWorkScheduleSchema.refine(validateTimeOrder, {
-  message: WORK_SCHEDULE_MESSAGES.VALIDATION.END_TIME_AFTER_START,
-  path: ['endTime'],
-})
-export type CreateWorkSchedulePayload = z.infer<typeof createWorkScheduleActionSchema>
+export interface WorkScheduleRepository {
+  findAll(): Promise<WorkSchedule[]>
+  findById(id: string): Promise<WorkSchedule | undefined>
+  findByStylistId(stylistId: string): Promise<WorkSchedule[]>
+  findByStylistAndDay(stylistId: string, dayOfWeek: DayOfWeek): Promise<WorkSchedule[]>
+  checkTimeOverlap(
+    stylistId: string,
+    dayOfWeek: DayOfWeek,
+    startTime: string,
+    endTime: string,
+    excludeId?: string,
+  ): Promise<WorkSchedule[]>
+  create(newSchedule: CreateWorkScheduleData): Promise<WorkSchedule>
+  update(id: string, data: Partial<CreateWorkScheduleData>): Promise<WorkSchedule>
+  delete(id: string): Promise<void>
+  deleteByStylistId(stylistId: string): Promise<void>
+  findByMultipleStylists(stylistIds: string[]): Promise<WorkSchedule[]>
+}
 
-// Schema pentru acțiunea de EDITARE
-export const updateWorkScheduleActionSchema = baseWorkScheduleSchema
-  .extend({
-    id: z.string().uuid(WORK_SCHEDULE_MESSAGES.VALIDATION.ID_REQUIRED),
-  })
-  .refine(validateTimeOrder, {
-    message: WORK_SCHEDULE_MESSAGES.VALIDATION.END_TIME_AFTER_START,
-    path: ['endTime'],
-  })
-export type UpdateWorkSchedulePayload = z.infer<typeof updateWorkScheduleActionSchema>
+// --- SERVICE INTERFACE ---
 
-// Schema pentru acțiunea de ȘTERGERE
-export const deleteWorkScheduleActionSchema = z.object({
-  id: z.string().uuid(WORK_SCHEDULE_MESSAGES.VALIDATION.ID_REQUIRED),
-})
-export type DeleteWorkSchedulePayload = z.infer<typeof deleteWorkScheduleActionSchema>
+export interface WorkScheduleService {
+  getAllSchedules(): Promise<WorkSchedule[]>
+  getStylistSchedule(stylistId: string): Promise<StylistWeeklySchedule>
+  getScheduleForDay(stylistId: string, dayOfWeek: DayOfWeek): Promise<WorkSchedule[]>
+  getScheduleById(id: string): Promise<WorkSchedule>
+  createSchedule(payload: CreateWorkSchedulePayload): Promise<{
+    success: boolean
+    message: string
+    data: WorkSchedule
+  }>
+  updateSchedule(payload: UpdateWorkSchedulePayload): Promise<{
+    success: boolean
+    message: string
+    data: WorkSchedule
+  }>
+  deleteSchedule(scheduleId: string): Promise<{
+    success: boolean
+    message: string
+  }>
+  deleteAllStylistSchedules(stylistId: string): Promise<{
+    success: boolean
+    message: string
+  }>
+  getMultipleStylists(stylistIds: string[]): Promise<StylistWeeklySchedule[]>
+  isStylistAvailable(stylistId: string, dayOfWeek: DayOfWeek, startTime: string, endTime: string): Promise<boolean>
+}
 
-// --- Tipuri pentru afișare și filtrare ---
+// --- DISPLAY TYPES ---
 
-// Tip pentru programul grupat pe zile
+/**
+ * Tip pentru programul grupat pe zile
+ */
 export type WorkSchedulesByDay = {
   [key in DayOfWeek]?: WorkSchedule[]
 }
 
-// Tip pentru intervalul de timp
+/**
+ * Tip pentru intervalul de timp
+ */
 export type TimeInterval = {
   start: string
   end: string
 }
 
-// Tip pentru programul unui stilist organizat pe zile
+/**
+ * Tip pentru programul unui stilist organizat pe zile
+ */
 export type StylistWeeklySchedule = {
   stylistId: string
   stylistName?: string
   schedule: WorkSchedulesByDay
 }
 
-// --- Schema pentru validarea suprapunerilor ---
-export const checkOverlapSchema = z.object({
-  stylistId: z.string().uuid(),
-  dayOfWeek: z.number().int().min(0).max(6),
-  startTime: timeSchema,
-  endTime: timeSchema,
-  excludeId: z.string().uuid().optional(), // Pentru a exclude intervalul curent la editare
-})
+// --- RE-EXPORT VALIDATORS ---
+// Re-exportăm validatori din validators.ts pentru a păstra compatibilitatea
 
-export type CheckOverlapPayload = z.infer<typeof checkOverlapSchema>
+import {
+  CheckOverlapSchema,
+  CreateWorkScheduleActionSchema,
+  DeleteWorkScheduleActionSchema,
+  UpdateWorkScheduleActionSchema,
+} from './workSchedule.validators'
+
+export type { CreateWorkScheduleFormData, UpdateWorkScheduleFormData } from './workSchedule.validators'
+export {
+  CheckOverlapSchema,
+  CreateWorkScheduleActionSchema,
+  CreateWorkScheduleFormValidator,
+  DeleteWorkScheduleActionSchema,
+  UpdateWorkScheduleActionSchema,
+  UpdateWorkScheduleFormValidator,
+} from './workSchedule.validators'
+
+// --- ACTION PAYLOAD TYPES ---
+// Derivate din validatori pentru type safety
+
+export type CreateWorkSchedulePayload = z.infer<typeof CreateWorkScheduleActionSchema>
+export type UpdateWorkSchedulePayload = z.infer<typeof UpdateWorkScheduleActionSchema>
+export type DeleteWorkSchedulePayload = z.infer<typeof DeleteWorkScheduleActionSchema>
+export type CheckOverlapPayload = z.infer<typeof CheckOverlapSchema>
