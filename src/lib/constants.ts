@@ -23,16 +23,30 @@ export type UserRole = keyof typeof ROLES | null
 export const DEFAULT_CURRENCY = 'MDL'
 
 export const APP_ROUTES = {
-  ADMIN_DASHBOARD: '/admin',
-  STYLIST_DASHBOARD: '/stylist',
-  LOGIN: '/auth/login',
-  LANDING: '/',
-  ADMIN_STYLISTS_PAGE: '/admin/stylists',
-  ADMIN_SERVICES_PAGE: '/admin/services',
-  AUTH_CONFIRM:
-    process.env.NODE_ENV === 'production'
-      ? 'https://yourdomain.com/auth/confirm' // TODO: Înlocuiește cu domeniul tău în producție
-      : 'http://localhost:3000/auth/confirm',
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+  },
+  ADMIN: '/admin',
+  STYLIST: '/stylist',
+} as const
+
+export const UI_MESSAGES = {
+  LOADING: {
+    NAVIGATION: 'Se încarcă...',
+    GENERAL: 'Se procesează...',
+    SUBMITTING: 'Se trimite...',
+  },
+  ERRORS: {
+    GENERAL: 'A apărut o eroare. Vă rugăm să încercați din nou.',
+    NETWORK: 'Eroare de conexiune. Verificați conexiunea la internet.',
+    VALIDATION: 'Datele introduse nu sunt valide.',
+  },
+  SUCCESS: {
+    SAVED: 'Datele au fost salvate cu succes.',
+    UPDATED: 'Datele au fost actualizate cu succes.',
+    DELETED: 'Elementul a fost șters cu succes.',
+  },
 } as const
 
 /**

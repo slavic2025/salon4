@@ -1,14 +1,31 @@
 import Image from 'next/image'
+import Link from 'next/link'
+
+import { NavigationTest } from '@/components/shared/NavigationTest'
 
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
+
         <div className="p-6 mb-4 rounded-lg bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-white shadow-lg w-full max-w-md text-center">
           <h2 className="text-2xl font-bold mb-2">Tailwind CSS funcționează! 🎉</h2>
           <p className="text-base">Dacă vezi acest mesaj colorat și stilizat, Tailwind este configurat corect.</p>
         </div>
+
+        {/* Componenta de test pentru preloader */}
+        <NavigationTest />
+
+        <div className="text-center">
+          <Link
+            href="/test"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200"
+          >
+            Testează Preloader-ul Global →
+          </Link>
+        </div>
+
         <div className="bg-blue-500 text-white p-4">Test Tailwind simplu</div>
         <div className="flex flex-wrap gap-4 justify-center items-center mb-6">
           <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 shadow-md">

@@ -1,36 +1,36 @@
-# .cursorrules - Salon Project Architecture & Development Guidelines
+# .cursorrules - Salon Management Platform - Reguli Generale
 
-## 🎯 AI Assistant Role & Mindset
-You are a **senior software engineer** with deep expertise in:
-- Clean architecture & SOLID principles
-- TypeScript/Next.js ecosystem
-- Security-first development
-- Performance optimization
-- Code maintainability
+## 📋 Descrierea Proiectului și Obiectivele Generale
 
-**Core Principles:**
-- Write production-ready, scalable code
-- Prioritize security at every layer
-- Maintain consistency across the codebase
-- Prefer explicit over implicit
-- Always consider the maintenance burden
+### Scopul Aplicației
+O platformă SaaS completă pentru managementul salonului de înfrumusețare, axată pe automatizarea proceselor, gestionarea eficientă a programărilor și optimizarea experienței atât pentru clienți, cât și pentru personalul salonului.
 
-## 📋 Project Context & Tech Stack
+### Publicul Țintă
+- **Proprietari de salon**: Gestionarea business-ului, rapoarte, configurări
+- **Stilist/Cosmetician**: Programări, clienți, servicii
+- **Clienți**: Rezervări online, istoric, plăți
 
-### Technology Stack (Non-Negotiable)
-```typescript
-// Core Stack - DO NOT DEVIATE
-Next.js: 15+ (App Router ONLY)
-TypeScript: Strict mode, no `any` unless justified
-Supabase: BaaS with RLS policies
-Drizzle ORM: Single source of truth for DB schema
-Tailwind CSS: v4+, utility-first approach
-Zod: Data validation at all levels
-shadcn/ui: Base UI components
-pnpm: Package manager (never npm/yarn)
-```
+### Valori Cheie
+- **Securitate robustă**: Protecția datelor clienților și informațiilor business
+- **Performanță ridicată**: Răspuns rapid și scalabilitate
+- **Experiență utilizator intuitivă**: Interface simplu și eficient
+- **Fiabilitate**: Funcționare stabilă și consistentă
 
-### Architecture Overview
+## 🔧 Stack-ul de Tehnologii la Nivel Înalt
+
+### Frontend
+- **Next.js 15+**: Framework React cu App Router
+- **TypeScript**: Tipizare statică strictă
+- **Tailwind CSS**: Styling utility-first
+- **shadcn/ui**: Componente UI de bază
+
+### Backend & Database
+- **Supabase**: Backend-as-a-Service cu autentificare
+- **Drizzle ORM**: Gestionarea bazei de date type-safe
+- **PostgreSQL**: Baza de date relațională
+- **Zod**: Validarea datelor
+
+### Arhitectura Generală
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🎨 UI Layer (src/app, src/components)                      │
@@ -55,351 +55,93 @@ pnpm: Package manager (never npm/yarn)
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🔧 Critical Development Patterns
+## 🎯 Reguli Generale de Clean Code & Best Practices
 
-### 1. Dependency Injection (Factory Pattern)
-```typescript
-// ✅ CORRECT - Dependencies injected
-export const createAuthService = (
-  repository: AuthRepository,
-  supabase: SupabaseClient
-) => ({
-  async login(credentials: LoginCredentials) {
-    // business logic here
-  }
-});
+### Constants Over Magic Numbers
+- Înlocuiește valorile hard-coded cu constante nume
+- Folosește nume descriptive pentru constante care explică scopul valorii
+- Păstrează constantele la începutul fișierului sau într-un fișier dedicat
 
-// ❌ INCORRECT - Direct imports
-export const createAuthService = () => {
-  // importing db directly is forbidden
-  const result = await db.select()...
-};
+### Meaningful Names
+- Variabilele, funcțiile și clasele trebuie să-și dezvăluie scopul
+- Numele trebuie să explice de ce există ceva și cum se folosește
+- Evită abrevierile cu excepția celor universal înțelese
+
+### Smart Comments
+- Nu comenta ce face codul - fă codul să se auto-documenteze
+- Folosește comentariile pentru a explica de ce se face ceva într-un anumit fel
+- Documentează API-urile, algoritmii complecși și efectele laterale non-evidente
+
+### Single Responsibility
+- Fiecare funcție trebuie să facă exact un singur lucru
+- Funcțiile trebuie să fie mici și focusate
+- Dacă o funcție are nevoie de un comentariu pentru a explica ce face, trebuie împărțită
+
+### DRY (Don't Repeat Yourself)
+- Extrage codul repetat în funcții reutilizabile
+- Împarte logica comună prin abstracție adecvată
+- Menține surse unice de adevăr
+
+### Clean Structure
+- Păstrează codul înrudit împreună
+- Organizează codul într-o ierarhie logică
+- Folosește convenții consistente pentru denumirea fișierelor și folderelor
+
+### Encapsulation
+- Ascunde detaliile de implementare
+- Expune interface-uri clare
+- Mută condițiile imbricate în funcții cu nume descriptive
+
+### Code Quality Maintenance
+- Refactorizează continuu
+- Remediază datoria tehnică devreme
+- Lasă codul mai curat decât l-ai găsit
+
+### Testing
+- Scrie teste înainte de a remedia bug-uri
+- Păstrează testele lizibile și mentenabile
+- Testează cazurile limită și condițiile de eroare
+
+### Version Control
+- Scrie mesaje de commit clare
+- Fă commit-uri mici și focusate
+- Folosește nume de branch-uri semnificative
+
+## 🛡️ Principii de Securitate
+- Implementează autentificare și autorizare la toate nivelurile
+- Validează toate input-urile utilizatorului
+- Folosește HTTPS pentru toate comunicările
+- Protejează datele sensibile prin criptare
+- Implementează logging pentru auditare
+
+## 📁 Structura de Bază a Proiectului
+```
+src/
+├── app/                 # Next.js App Router
+├── components/          # Componente UI
+│   ├── ui/             # shadcn/ui components
+│   ├── shared/         # Componente reutilizabile
+│   └── features/       # Componente specifice feature-urilor
+├── core/               # Business logic
+│   └── domains/        # Domain-specific logic
+├── db/                 # Database schema și client
+├── features/           # Server Actions
+└── lib/                # Utilitare și constante
 ```
 
-### 2. Zod Schema Separation
-```typescript
-// UI Schema - User-friendly validation
-export const LoginFormSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters")
-});
+## 🎨 Reguli de Styling
+- Folosește Tailwind CSS pentru toate stilurile
+- Evită CSS custom cu excepția cazurilor absolut necesare
+- Menține consistență în design system
+- Folosește shadcn/ui ca bază pentru componente
 
-// Server Schema - Data transformation
-export const LoginActionSchema = z.object({
-  email: z.string().email().toLowerCase().trim(),
-  password: z.string().min(8).transform(hash)
-});
-```
-
-### 3. Component Organization
-```
-src/components/
-├── ui/                    # shadcn/ui components (untouched)
-├── shared/               # Reusable across features
-│   ├── PageHeader.tsx
-│   └── SubmitButton.tsx
-└── features/            # Feature-specific components
-    ├── auth/
-    │   ├── LoginForm.tsx
-    │   └── RegisterForm.tsx
-    └── stylist/
-        └── StylistDashboard.tsx
-```
-
-## 🛡️ Security Implementation (4-Layer Defense)
-
-### Layer 1: Middleware (src/middleware.ts)
-```typescript
-// ONLY checks authentication, NOT roles
-export async function middleware(request: NextRequest) {
-  const { user } = await getUser();
-  
-  if (!user && isProtectedRoute(pathname)) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
-  
-  // ❌ NEVER do role-based redirects in middleware
-  // This causes infinite loops
-}
-```
-
-### Layer 2: Layout Server Components
-```typescript
-// Verify roles and redirect appropriately
-export default async function AdminLayout({ children }) {
-  const { role } = await enforceRouteAccess('/admin');
-  
-  if (role !== ROLES.ADMIN) {
-    throw new Error('Unauthorized access');
-  }
-  
-  return <DashboardLayout>{children}</DashboardLayout>;
-}
-```
-
-### Layer 3: Page Server Components
-```typescript
-// Double-check access (Defense in Depth)
-export default async function AdminServicesPage() {
-  const { role } = await enforceRouteAccess('/admin/services');
-  
-  if (role !== ROLES.ADMIN) {
-    throw new Error('Unauthorized access to services management');
-  }
-  
-  // page logic...
-}
-```
-
-### Layer 4: Server Actions
-```typescript
-// Final validation before critical operations
-export async function createServiceAction(payload: unknown) {
-  await ensureUserIsAdmin(); // Throws if not admin
-  
-  return executeSafeAction(CreateServiceSchema, payload, async (data) => {
-    // business logic
-  });
-}
-```
-
-## 📁 File Structure & Naming Conventions
-
-### Domain Structure
-```
-src/core/domains/[domain]/
-├── [domain].service.ts      # Business logic
-├── [domain].repository.ts   # Data access
-├── [domain].types.ts       # Domain types
-├── [domain].constants.ts   # Domain constants
-└── [domain].schemas.ts     # Validation schemas
-```
-
-### Constants Management
-```typescript
-// src/lib/constants.ts - Global constants
-export const APP_ROUTES = {
-  AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register'
-  },
-  ADMIN: '/admin',
-  STYLIST: '/stylist'
-} as const;
-
-// src/core/domains/auth/auth.constants.ts - Domain-specific
-export const AUTH_CONSTANTS = {
-  SESSION_DURATION: 3600,
-  MAX_LOGIN_ATTEMPTS: 3,
-  MESSAGES: {
-    INVALID_CREDENTIALS: 'Invalid email or password',
-    ACCOUNT_LOCKED: 'Account temporarily locked'
-  }
-} as const;
-```
-
-### User-Facing Strings Rule
-**CRITICAL: Toate stringurile vizibile utilizatorului TREBUIE să fie în fișiere de constante.**
-
-```typescript
-// ✅ CORRECT - User messages in constants
-export const VALIDATION_MESSAGES = {
-  EMAIL_REQUIRED: 'Adresa de email este obligatorie',
-  PASSWORD_TOO_SHORT: 'Parola trebuie să aibă cel puțin 8 caractere'
-} as const;
-
-// ✅ CORRECT - Log messages can be inline
-logger.info('User authentication attempt', { userId });
-logger.error('Database connection failed', { error });
-
-// ❌ INCORRECT - User-facing string hardcoded
-return { error: 'Eroare la validare' }; // Should be in constants
-
-// ✅ CORRECT - Use constants instead
-return { error: VALIDATION_MESSAGES.VALIDATION_ERROR };
-```
-
-**Scope:**
-- **În constante:** Mesaje de eroare pentru utilizatori, etichete UI, notificări, validări
-- **Inline permis:** Log messages, debug info, developer errors, internal comments
-
-## 🔍 Code Quality & Standards
-
-### TypeScript Best Practices
-```typescript
-// ✅ Use strict types
-interface User {
-  id: string;
-  email: string;
-  role: 'ADMIN' | 'STYLIST' | 'CLIENT';
-}
-
-// ✅ Prefer type guards
-function isAdmin(user: User): user is User & { role: 'ADMIN' } {
-  return user.role === 'ADMIN';
-}
-
-// ❌ Avoid any
-function processData(data: any) { // forbidden
-  return data.something;
-}
-```
-
-### Error Handling
-```typescript
-// ✅ Custom error classes
-export class UniquenessError extends Error {
-  constructor(field: string) {
-    super(`${field} already exists`);
-    this.name = 'UniquenessError';
-  }
-}
-
-// ✅ Safe error responses
-try {
-  await dangerousOperation();
-} catch (error) {
-  logger.error('Operation failed:', error);
-  return { error: 'Something went wrong' }; // Generic message
-}
-```
-
-## 🎨 UI/UX Guidelines
-
-### Component Patterns
-```typescript
-// ✅ Server Component (data fetching)
-export default async function UsersPage() {
-  const users = await getUsers();
-  return <UsersList users={users} />;
-}
-
-// ✅ Client Component (interactivity)
-'use client';
-export function UsersList({ users }: { users: User[] }) {
-  const [filter, setFilter] = useState('');
-  // interactive logic
-}
-```
-
-### Styling Rules
-```typescript
-// ✅ Tailwind utilities
-<div className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm">
-
-// ❌ Custom CSS (only in globals.css if absolutely necessary)
-<div className="custom-card">
-```
-
-## 🚀 Performance & Optimization
-
-### Data Fetching
-```typescript
-// ✅ Server Components for data fetching
-export default async function DashboardPage() {
-  const [users, stats] = await Promise.all([
-    getUsers(),
-    getStats()
-  ]);
-  
-  return <Dashboard users={users} stats={stats} />;
-}
-
-// ✅ Use Suspense for loading states
-<Suspense fallback={<LoadingSpinner />}>
-  <DataComponent />
-</Suspense>
-```
-
-### Database Queries
-```typescript
-// ✅ Efficient Drizzle queries
-const users = await db
-  .select({
-    id: usersTable.id,
-    email: usersTable.email,
-    role: usersTable.role
-  })
-  .from(usersTable)
-  .where(eq(usersTable.active, true))
-  .limit(10);
-```
-
-## 🧪 Testing Strategy
-
-### Unit Tests (Vitest)
-```typescript
-// ✅ Test business logic
-describe('AuthService', () => {
-  it('should hash password correctly', async () => {
-    const mockRepository = createMockAuthRepository();
-    const service = createAuthService(mockRepository, mockSupabase);
-    
-    const result = await service.hashPassword('password123');
-    expect(result).toBeDefined();
-  });
-});
-```
-
-## 📋 AI Assistant Instructions
-
-### Code Generation Rules
-1. **Always read existing files first** - Use file system tools to understand current implementation
-2. **Check for constants** - Never hardcode strings that should be in constants files
-3. **Follow the architecture** - Respect the layered architecture boundaries
-4. **Security first** - Implement all 4 layers of security
-5. **Type safety** - Use strict TypeScript, no `any`
-6. **Error handling** - Implement proper error boundaries and logging
-
-### When Adding New Features
-1. Create domain structure in `src/core/domains/[domain]/`
-2. Add constants to domain constants file
-3. Create Zod schemas (separate for UI and server)
-4. Implement repository with dependency injection
-5. Create service with business logic
-6. Add Server Actions in features layer
-7. Create UI components following the organization pattern
-8. Add security checks at all layers
-
-### Response Format
-- Always explain architectural decisions
-- Provide complete, working code examples
-- Include security considerations
-- Mention any dependencies or setup required
-- Point out potential gotchas or edge cases
-
-## 🔧 Quick Reference
-
-### Essential Utilities
-```typescript
-// Route protection
-await enforceRouteAccess(pathname)     // For Server Components
-await ensureUserIsAdmin()              // For Server Actions
-await ensureUserIsStylist()            // For Server Actions
-
-// Schema validation
-const FormSchema = z.object({...})     // UI validation
-const ActionSchema = z.object({...})   // Server validation
-
-// Error handling
-throw new UniquenessError('email')
-throw new AppError('Custom error')
-```
-
-### Common Patterns
-```typescript
-// Factory pattern for services
-export const createUserService = (repo, supabase) => ({...})
-
-// Server Action pattern
-export async function createUserAction(payload: unknown) {
-  await ensureUserIsAdmin();
-  return executeSafeAction(CreateUserSchema, payload, async (data) => {
-    // business logic
-  });
-}
-```
+## ⚡ Performance & Optimization
+- Folosește Server Components pentru data fetching
+- Implementează lazy loading pentru componente mari
+- Optimizează imaginile și asset-urile
+- Folosește caching adecvat
+- Monitorizează performanța aplicației
 
 ---
 
-Remember: **Security, maintainability, and type safety are non-negotiable**. Every line of code should reflect these principles.
+**Principii Fundamentale**: Securitate, mentenabilitate și type safety sunt non-negociabile. Fiecare linie de cod trebuie să reflecte aceste principii.
