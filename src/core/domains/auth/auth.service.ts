@@ -1,14 +1,18 @@
 // src/core/domains/auth/auth.service.ts
-import { SupabaseClient, type User } from '@supabase/supabase-js'
+
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 import { type UserRole } from '@/lib/constants'
 import { createLogger } from '@/lib/logger'
 
-import { AUTH_MESSAGES } from './auth.constants'
-import { AuthRepository } from './auth.repository'
-import { SignInFormValues } from './auth.types'
+import { AUTH_LOG_MESSAGES, AUTH_SERVER_MESSAGES } from './auth.constants'
+import type { AuthRepository, AuthService, SignInData } from './auth.types'
 
-export function createAuthService(repository: AuthRepository, supabase: SupabaseClient) {
+/**
+ * Business logic pentru gestionarea autentificării
+ * Folosește Dependency Injection pattern și validatori centralizați
+ */
+export function createAuthService(repository: AuthRepository, supabase: SupabaseClient): AuthService {
   const logger = createLogger('AuthService')
 
   return {
@@ -21,32 +25,32 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
         return null
       }
 
-      logger.info(AUTH_MESSAGES.LOG.FETCHING_USER_ROLE, { userId: user.id })
+      logger.info(AUTH_LOG_MESSAGES.FETCHING_USER_ROLE, { userId: user.id })
 
       const role = await repository.getUserRole(user.id)
 
       if (!role) {
-        logger.warn(AUTH_MESSAGES.LOG.USER_NO_ROLE_IN_DB_WARNING, { userId: user.id })
+        logger.warn(AUTH_LOG_MESSAGES.USER_NO_ROLE_IN_DB_WARNING, { userId: user.id })
         return null
       }
 
-      logger.debug(AUTH_MESSAGES.LOG.ROLE_FETCHED_SUCCESS, { userId: user.id, role })
+      logger.debug(AUTH_LOG_MESSAGES.ROLE_FETCHED_SUCCESS, { userId: user.id, role })
       return role
     },
 
     /**
      * Autentifică un utilizator folosind email și parolă.
      */
-    async signInWithPassword(credentials: SignInFormValues) {
+    async signInWithPassword(credentials: SignInData) {
       const { error } = await supabase.auth.signInWithPassword(credentials)
 
       if (error) {
-        logger.warn(AUTH_MESSAGES.LOG.SIGN_IN_FAILED, { email: credentials.email, error: error.message })
-        return { success: false, message: AUTH_MESSAGES.SERVER.INVALID_CREDENTIALS.message }
+        logger.warn(AUTH_LOG_MESSAGES.SIGN_IN_FAILED, { email: credentials.email, error: error.message })
+        return { success: false, message: AUTH_SERVER_MESSAGES.INVALID_CREDENTIALS.message }
       }
 
-      logger.info(AUTH_MESSAGES.LOG.SIGN_IN_SUCCESS, { email: credentials.email })
-      return { success: true, message: AUTH_MESSAGES.SERVER.LOGIN_SUCCESS.message }
+      logger.info(AUTH_LOG_MESSAGES.SIGN_IN_SUCCESS, { email: credentials.email })
+      return { success: true, message: AUTH_SERVER_MESSAGES.LOGIN_SUCCESS.message }
     },
 
     /**
@@ -56,12 +60,12 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
       const { error } = await supabase.auth.updateUser({ password })
 
       if (error) {
-        logger.error(AUTH_MESSAGES.LOG.SET_PASSWORD_FAILED, { error })
+        logger.error(AUTH_LOG_MESSAGES.SET_PASSWORD_FAILED, { error })
         return { success: false, message: error.message }
       }
 
-      logger.info(AUTH_MESSAGES.LOG.SET_PASSWORD_SUCCESS)
-      return { success: true, message: AUTH_MESSAGES.SERVER.PASSWORD_SET_SUCCESS.message }
+      logger.info(AUTH_LOG_MESSAGES.SET_PASSWORD_SUCCESS)
+      return { success: true, message: AUTH_SERVER_MESSAGES.PASSWORD_SET_SUCCESS.message }
     },
 
     /**
@@ -75,11 +79,11 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
      * - supabase.auth.updateUser({ password }) după setarea sesiunii
      */
     async setPasswordWithToken(password: string, token_hash: string) {
-      logger.warn(AUTH_MESSAGES.LOG.SET_PASSWORD_WITH_TOKEN_ATTEMPTED, { token_hash })
+      logger.warn(AUTH_LOG_MESSAGES.SET_PASSWORD_WITH_TOKEN_ATTEMPTED, { token_hash })
 
       return {
         success: false,
-        message: AUTH_MESSAGES.SERVER.SET_PASSWORD_WITH_TOKEN_ERROR.message,
+        message: AUTH_SERVER_MESSAGES.SET_PASSWORD_WITH_TOKEN_ERROR.message,
       }
     },
 
@@ -90,11 +94,11 @@ export function createAuthService(repository: AuthRepository, supabase: Supabase
       const { error } = await supabase.auth.signOut()
 
       if (error) {
-        logger.error(AUTH_MESSAGES.LOG.SIGN_OUT_FAILED, { error })
-        throw new Error(AUTH_MESSAGES.SERVER.SIGN_OUT_ERROR.message)
+        logger.error(AUTH_LOG_MESSAGES.SIGN_OUT_FAILED, { error })
+        throw new Error(AUTH_SERVER_MESSAGES.SIGN_OUT_ERROR.message)
       }
 
-      logger.info(AUTH_MESSAGES.LOG.SIGN_OUT_SUCCESS)
+      logger.info(AUTH_LOG_MESSAGES.SIGN_OUT_SUCCESS)
     },
   }
 }

@@ -4,7 +4,7 @@ import 'dotenv/config'
 import type { User } from '@supabase/supabase-js'
 import { eq } from 'drizzle-orm'
 
-import { createAuthAdminRepository } from '@/core/domains/auth/auth.admin.repository'
+import { createAuthRepository } from '@/core/domains/auth'
 import { db } from '@/db'
 import { admins } from '@/db/schema/admins'
 
@@ -40,11 +40,11 @@ async function main() {
   }
 
   // Folosim noul nostru repository centralizat
-  const authAdminRepo = createAuthAdminRepository()
+  const authRepo = createAuthRepository(db)
 
   try {
     logger.info(`Looking for user with email: ${email}`)
-    const user = await authAdminRepo.findUserByEmail(email)
+    const user = await authRepo.findUserByEmail(email)
     logger.info(`Found user: ${user.email} (ID: ${user.id})`)
 
     await promoteUserToAdmin(user)

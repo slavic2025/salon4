@@ -10,9 +10,9 @@ export type {
   ServiceCategory,
   ServiceData,
   ServiceFilters,
+  ServiceFormValues,
   ServiceRepository,
   ServiceService,
-  ServiceFormValues,
   UpdateServiceData,
   UpdateServicePayload,
 } from './service.types'

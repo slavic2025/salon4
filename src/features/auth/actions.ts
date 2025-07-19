@@ -4,16 +4,16 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { createAuthRepository } from '@/core/domains/auth/auth.repository'
-import { createAuthService } from '@/core/domains/auth/auth.service'
 import {
-  setPasswordActionSchema,
+  createAuthRepository,
+  createAuthService,
+  SetPasswordActionValidator,
   type SetPasswordPayload,
-  setPasswordWithTokenActionSchema,
+  SetPasswordWithTokenActionValidator,
   type SetPasswordWithTokenPayload,
-  signInActionSchema,
+  SignInActionValidator,
   type SignInPayload,
-} from '@/core/domains/auth/auth.types'
+} from '@/core/domains/auth'
 import { db } from '@/db'
 import { APP_ROUTES } from '@/lib/constants'
 import { executeSafeAction } from '@/lib/safe-action'
@@ -28,7 +28,7 @@ async function getAuthService() {
 // --- PUBLIC SERVER ACTIONS ---
 
 export const signInAction = async (credentials: SignInPayload) => {
-  return executeSafeAction(signInActionSchema, credentials, async (validatedCredentials) => {
+  return executeSafeAction(SignInActionValidator, credentials, async (validatedCredentials) => {
     const authService = await getAuthService()
     const result = await authService.signInWithPassword(validatedCredentials)
     if (!result.success) {
@@ -39,7 +39,7 @@ export const signInAction = async (credentials: SignInPayload) => {
 }
 
 export const setPasswordAction = async (payload: SetPasswordPayload) => {
-  return executeSafeAction(setPasswordActionSchema, payload, async ({ password }) => {
+  return executeSafeAction(SetPasswordActionValidator, payload, async ({ password }) => {
     const authService = await getAuthService()
     const result = await authService.setPassword(password)
     if (!result.success) {
@@ -50,7 +50,7 @@ export const setPasswordAction = async (payload: SetPasswordPayload) => {
 }
 
 export const setPasswordWithTokenAction = async (payload: SetPasswordWithTokenPayload) => {
-  return executeSafeAction(setPasswordWithTokenActionSchema, payload, async ({ password, token_hash }) => {
+  return executeSafeAction(SetPasswordWithTokenActionValidator, payload, async ({ password, token_hash }) => {
     const authService = await getAuthService()
     const result = await authService.setPasswordWithToken(password, token_hash)
     if (!result.success) {

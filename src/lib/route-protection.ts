@@ -3,8 +3,7 @@
 import { type User } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 
-import { createAuthRepository } from '@/core/domains/auth/auth.repository'
-import { createAuthService } from '@/core/domains/auth/auth.service'
+import { createAuthRepository, createAuthService } from '@/core/domains/auth'
 import { db } from '@/db'
 import { createLogger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/server'

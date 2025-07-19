@@ -8,16 +8,15 @@ import { useForm } from 'react-hook-form'
 import { SubmitButton } from '@/components/shared/SubmitButton'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { AUTH_MESSAGES } from '@/core/domains/auth/auth.constants'
-import { signInFormSchema, type SignInFormValues } from '@/core/domains/auth/auth.types'
+import { AUTH_MESSAGES, type SignInFormData, SignInFormValidator } from '@/core/domains/auth'
 import { signInAction } from '@/features/auth/actions'
 import { useActionForm } from '@/hooks/useActionForm'
 
 export function LoginForm() {
   const router = useRouter()
 
-  const form = useForm<SignInFormValues>({
-    resolver: zodResolver(signInFormSchema),
+  const form = useForm<SignInFormData>({
+    resolver: zodResolver(SignInFormValidator),
     defaultValues: {
       email: '',
       password: '',
@@ -32,7 +31,7 @@ export function LoginForm() {
     onError: ({ validationErrors }) => {
       if (validationErrors) {
         Object.entries(validationErrors).forEach(([field, messages]) => {
-          form.setError(field as keyof SignInFormValues, {
+          form.setError(field as keyof SignInFormData, {
             type: 'server',
             message: messages?.[0],
           })

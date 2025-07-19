@@ -51,7 +51,7 @@ export function DeleteMenuItem({ id, onDelete, messages, icon, disabled }: Delet
         } else {
           toast.error(messages.genericError || 'A apărut o eroare la ștergere.')
         }
-      } catch (e: any) {
+      } catch {
         toast.error(messages.genericError || 'A apărut o eroare la ștergere.')
       }
     })

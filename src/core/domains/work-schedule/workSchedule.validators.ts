@@ -61,7 +61,7 @@ export const TimeValidator = z
 /**
  * Schema de bază pentru intervalul de timp
  */
-const TimeRangeSchema = z.object({
+const _TimeRangeSchema = z.object({
   startTime: TimeValidator,
   endTime: TimeValidator,
 })

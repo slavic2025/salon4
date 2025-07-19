@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { SubmitButton } from '@/components/shared/SubmitButton'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { setPasswordFormSchema, type SetPasswordFormValues } from '@/core/domains/auth/auth.types'
+import { type SetPasswordFormData,SetPasswordFormValidator } from '@/core/domains/auth'
 import { createClient } from '@/lib/supabase/client'
 
 export function SetPasswordForm() {
@@ -16,8 +16,8 @@ export function SetPasswordForm() {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
 
-  const form = useForm<SetPasswordFormValues>({
-    resolver: zodResolver(setPasswordFormSchema),
+  const form = useForm<SetPasswordFormData>({
+    resolver: zodResolver(SetPasswordFormValidator),
     defaultValues: {
       password: '',
       confirmPassword: '',
@@ -76,7 +76,7 @@ export function SetPasswordForm() {
     return hashTokens
   }
 
-  async function onSubmit(values: SetPasswordFormValues) {
+  async function onSubmit(values: SetPasswordFormData) {
     setServerError(null)
     setIsPending(true)
     try {
