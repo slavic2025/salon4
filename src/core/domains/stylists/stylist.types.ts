@@ -1,44 +1,113 @@
 // src/core/domains/stylists/stylist.types.ts
 
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import { stylists } from '@/db/schema/stylists'
 
-import { STYLIST_MESSAGES } from './stylist.constants'
+// --- DATABASE TYPES ---
 
-// --- Tipuri de Bază generate din Schema Drizzle ---
-export const selectStylistSchema = createSelectSchema(stylists)
-export const insertStylistSchema = createInsertSchema(stylists)
-
+/**
+ * Tipuri generate automat din schema Drizzle
+ */
 export type Stylist = typeof stylists.$inferSelect
 export type NewStylist = typeof stylists.$inferInsert
 
-// --- Schema pentru Formularul din UI (Adăugare / Editare) ---
-export const stylistFormSchema = z.object({
-  fullName: z.string().min(3, STYLIST_MESSAGES.VALIDATION.FULL_NAME_MIN_LENGTH),
-  email: z.string().email(STYLIST_MESSAGES.VALIDATION.INVALID_EMAIL),
-  phone: z.string().min(9, STYLIST_MESSAGES.VALIDATION.PHONE_TOO_SHORT),
-  description: z.string(),
-  isActive: z.boolean(),
-})
+// --- BUSINESS TYPES ---
 
-export type StylistFormValues = z.infer<typeof stylistFormSchema>
+/**
+ * Date de bază pentru stylist (fără ID și timestamps)
+ */
+export interface StylistData {
+  fullName: string
+  email: string
+  phone: string
+  description: string
+  isActive: boolean
+}
 
-// --- Scheme pentru Acțiunile de pe Server ---
+/**
+ * Date pentru creare stylist (cu ID din Supabase Auth)
+ */
+export interface CreateStylistData extends StylistData {
+  id: string
+}
 
-// Schema pentru acțiunea de ADĂUGARE
-export const createStylistActionSchema = stylistFormSchema
-export type CreateStylistPayload = z.infer<typeof createStylistActionSchema>
+/**
+ * Date pentru actualizare stylist (toate câmpurile opționale)
+ */
+export interface UpdateStylistData extends Partial<StylistData> {}
 
-// Schema pentru acțiunea de EDITARE
-export const updateStylistActionSchema = stylistFormSchema.extend({
-  id: z.string().uuid(STYLIST_MESSAGES.VALIDATION.ID_REQUIRED),
-})
-export type UpdateStylistPayload = z.infer<typeof updateStylistActionSchema>
+/**
+ * Filtru pentru căutarea stiliștilor
+ */
+export interface StylistFilters {
+  isActive?: boolean
+  search?: string
+  limit?: number
+  offset?: number
+}
 
-// Schema pentru acțiunea de ȘTERGERE
-export const deleteStylistActionSchema = z.object({
-  id: z.string().uuid(STYLIST_MESSAGES.VALIDATION.ID_REQUIRED),
-})
-export type DeleteStylistPayload = z.infer<typeof deleteStylistActionSchema>
+// --- REPOSITORY INTERFACE ---
+
+export interface StylistRepository {
+  findAll(): Promise<Stylist[]>
+  findById(id: string): Promise<Stylist | undefined>
+  findByEmail(email: string): Promise<Stylist | undefined>
+  findByPhone(phone: string): Promise<Stylist | undefined>
+  create(newStylist: CreateStylistData): Promise<Stylist>
+  update(id: string, data: Partial<CreateStylistData>): Promise<Stylist>
+  delete(id: string): Promise<void>
+}
+
+// --- SERVICE INTERFACE ---
+
+export interface StylistService {
+  getAllStylists(): Promise<Stylist[]>
+  getStylistById(id: string): Promise<Stylist | null>
+  createStylist(payload: CreateStylistPayload): Promise<{
+    success: boolean
+    message: string
+    data: Stylist
+  }>
+  updateStylist(payload: UpdateStylistPayload): Promise<{
+    success: boolean
+    message: string
+    data: Stylist
+  }>
+  deleteStylist(stylistId: string): Promise<{
+    success: boolean
+    message: string
+  }>
+}
+
+// --- RE-EXPORT VALIDATORS ---
+// Re-exportăm validatori din validators.ts pentru a păstra compatibilitatea
+
+import {
+  CreateStylistActionSchema,
+  DeleteStylistActionSchema,
+  type StylistFormData,
+  StylistFormValidator,
+  UpdateStylistActionSchema,
+  type UpdateStylistFormData,
+} from './stylist.validators'
+
+export { CreateStylistActionSchema, DeleteStylistActionSchema, StylistFormValidator, UpdateStylistActionSchema }
+
+export type { StylistFormData, UpdateStylistFormData }
+
+// --- ACTION PAYLOAD TYPES ---
+// Derivate din validatori pentru type safety
+
+export type CreateStylistPayload = z.infer<typeof CreateStylistActionSchema>
+export type UpdateStylistPayload = z.infer<typeof UpdateStylistActionSchema>
+export type DeleteStylistPayload = z.infer<typeof DeleteStylistActionSchema>
+
+// --- BACKWARD COMPATIBILITY ---
+// Pentru compatibilitate cu codul existent
+
+export const stylistFormSchema = StylistFormValidator
+export type StylistFormValues = StylistFormData
+export const createStylistActionSchema = CreateStylistActionSchema
+export const updateStylistActionSchema = UpdateStylistActionSchema
+export const deleteStylistActionSchema = DeleteStylistActionSchema

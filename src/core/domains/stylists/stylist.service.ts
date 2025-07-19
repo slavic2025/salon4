@@ -2,13 +2,12 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-import { APP_ROUTES } from '@/lib/constants'
 import { DatabaseError, UniquenessError } from '@/lib/errors'
 import { createLogger } from '@/lib/logger'
 
 import { STYLIST_MESSAGES } from './stylist.constants'
 import type { StylistRepository } from './stylist.repository'
-import type { CreateStylistPayload, UpdateStylistPayload } from './stylist.types'
+import type { CreateStylistData, CreateStylistPayload, UpdateStylistPayload } from './stylist.types'
 
 export function createStylistService(repository: StylistRepository, supabaseAdmin: SupabaseClient) {
   const logger = createLogger('StylistService')
@@ -40,14 +39,14 @@ export function createStylistService(repository: StylistRepository, supabaseAdmi
     getAllStylists: () => repository.findAll(),
 
     async createStylist(payload: CreateStylistPayload) {
-      await _ensureUniqueness(payload)
+      await _ensureUniqueness({ email: payload.email, phone: payload.phone })
 
       logger.info('Inviting auth user for new stylist...', { email: payload.email })
       const {
         data: { user },
         error: inviteError,
       } = await supabaseAdmin.auth.admin.inviteUserByEmail(payload.email, {
-        redirectTo: APP_ROUTES.AUTH_CONFIRM, // asigură-te că această constantă este definită ca URL complet (ex: http://localhost:3000/auth/confirm)
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/login`,
       })
 
       if (inviteError || !user) {
@@ -56,7 +55,13 @@ export function createStylistService(repository: StylistRepository, supabaseAdmi
       }
 
       try {
-        const newProfile = await repository.create({ ...payload, id: user.id, email: user.email! })
+        const createData: CreateStylistData = {
+          ...payload,
+          id: user.id,
+          email: user.email!,
+          description: payload.description || '',
+        }
+        const newProfile = await repository.create(createData)
         logger.info('Stylist profile created successfully.', { stylistId: newProfile.id })
         return { success: true, message: STYLIST_MESSAGES.SERVER.CREATE_SUCCESS, data: newProfile }
       } catch (profileError) {
@@ -71,7 +76,7 @@ export function createStylistService(repository: StylistRepository, supabaseAdmi
 
     async updateStylist(payload: UpdateStylistPayload) {
       const { id, ...data } = payload
-      await _ensureUniqueness(data, id)
+      await _ensureUniqueness({ email: data.email || '', phone: data.phone }, id)
 
       const updatedStylist = await repository.update(id, data)
       logger.info('Stylist updated successfully.', { stylistId: id })

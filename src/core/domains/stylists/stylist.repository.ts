@@ -6,7 +6,7 @@ import { desc } from 'drizzle-orm'
 import { type DbClient } from '@/db'
 import { stylists } from '@/db/schema/stylists'
 
-import type { NewStylist, Stylist } from './stylist.types'
+import type { CreateStylistData, Stylist, UpdateStylistData } from './stylist.types'
 
 export function createStylistRepository(db: DbClient) {
   const TABLE = stylists
@@ -33,11 +33,11 @@ export function createStylistRepository(db: DbClient) {
     async findByPhone(phone: string): Promise<Stylist | undefined> {
       return _findOneBy('phone', phone)
     },
-    async create(newStylist: NewStylist): Promise<Stylist> {
+    async create(newStylist: CreateStylistData): Promise<Stylist> {
       const [stylist] = await db.insert(TABLE).values(newStylist).returning()
       return stylist
     },
-    async update(id: string, data: Partial<NewStylist>): Promise<Stylist> {
+    async update(id: string, data: UpdateStylistData): Promise<Stylist> {
       const [stylist] = await db
         .update(TABLE)
         .set({ ...data, updatedAt: new Date() })
