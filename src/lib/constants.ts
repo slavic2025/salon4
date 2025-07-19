@@ -37,6 +37,10 @@ export const APP_ROUTES = {
   // Rute specifice pentru pagini
   ADMIN_SERVICES_PAGE: '/admin/services',
   ADMIN_STYLISTS_PAGE: '/admin/stylists',
+  // Rute specifice pentru stylist
+  STYLIST_UNAVAILABILITY: '/stylist/unavailability',
+  STYLIST_SCHEDULE: '/stylist/schedule',
+  STYLIST_SERVICES: '/stylist/services',
 } as const
 
 export const UI_MESSAGES = {

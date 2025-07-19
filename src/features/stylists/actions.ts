@@ -17,9 +17,15 @@ import {
 import { db } from '@/db'
 import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
+import { createLogger } from '@/lib/logger'
 import { ensureUserIsAdmin } from '@/lib/route-protection'
 import { executeSafeAction } from '@/lib/safe-action'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+/**
+ * Logger pentru domeniul stylists
+ */
+const logger = createLogger('stylists')
 
 /**
  * Instanțiem serviciul o singură dată la nivel de modul.
@@ -52,25 +58,24 @@ function createAdminStylistAction<T extends z.ZodType<any, any, any>>(
 ) {
   return (payload: z.infer<T>) => {
     return executeSafeAction(schema, payload, async (validatedPayload) => {
-      // 1. Securitatea este aplicată automat aici.
       await _ensureUserIsAdmin()
 
       try {
-        // 2. Execuția logicii de business specifice.
         const result = await actionLogic(validatedPayload)
-
-        // 3. Revalidarea căii este centralizată.
         revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
-
+        logger.info('Acțiune stylist executată cu succes', { action: 'admin-stylist' })
         return { data: result }
       } catch (error) {
-        // 4. Gestionarea erorilor specifice domeniului este centralizată.
         if (error instanceof UniquenessError) {
+          logger.warn('Eroare de unicitate în acțiunea stylist', {
+            fields: error.fields.map((f) => f.field),
+            action: 'admin-stylist',
+          })
           return {
             validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
           }
         }
-        // Orice altă eroare va fi prinsă de `executeSafeAction` și va returna o eroare de server.
+        logger.error('Eroare în acțiunea stylist', { error, action: 'admin-stylist' })
         throw error
       }
     })

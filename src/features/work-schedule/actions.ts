@@ -4,6 +4,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import { WORK_SCHEDULE_MESSAGES } from '@/core/domains/work-schedule/workSchedule.constants'
 import { createWorkScheduleRepository } from '@/core/domains/work-schedule/workSchedule.repository'
 import { createWorkScheduleService } from '@/core/domains/work-schedule/workSchedule.service'
 import {
@@ -15,10 +16,16 @@ import {
   type UpdateWorkSchedulePayload,
 } from '@/core/domains/work-schedule/workSchedule.types'
 import { db } from '@/db'
-import { APP_ROUTES } from '@/lib/constants'
+import { APP_ROUTES, ROLES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
+import { createLogger } from '@/lib/logger'
 import { ensureUserIsAdmin, ensureUserIsStylist } from '@/lib/route-protection'
 import { executeSafeAction } from '@/lib/safe-action'
+
+/**
+ * Logger pentru domeniul work-schedule
+ */
+const logger = createLogger('work-schedule')
 
 /**
  * Instanțiem serviciul o singură dată la nivel de modul.
@@ -50,25 +57,24 @@ function createAdminWorkScheduleAction<T extends z.ZodType<any, any, any>>(
 ) {
   return (payload: z.infer<T>) => {
     return executeSafeAction(schema, payload, async (validatedPayload) => {
-      // 1. Securitatea este aplicată automat aici.
       await _ensureUserIsAdmin()
 
       try {
-        // 2. Execuția logicii de business specifice.
         const result = await actionLogic(validatedPayload)
-
-        // 3. Revalidarea căilor este centralizată.
         revalidatePaths.forEach((path) => revalidatePath(path))
-
+        logger.info('Acțiune admin work-schedule executată cu succes', { action: 'admin-work-schedule' })
         return { data: result }
       } catch (error) {
-        // 4. Gestionarea erorilor specifice domeniului este centralizată.
         if (error instanceof UniquenessError) {
+          logger.warn('Eroare de unicitate în acțiunea admin work-schedule', {
+            fields: error.fields.map((f) => f.field),
+            action: 'admin-work-schedule',
+          })
           return {
             validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
           }
         }
-        // Orice altă eroare va fi prinsă de `executeSafeAction` și va returna o eroare de server.
+        logger.error('Eroare în acțiunea admin work-schedule', { error, action: 'admin-work-schedule' })
         throw error
       }
     })
@@ -77,6 +83,8 @@ function createAdminWorkScheduleAction<T extends z.ZodType<any, any, any>>(
 
 /**
  * FACTORY FUNCTION: Creează o acțiune sigură care permite unui stylist să-și gestioneze propriul program.
+ * Încorporează validarea, autorizarea, execuția, gestionarea erorilor și revalidarea.
+ *
  * @param schema - Schema Zod pentru validarea datelor de intrare.
  * @param actionLogic - Funcția care conține logica de business specifică.
  * @returns O Server Action completă și sigură.
@@ -91,14 +99,28 @@ function createStylistOwnScheduleActionFactory<T extends z.ZodType<any, any, any
 
       try {
         const result = await actionLogic(validatedPayload, user.id)
-        revalidatePath(APP_ROUTES.STYLIST + '/schedule')
+        revalidatePath(APP_ROUTES.STYLIST_SCHEDULE)
+        logger.info('Acțiune stylist work-schedule executată cu succes', {
+          userId: user.id,
+          action: 'stylist-work-schedule',
+        })
         return { data: result }
       } catch (error) {
         if (error instanceof UniquenessError) {
+          logger.warn('Eroare de unicitate în acțiunea stylist work-schedule', {
+            fields: error.fields.map((f) => f.field),
+            userId: user.id,
+            action: 'stylist-work-schedule',
+          })
           return {
             validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
           }
         }
+        logger.error('Eroare în acțiunea stylist work-schedule', {
+          error,
+          userId: user.id,
+          action: 'stylist-work-schedule',
+        })
         throw error
       }
     })
@@ -124,65 +146,81 @@ export const deleteWorkScheduleAction = createAdminWorkScheduleAction(
 
 // --- STYLIST OWN SCHEDULE SERVER ACTIONS ---
 
-/**
- * Action pentru ca un stylist să-și adauge un interval nou la program
- */
 export const createStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
   CreateWorkScheduleActionSchema,
   async (payload: CreateWorkSchedulePayload, userId: string) => {
     // Verificăm că stilistul încearcă să adauge interval pentru el însuși
     if (payload.stylistId !== userId) {
-      throw new Error('Nu poți adăuga intervale pentru alți stiliști')
+      logger.warn('Încercare de adăugare interval pentru alt stilist', {
+        requestedStylistId: payload.stylistId,
+        userId,
+        action: 'stylist-add-schedule',
+      })
+      throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_MODIFY)
     }
 
+    logger.info('Adăugare interval pentru stilist', {
+      stylistId: payload.stylistId,
+      dayOfWeek: payload.dayOfWeek,
+      action: 'stylist-add-schedule',
+    })
     return workScheduleService.createSchedule(payload)
   },
 )
 
-/**
- * Action pentru ca un stylist să-și actualizeze un interval din program
- */
 export const updateStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
   UpdateWorkScheduleActionSchema,
   async (payload: UpdateWorkSchedulePayload, userId: string) => {
     // Verificăm că stilistul încearcă să actualizeze interval pentru el însuși
     if (payload.stylistId !== userId) {
-      throw new Error('Nu poți actualizeze intervale pentru alți stiliști')
+      logger.warn('Încercare de actualizare interval pentru alt stilist', {
+        requestedStylistId: payload.stylistId,
+        userId,
+        action: 'stylist-update-schedule',
+      })
+      throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_MODIFY)
     }
 
+    logger.info('Actualizare interval pentru stilist', {
+      stylistId: payload.stylistId,
+      scheduleId: payload.id,
+      action: 'stylist-update-schedule',
+    })
     return workScheduleService.updateSchedule(payload)
   },
 )
 
-/**
- * Action pentru ca un stylist să-și șteargă un interval din program
- */
 export const deleteStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
   DeleteWorkScheduleActionSchema,
   async (payload: DeleteWorkSchedulePayload, userId: string) => {
     // Verificăm că intervalul aparține stilistului
     const schedule = await workScheduleService.getScheduleById(payload.id)
     if (schedule.stylistId !== userId) {
-      throw new Error('Nu poți șterge intervale de la alți stiliști')
+      logger.warn('Încercare de ștergere interval pentru alt stilist', {
+        scheduleStylistId: schedule.stylistId,
+        userId,
+        scheduleId: payload.id,
+        action: 'stylist-delete-schedule',
+      })
+      throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_MODIFY)
     }
 
+    logger.info('Ștergere interval pentru stilist', {
+      stylistId: schedule.stylistId,
+      scheduleId: payload.id,
+      action: 'stylist-delete-schedule',
+    })
     return workScheduleService.deleteSchedule(payload.id)
   },
 )
 
 // --- FETCH SERVER ACTIONS ---
 
-/**
- * Obține toate programele (pentru admin)
- */
 export async function getAllWorkSchedulesAction() {
   await ensureUserIsAdmin()
   return await workScheduleService.getAllSchedules()
 }
 
-/**
- * Obține programul unui stilist (pentru admin și stylist)
- */
 export async function getStylistScheduleAction(payload: { stylistId: string }) {
   const schema = z.object({ stylistId: z.string().uuid() })
   const { stylistId } = schema.parse(payload)
@@ -190,24 +228,30 @@ export async function getStylistScheduleAction(payload: { stylistId: string }) {
   const user = await ensureUserIsStylist()
 
   // Stilistul poate vedea doar propriul program, adminul poate vedea pe toți
-  if (user.role !== 'ADMIN' && stylistId !== user.id) {
-    throw new Error('Nu poți accesa programul altor stiliști')
+  if (user.role !== ROLES.ADMIN && stylistId !== user.id) {
+    logger.warn('Încercare de acces la programul altui stilist', {
+      requestedStylistId: stylistId,
+      userId: user.id,
+      userRole: user.role,
+      action: 'get-stylist-schedule',
+    })
+    throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_ACCESS)
   }
 
+  logger.info('Acces la programul stilistului', {
+    stylistId,
+    userId: user.id,
+    userRole: user.role,
+    action: 'get-stylist-schedule',
+  })
   return await workScheduleService.getStylistSchedule(stylistId)
 }
 
-/**
- * Obține propriul program al stilistului
- */
 export async function getStylistOwnScheduleAction() {
   const user = await ensureUserIsStylist()
   return await workScheduleService.getStylistSchedule(user.id)
 }
 
-/**
- * Verifică disponibilitatea unui stilist (pentru programări)
- */
 export async function checkStylistAvailabilityAction(payload: {
   stylistId: string
   dayOfWeek: number

@@ -111,9 +111,9 @@ export const updateUnavailabilityStylistAction = async (id: string, payload: unk
 }
 
 export const deleteUnavailabilityStylistAction = async (id: string) => {
-  const user = await ensureUserIsStylist()
-
   try {
+    const user = await ensureUserIsStylist()
+
     // Verificăm că indisponibilitatea există și aparține stylistului
     const existing = await unavailabilityService.getUnavailabilityById(id)
     if (!existing || existing.stylistId !== user.id) {
@@ -163,9 +163,9 @@ export const createBulkUnavailabilityStylistAction = async (payload: {
   allDay: boolean
   description?: string | null
 }) => {
-  const user = await ensureUserIsStylist()
-
   try {
+    const user = await ensureUserIsStylist()
+
     // Enforțăm că stylistul poate crea doar pentru el însuși
     if (payload.stylistId !== user.id) {
       return {

@@ -201,6 +201,17 @@
 - Valorifică dependency injection
 - Folosește Module pattern pentru encapsulation
 
+## 📝 Reguli de Logging
+- Folosește întotdeauna logger-ul din `@/lib/logger` în loc de `console.log`
+- Creează instanța logger-ului cu context-ul specific domeniului (ex: `createLogger('auth')`)
+- Folosește nivelurile de logare optime:
+  - `logger.debug()` - pentru informații detaliate de debugging
+  - `logger.info()` - pentru informații generale despre fluxul aplicației
+  - `logger.warn()` - pentru situații care necesită atenție dar nu sunt erori
+  - `logger.error()` - pentru erori care afectează funcționalitatea
+- Loghează erorile cu context complet (mesaj + data)
+- Evită logging-ul excesiv în producție prin configurarea nivelului de logare
+
 ---
 
 **Principii Fundamentale**: Urmează aceste reguli pentru a asigura cod consistent, performant și mentenabil în cadrul proiectului salon management platform.
