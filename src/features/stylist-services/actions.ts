@@ -8,12 +8,14 @@ import { createServiceService } from '@/core/domains/services/service.service'
 import { STYLIST_SERVICE_LINK_MESSAGES } from '@/core/domains/stylist-services/stylist-service.constants'
 import { createStylistServiceLinkRepository } from '@/core/domains/stylist-services/stylist-service.repository'
 import { createStylistServiceLinkService } from '@/core/domains/stylist-services/stylist-service.service'
-import {
-  createStylistServiceLinkActionSchema,
-  type CreateStylistServiceLinkPayload,
-  deleteStylistServiceLinkActionSchema,
-  type DeleteStylistServiceLinkPayload,
+import type {
+  CreateStylistServiceLinkPayload,
+  DeleteStylistServiceLinkPayload,
 } from '@/core/domains/stylist-services/stylist-service.types'
+import {
+  CreateStylistServiceLinkActionSchema,
+  DeleteStylistServiceLinkActionSchema,
+} from '@/core/domains/stylist-services/stylist-service.validators'
 import { db } from '@/db'
 import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
@@ -49,7 +51,7 @@ function createAdminStylistServiceLinkAction<T extends z.ZodType<any, any, any>>
 }
 
 export const createStylistServiceLinkAction = createAdminStylistServiceLinkAction(
-  createStylistServiceLinkActionSchema,
+  CreateStylistServiceLinkActionSchema,
   async (payload: CreateStylistServiceLinkPayload) => {
     const stylistServiceLinkService = createStylistServiceLinkService(createStylistServiceLinkRepository(db))
     return stylistServiceLinkService.createLink(payload)
@@ -57,7 +59,7 @@ export const createStylistServiceLinkAction = createAdminStylistServiceLinkActio
 )
 
 export const deleteStylistServiceLinkAction = createAdminStylistServiceLinkAction(
-  deleteStylistServiceLinkActionSchema,
+  DeleteStylistServiceLinkActionSchema,
   async (payload: DeleteStylistServiceLinkPayload) => {
     const stylistServiceLinkService = createStylistServiceLinkService(createStylistServiceLinkRepository(db))
     return stylistServiceLinkService.deleteLink(payload.stylistId, payload.serviceId)
@@ -78,7 +80,12 @@ export const updateStylistServiceLinkAction = async (payload: {
   })
   const { stylistId, serviceId, customPrice, customDuration } = schema.parse(payload)
   const priceString = typeof customPrice === 'number' ? String(customPrice) : customPrice
-  return await stylistServiceLinkService.updateLink(stylistId, serviceId, { customPrice: priceString, customDuration })
+  return await stylistServiceLinkService.updateLink(stylistId, serviceId, {
+    stylistId,
+    serviceId,
+    customPrice: priceString,
+    customDuration,
+  })
 }
 
 // --- SERVER ACTIONS PENTRU FETCH ---
@@ -129,7 +136,7 @@ function createStylistOwnServiceLinkAction<T extends z.ZodType<any, any, any>>(
  * Action pentru ca un stylist să-și adauge un serviciu nou
  */
 export const createStylistOwnServiceAction = createStylistOwnServiceLinkAction(
-  createStylistServiceLinkActionSchema,
+  CreateStylistServiceLinkActionSchema,
   async (payload: CreateStylistServiceLinkPayload, userId: string) => {
     // Verificăm că stilistul încearcă să adauge serviciu pentru el însuși
     if (payload.stylistId !== userId) {
@@ -145,7 +152,7 @@ export const createStylistOwnServiceAction = createStylistOwnServiceLinkAction(
  * Action pentru ca un stylist să-și șteargă un serviciu
  */
 export const deleteStylistOwnServiceAction = createStylistOwnServiceLinkAction(
-  deleteStylistServiceLinkActionSchema,
+  DeleteStylistServiceLinkActionSchema,
   async (payload: DeleteStylistServiceLinkPayload, userId: string) => {
     // Verificăm că stilistul încearcă să șteargă serviciu de la el însuși
     if (payload.stylistId !== userId) {
@@ -186,6 +193,8 @@ export const updateStylistOwnServiceAction = async (payload: {
 
     const stylistServiceLinkService = createStylistServiceLinkService(createStylistServiceLinkRepository(db))
     const result = await stylistServiceLinkService.updateLink(stylistId, serviceId, {
+      stylistId,
+      serviceId,
       customPrice: priceString,
       customDuration,
     })
