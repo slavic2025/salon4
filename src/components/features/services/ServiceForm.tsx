@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { SERVICE_CATEGORIES, serviceFormSchema, type ServiceFormValues } from '@/core/domains/services/service.types'
+import { CreateServiceFormValidator, SERVICE_CATEGORIES, type ServiceFormValues } from '@/core/domains/services'
 import { DEFAULT_CURRENCY } from '@/lib/constants'
 
 type ServiceFormProps = {
@@ -22,7 +22,7 @@ type ServiceFormProps = {
 
 export function ServiceForm({ defaultValues, onSubmit, isPending, submitButtonText = 'Salvează' }: ServiceFormProps) {
   const form = useForm<ServiceFormValues>({
-    resolver: zodResolver(serviceFormSchema),
+    resolver: zodResolver(CreateServiceFormValidator),
     defaultValues: {
       name: defaultValues?.name ?? '',
       description: defaultValues?.description ?? '',

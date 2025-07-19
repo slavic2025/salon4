@@ -1,6 +1,6 @@
 // src/app/(dashboard)/stylist/layout.tsx
 import { DashboardLayout } from '@/components/features/dashboard/dashboard-layout'
-import { STYLIST_NAV_ITEMS } from '@/core/domains/stylist/stylist.constants'
+import { STYLIST_NAV_ITEMS } from '@/core/domains/stylists/stylist.constants'
 import { ROLES } from '@/lib/constants'
 import { enforceRouteAccess } from '@/lib/route-protection'
 

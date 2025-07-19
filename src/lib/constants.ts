@@ -29,6 +29,14 @@ export const APP_ROUTES = {
   },
   ADMIN: '/admin',
   STYLIST: '/stylist',
+  // Alias-uri pentru compatibilitate
+  LANDING: '/',
+  LOGIN: '/auth/login',
+  ADMIN_DASHBOARD: '/admin',
+  STYLIST_DASHBOARD: '/stylist',
+  // Rute specifice pentru pagini
+  ADMIN_SERVICES_PAGE: '/admin/services',
+  ADMIN_STYLISTS_PAGE: '/admin/stylists',
 } as const
 
 export const UI_MESSAGES = {

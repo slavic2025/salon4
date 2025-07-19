@@ -2,9 +2,8 @@
 'use client'
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { SERVICE_MESSAGES } from '@/core/domains/services/service.constants'
-import type { Service } from '@/core/domains/services/service.types'
-import { SERVICE_CATEGORIES } from '@/core/domains/services/service.types'
+import type { Service } from '@/core/domains/services'
+import { SERVICE_CATEGORIES, SERVICE_SUCCESS_MESSAGES } from '@/core/domains/services'
 import { updateServiceAction } from '@/features/services/actions'
 import { useActionForm } from '@/hooks/useActionForm'
 
@@ -22,7 +21,7 @@ export function EditServiceDialog({ service, isOpen, setIsOpen }: EditServiceDia
     onSuccess: () => setIsOpen(false),
     toastMessages: {
       loading: 'Se actualizează serviciul...',
-      success: SERVICE_MESSAGES.SUCCESS.UPDATED,
+      success: SERVICE_SUCCESS_MESSAGES.UPDATED,
     },
   })
 

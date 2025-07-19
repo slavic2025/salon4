@@ -1,4 +1,5 @@
 // src/core/domains/stylists/stylist.constants.ts
+import type { NavItem } from '@/types/ui.types'
 
 // --- VALIDATION MESSAGES ---
 
@@ -43,12 +44,12 @@ export const STYLIST_ERROR_MESSAGES = {
   DATABASE_ERROR: 'Eroare la accesarea bazei de date - contactați suportul tehnic',
 } as const
 
-// --- UI MESSAGES ---
+// --- ADMIN UI MESSAGES ---
 
 /**
- * Mesaje pentru interfața utilizator
+ * Mesaje pentru interfața de administrare a stiliștilor
  */
-export const STYLIST_UI_MESSAGES = {
+export const STYLIST_ADMIN_UI_MESSAGES = {
   PAGE_TITLE: 'Gestionare Stiliști',
   PAGE_DESCRIPTION: 'Gestionează echipa de stiliști și cosmetologi ai salonului',
   ADD_BUTTON: 'Adaugă Stilist',
@@ -72,6 +73,72 @@ export const STYLIST_UI_MESSAGES = {
   LOADING_DELETE: 'Se șterge...',
   SEARCH_PLACEHOLDER: 'Caută după nume sau email...',
 } as const
+
+// --- DASHBOARD UI MESSAGES ---
+
+/**
+ * Mesaje pentru dashboard-ul stilistului
+ */
+export const STYLIST_DASHBOARD_MESSAGES = {
+  DASHBOARD: {
+    WELCOME_TITLE: 'Dashboard Stilist',
+    WELCOME_DESCRIPTION: 'Bine ai venit! Aici poți gestiona programările și serviciile tale.',
+  },
+  PROFILE: {
+    TITLE: 'Profilul meu',
+    DESCRIPTION: 'Gestionează informațiile tale personale și profesionale.',
+  },
+  SERVICES: {
+    TITLE: 'Serviciile mele',
+    DESCRIPTION: 'Vezi și gestionează serviciile pe care le oferi.',
+  },
+  APPOINTMENTS: {
+    TITLE: 'Programările mele',
+    DESCRIPTION: 'Vezi și gestionează programările tale.',
+  },
+  WORK_SCHEDULE: {
+    TITLE: 'Programul meu de lucru',
+    DESCRIPTION: 'Configurează intervalele tale de lucru pentru fiecare zi a săptămânii.',
+  },
+} as const
+
+// --- NAVIGATION ITEMS ---
+
+/**
+ * Elemente de navigație pentru dashboard-ul stilistului
+ */
+export const STYLIST_NAV_ITEMS: NavItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/stylist',
+    icon: 'dashboard',
+  },
+  {
+    title: 'Programările mele',
+    href: '/stylist/appointments',
+    icon: 'calendar',
+  },
+  {
+    title: 'Indisponibilitate',
+    href: '/stylist/unavailability',
+    icon: 'calendarX',
+  },
+  {
+    title: 'Programul meu de lucru',
+    href: '/stylist/work-schedule',
+    icon: 'clock',
+  },
+  {
+    title: 'Serviciile mele',
+    href: '/stylist/services',
+    icon: 'scissors',
+  },
+  {
+    title: 'Profilul meu',
+    href: '/stylist/profile',
+    icon: 'user',
+  },
+]
 
 // --- SYSTEM LIMITS ---
 
@@ -97,7 +164,8 @@ export const STYLIST_MESSAGES = {
   VALIDATION: STYLIST_VALIDATION_MESSAGES,
   SUCCESS: STYLIST_SUCCESS_MESSAGES,
   ERROR: STYLIST_ERROR_MESSAGES,
-  UI: STYLIST_UI_MESSAGES,
+  ADMIN_UI: STYLIST_ADMIN_UI_MESSAGES,
+  DASHBOARD_UI: STYLIST_DASHBOARD_MESSAGES,
   SERVER: {
     CREATE_SUCCESS: STYLIST_SUCCESS_MESSAGES.CREATED,
     CREATE_AUTH_ERROR: STYLIST_ERROR_MESSAGES.CREATE_AUTH_ERROR,

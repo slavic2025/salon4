@@ -4,16 +4,16 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import {
+  CreateServiceActionSchema,
+  CreateServicePayload,
+  DeleteServiceActionSchema,
+  type DeleteServicePayload,
+  UpdateServiceActionSchema,
+  type UpdateServicePayload,
+} from '@/core/domains/services'
 import { createServiceRepository } from '@/core/domains/services/service.repository'
 import { createServiceService } from '@/core/domains/services/service.service'
-import {
-  createServiceActionSchema,
-  CreateServicePayload,
-  deleteServiceActionSchema,
-  type DeleteServicePayload,
-  updateServiceActionSchema,
-  type UpdateServicePayload,
-} from '@/core/domains/services/service.types'
 import { db } from '@/db'
 import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
@@ -79,16 +79,16 @@ function createAdminServiceAction<T extends z.ZodType<any, any, any>>(
 // Definițiile sunt acum declarative, concise și ușor de citit.
 
 export const updateServiceAction = createAdminServiceAction(
-  updateServiceActionSchema,
+  UpdateServiceActionSchema,
   async (payload: UpdateServicePayload) => serviceService.updateService(payload),
 )
 
 export const createServiceAction = createAdminServiceAction(
-  createServiceActionSchema,
+  CreateServiceActionSchema,
   async (payload: CreateServicePayload) => serviceService.createService(payload),
 )
 
 export const deleteServiceAction = createAdminServiceAction(
-  deleteServiceActionSchema,
+  DeleteServiceActionSchema,
   async (payload: DeleteServicePayload) => serviceService.deleteService(payload.id),
 )

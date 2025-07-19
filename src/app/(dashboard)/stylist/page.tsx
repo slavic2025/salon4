@@ -1,5 +1,5 @@
 // src/app/(dashboard)/stylist/page.tsx
-import { STYLIST_MESSAGES } from '@/core/domains/stylist/stylist.constants'
+import { STYLIST_DASHBOARD_MESSAGES } from '@/core/domains/stylists/stylist.constants'
 import { ROLES } from '@/lib/constants'
 import { enforceRouteAccess } from '@/lib/route-protection'
 
@@ -14,8 +14,10 @@ export default async function StylistDashboardPage() {
 
   return (
     <div className="space-y-1">
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">{STYLIST_MESSAGES.DASHBOARD.WELCOME_TITLE}</h1>
-      <p className="text-muted-foreground">{STYLIST_MESSAGES.DASHBOARD.WELCOME_DESCRIPTION}</p>
+      <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        {STYLIST_DASHBOARD_MESSAGES.DASHBOARD.WELCOME_TITLE}
+      </h1>
+      <p className="text-muted-foreground">{STYLIST_DASHBOARD_MESSAGES.DASHBOARD.WELCOME_DESCRIPTION}</p>
     </div>
   )
 }

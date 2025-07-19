@@ -56,7 +56,7 @@ export const StylistFormValidator = z.object({
   email: EmailValidator,
   phone: PhoneValidator,
   description: DescriptionValidator,
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 })
 
 /**
