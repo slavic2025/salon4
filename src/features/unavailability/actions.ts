@@ -4,14 +4,11 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-import {
-  UNAVAILABILITY_CAUSES,
-  UNAVAILABILITY_ERROR_MESSAGES,
-  UNAVAILABILITY_VALIDATION_MESSAGES,
-} from '@/core/domains/unavailability/unavailability.constants'
+import { UNAVAILABILITY_ERROR_MESSAGES } from '@/core/domains/unavailability/unavailability.constants'
 import { createUnavailabilityRepository } from '@/core/domains/unavailability/unavailability.repository'
 import { createUnavailabilityService } from '@/core/domains/unavailability/unavailability.service'
 import {
+  CreateBulkUnavailabilityActionSchema,
   CreateUnavailabilityActionSchema,
   UpdateUnavailabilityActionSchema,
 } from '@/core/domains/unavailability/unavailability.types'
@@ -55,14 +52,14 @@ function createStylistUnavailabilityAction<T extends z.ZodType<any, any, any>>(
           userId: user.id,
           action: 'stylist-unavailability',
         })
-        return { data: result }
+        return { success: true, data: result }
       } catch (error) {
         logger.error('Eroare în acțiunea unavailability', {
           error,
           userId: user.id,
           action: 'stylist-unavailability',
         })
-        return { serverError: UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED }
+        return { success: false, error: UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED }
       }
     })
   }
@@ -85,10 +82,7 @@ export const updateUnavailabilityStylistAction = async (id: string, payload: unk
 
     try {
       // Verificăm că indisponibilitatea există și aparține stylistului
-      const existing = await unavailabilityService.getUnavailabilityById(id)
-      if (!existing || existing.stylistId !== user.id) {
-        return { serverError: UNAVAILABILITY_ERROR_MESSAGES.UNAUTHORIZED }
-      }
+      await unavailabilityService.ensureStylistOwns(id, user.id)
 
       const result = await unavailabilityService.updateUnavailability(id, data)
       revalidatePath(APP_ROUTES.STYLIST_UNAVAILABILITY)
@@ -97,7 +91,7 @@ export const updateUnavailabilityStylistAction = async (id: string, payload: unk
         userId: user.id,
         action: 'update-unavailability',
       })
-      return { data: result }
+      return { success: true, data: result }
     } catch (error) {
       logger.error('Eroare la actualizarea unavailability', {
         error,
@@ -105,7 +99,7 @@ export const updateUnavailabilityStylistAction = async (id: string, payload: unk
         userId: user.id,
         action: 'update-unavailability',
       })
-      return { serverError: UNAVAILABILITY_ERROR_MESSAGES.UPDATE_FAILED }
+      return { success: false, error: UNAVAILABILITY_ERROR_MESSAGES.UPDATE_FAILED }
     }
   })
 }
@@ -115,13 +109,7 @@ export const deleteUnavailabilityStylistAction = async (id: string) => {
 
   try {
     // Verificăm că indisponibilitatea există și aparține stylistului
-    const existing = await unavailabilityService.getUnavailabilityById(id)
-    if (!existing || existing.stylistId !== user.id) {
-      return {
-        success: false,
-        error: UNAVAILABILITY_ERROR_MESSAGES.UNAUTHORIZED,
-      }
-    }
+    await unavailabilityService.ensureStylistOwns(id, user.id)
 
     const success = await unavailabilityService.deleteUnavailability(id)
     if (success) {
@@ -154,105 +142,45 @@ export const deleteUnavailabilityStylistAction = async (id: string) => {
   }
 }
 
-export const createBulkUnavailabilityStylistAction = async (payload: {
-  stylistId: string
-  dates: string[]
-  startTime?: string | null
-  endTime?: string | null
-  cause: (typeof UNAVAILABILITY_CAUSES)[keyof typeof UNAVAILABILITY_CAUSES]
-  allDay: boolean
-  description?: string | null
-}) => {
-  const user = await ensureUserIsStylist()
+export const createBulkUnavailabilityStylistAction = async (payload: unknown) => {
+  return executeSafeAction(CreateBulkUnavailabilityActionSchema, payload as any, async (data) => {
+    const user = await ensureUserIsStylist()
 
-  try {
-    // Enforțăm că stylistul poate crea doar pentru el însuși
-    if (payload.stylistId !== user.id) {
-      return {
-        success: false,
-        error: UNAVAILABILITY_ERROR_MESSAGES.UNAUTHORIZED,
+    try {
+      // Enforțăm că stylistul poate crea doar pentru el însuși
+      if (data.stylistId !== user.id) {
+        return { success: false, error: UNAVAILABILITY_ERROR_MESSAGES.UNAUTHORIZED }
       }
-    }
 
-    if (!payload.dates?.length) {
-      return {
-        success: false,
-        error: UNAVAILABILITY_VALIDATION_MESSAGES.DATE_REQUIRED,
-      }
-    }
+      const results = await unavailabilityService.createBulkUnavailability(data)
 
-    const results = []
-    const errors = []
+      // Revalidare cache pentru pagini relevante
+      revalidatePath(APP_ROUTES.STYLIST_UNAVAILABILITY)
 
-    // Creăm fiecare indisponibilitate individual
-    for (const date of payload.dates) {
-      try {
-        const unavailabilityData = {
-          stylistId: payload.stylistId,
-          date,
-          startTime: payload.allDay ? null : payload.startTime,
-          endTime: payload.allDay ? null : payload.endTime,
-          cause: payload.cause,
-          allDay: payload.allDay,
-          description: payload.description,
-        }
+      logger.info('Creare în masă unavailability cu succes', {
+        userId: user.id,
+        created: results.length,
+        action: 'bulk-create-unavailability',
+      })
 
-        const unavailability = await unavailabilityService.createUnavailability(unavailabilityData)
-        results.push(unavailability)
-      } catch (error) {
-        logger.error(`Eroare la crearea indisponibilității pentru ${date}`, {
-          error,
-          date,
-          userId: user.id,
-          action: 'bulk-create-unavailability',
-        })
-        errors.push({
-          date,
-          error: error instanceof Error ? error.message : 'Eroare necunoscută',
-        })
-      }
-    }
-
-    // Revalidare cache pentru pagini relevante
-    revalidatePath(APP_ROUTES.STYLIST_UNAVAILABILITY)
-
-    if (errors.length === 0) {
       return {
         success: true,
-        message: `${results.length} indisponibilități au fost create cu succes`,
         data: {
           created: results.length,
-          total: payload.dates.length,
+          total: data.dates.length,
           results,
         },
       }
-    } else if (results.length > 0) {
-      return {
-        success: true,
-        message: `${results.length} din ${payload.dates.length} indisponibilități au fost create cu succes`,
-        data: {
-          created: results.length,
-          total: payload.dates.length,
-          results,
-          errors,
-        },
-      }
-    } else {
+    } catch (error) {
+      logger.error('Eroare la crearea în masă a indisponibilităților', {
+        error,
+        userId: user.id,
+        action: 'bulk-create-unavailability',
+      })
       return {
         success: false,
-        error: UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED,
-        data: { errors },
+        error: error instanceof Error ? error.message : UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED,
       }
     }
-  } catch (error) {
-    logger.error('Eroare la crearea în masă a indisponibilităților', {
-      error,
-      userId: user.id,
-      action: 'bulk-create-unavailability',
-    })
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : UNAVAILABILITY_ERROR_MESSAGES.CREATION_FAILED,
-    }
-  }
+  })
 }

@@ -280,7 +280,7 @@ export const ConflictCheckValidator = z
   })
 
 /**
- * Validator pentru bulk operations
+ * Validator pentru bulk operations complexe
  */
 export const BulkUnavailabilityValidator = z
   .object({
@@ -313,6 +313,19 @@ export const BulkUnavailabilityValidator = z
       }
     })
   })
+
+/**
+ * Schema pentru server action bulk create (simplificată)
+ */
+export const CreateBulkUnavailabilityActionSchema = z.object({
+  stylistId: UuidValidator,
+  dates: z.array(z.string()).min(1, 'Cel puțin o dată este obligatorie'),
+  startTime: z.string().nullable().optional(),
+  endTime: z.string().nullable().optional(),
+  cause: CauseValidator,
+  allDay: z.boolean(),
+  description: DescriptionValidator,
+})
 
 // --- TYPE EXPORTS ---
 

@@ -4,6 +4,7 @@ import { UNAVAILABILITY_ERROR_MESSAGES, UNAVAILABILITY_VALIDATION_MESSAGES } fro
 import {
   type CreateUnavailabilityData,
   type Unavailability,
+  type UnavailabilityCause,
   type UnavailabilityFilters,
   type UnavailabilityRepository,
   type UnavailabilityService,
@@ -185,6 +186,67 @@ export const createUnavailabilityService = (repository: UnavailabilityRepository
       if (conflicts.length > 0) {
         throw new Error(UNAVAILABILITY_VALIDATION_MESSAGES.TIME_CONFLICT)
       }
+    },
+
+    /**
+     * Verifică că o indisponibilitate aparține unui stylist specific
+     */
+    async ensureStylistOwns(id: string, stylistId: string): Promise<Unavailability> {
+      const unavailability = await repository.findById(id)
+
+      if (!unavailability) {
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.NOT_FOUND)
+      }
+
+      if (unavailability.stylistId !== stylistId) {
+        throw new Error(UNAVAILABILITY_ERROR_MESSAGES.UNAUTHORIZED)
+      }
+
+      return unavailability
+    },
+
+    /**
+     * Creează mai multe indisponibilități pentru aceleași date
+     */
+    async createBulkUnavailability(data: {
+      stylistId: string
+      dates: string[]
+      startTime?: string | null
+      endTime?: string | null
+      cause: UnavailabilityCause
+      allDay: boolean
+      description?: string | null
+    }): Promise<Unavailability[]> {
+      const results = []
+      const errors = []
+
+      for (const date of data.dates) {
+        try {
+          const unavailabilityData = {
+            stylistId: data.stylistId,
+            date,
+            startTime: data.allDay ? null : data.startTime,
+            endTime: data.allDay ? null : data.endTime,
+            cause: data.cause,
+            allDay: data.allDay,
+            description: data.description,
+          }
+
+          const unavailability = await this.createUnavailability(unavailabilityData)
+          results.push(unavailability)
+        } catch (error) {
+          errors.push({
+            date,
+            error: error instanceof Error ? error.message : 'Eroare necunoscută',
+          })
+        }
+      }
+
+      if (errors.length > 0 && results.length === 0) {
+        throw new Error(`Nu s-a putut crea nicio indisponibilitate: ${errors[0].error}`)
+      }
+
+      return results
     },
   }
 }

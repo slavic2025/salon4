@@ -101,15 +101,30 @@ export interface UnavailabilityService {
     endTime?: string,
     excludeId?: string,
   ): Promise<void>
+  ensureStylistOwns(id: string, stylistId: string): Promise<Unavailability>
+  createBulkUnavailability(data: {
+    stylistId: string
+    dates: string[]
+    startTime?: string | null
+    endTime?: string | null
+    cause: UnavailabilityCause
+    allDay: boolean
+    description?: string | null
+  }): Promise<Unavailability[]>
 }
 
 // --- RE-EXPORT VALIDATORS ---
 // Re-exportăm validatori din validators.ts pentru a păstra compatibilitatea
 
-import { CreateUnavailabilityActionSchema, UpdateUnavailabilityActionSchema } from './unavailability.validators'
+import {
+  CreateBulkUnavailabilityActionSchema,
+  CreateUnavailabilityActionSchema,
+  UpdateUnavailabilityActionSchema,
+} from './unavailability.validators'
 
 export type { CreateUnavailabilityFormData, UpdateUnavailabilityFormData } from './unavailability.validators'
 export {
+  CreateBulkUnavailabilityActionSchema,
   CreateUnavailabilityActionSchema,
   CreateUnavailabilityFormValidator,
   UpdateUnavailabilityActionSchema,
@@ -121,3 +136,4 @@ export {
 
 export type CreateUnavailabilityPayload = z.infer<typeof CreateUnavailabilityActionSchema>
 export type UpdateUnavailabilityPayload = z.infer<typeof UpdateUnavailabilityActionSchema>
+export type CreateBulkUnavailabilityPayload = z.infer<typeof CreateBulkUnavailabilityActionSchema>
