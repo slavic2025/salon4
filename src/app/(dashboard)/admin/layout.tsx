@@ -1,7 +1,6 @@
 // src/app/(dashboard)/admin/layout.tsx
 import { DashboardLayout } from '@/components/features/dashboard/dashboard-layout'
-import { ADMIN_NAV_ITEMS } from '@/core/domains/admin/admin.constants'
-import { ROLES } from '@/lib/constants'
+import { ADMIN_NAV_ITEMS, ROLES } from '@/lib/constants'
 import { enforceRouteAccess } from '@/lib/route-protection'
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {

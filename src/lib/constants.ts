@@ -57,6 +57,32 @@ export const UI_MESSAGES = {
   },
 } as const
 
+// --- NAVIGATION ITEMS ---
+
+import type { NavItem } from '@/types/ui.types'
+
+/**
+ * Elemente de navigație pentru dashboard-ul administratorului
+ */
+export const ADMIN_NAV_ITEMS: NavItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/admin',
+    icon: 'dashboard',
+  },
+  {
+    title: 'Stiliști',
+    href: '/admin/stylists',
+    icon: 'users',
+  },
+  {
+    title: 'Servicii',
+    href: '/admin/services',
+    icon: 'scissors',
+  },
+  // Adaugă aici alte linkuri pentru admin
+]
+
 /**
  * Constante pentru protecția rutelor
  */
