@@ -1,4 +1,4 @@
-// src/components/shared/main-nav.tsx
+// src/components/features/dashboard/main-nav.tsx
 'use client'
 
 import Link from 'next/link'
@@ -9,6 +9,15 @@ import { getIconComponent } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import type { MainNavProps } from '@/types/ui.types'
 
+import { DASHBOARD_CSS_CLASSES } from './dashboard.constants'
+
+// Constante pentru configurația UI
+const UI_CONSTANTS = {
+  ICON_SIZE: 'h-4 w-4',
+  TOOLTIP_DELAY: 0,
+  TOOLTIP_SIDE: 'right' as const,
+} as const
+
 export function MainNav({ items, onLinkClick }: MainNavProps) {
   const pathname = usePathname()
 
@@ -16,17 +25,16 @@ export function MainNav({ items, onLinkClick }: MainNavProps) {
     return null
   }
 
+  const isActiveLink = (href: string) => {
+    return href === '/' ? pathname === href : pathname.startsWith(href)
+  }
+
   return (
-    // Adăugăm TooltipProvider ca wrapper pentru a activa tooltip-urile
-    <TooltipProvider delayDuration={0}>
-      <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
+    <TooltipProvider delayDuration={UI_CONSTANTS.TOOLTIP_DELAY}>
+      <nav className={DASHBOARD_CSS_CLASSES.NAVIGATION.CONTAINER}>
         {items.map((item, index) => {
           const Icon = getIconComponent(item.icon)
-
-          // Logică îmbunătățită pentru link-ul activ:
-          // - Folosim startsWith pentru a include și sub-paginile.
-          // - Tratăm cazul special al link-ului rădăcină (ex: /admin) pentru a nu fi activ tot timpul.
-          const isActive = item.href === '/' ? pathname === item.href : pathname.startsWith(item.href)
+          const isActive = isActiveLink(item.href)
 
           return (
             <Tooltip key={index}>
@@ -35,16 +43,16 @@ export function MainNav({ items, onLinkClick }: MainNavProps) {
                   href={item.disabled ? '#' : item.href}
                   onClick={onLinkClick}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
-                    isActive && 'bg-muted text-primary',
-                    item.disabled && 'cursor-not-allowed opacity-50',
+                    DASHBOARD_CSS_CLASSES.NAVIGATION.LINK,
+                    isActive && DASHBOARD_CSS_CLASSES.NAVIGATION.ACTIVE,
+                    item.disabled && DASHBOARD_CSS_CLASSES.NAVIGATION.DISABLED,
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={UI_CONSTANTS.ICON_SIZE} />
                   <span>{item.title}</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">
+              <TooltipContent side={UI_CONSTANTS.TOOLTIP_SIDE}>
                 <p>{item.title}</p>
               </TooltipContent>
             </Tooltip>

@@ -3,6 +3,7 @@
 ## 🚀 Next.js Best Practices
 
 ### Structura Proiectului
+
 - Folosește structura App Router pentru directoare
 - Plasează componentele în directorul `app` pentru componente specifice rutelor
 - Plasează componentele partajate în directorul `components`
@@ -10,6 +11,7 @@
 - Folosește lowercase cu cratime pentru directoare (ex: `components/auth-wizard`)
 
 ### Componente
+
 - Folosește Server Components în mod implicit
 - Marchează explicit componentele client cu 'use client'
 - Înfășoară componentele client în Suspense cu fallback
@@ -18,6 +20,7 @@
 - Plasează conținutul static și interfețele la sfârșitul fișierului
 
 ### Performanță
+
 - Optimizează imaginile: Folosește format WebP, size data, lazy loading
 - Minimizează folosirea 'useEffect' și 'setState'
 - Favorizează Server Components (RSC) unde este posibil
@@ -25,24 +28,28 @@
 - Implementează strategii de caching corespunzătoare
 
 ### Data Fetching
+
 - Folosește Server Components pentru data fetching când este posibil
 - Implementează error handling corespunzător pentru data fetching
 - Folosește strategii de caching adecvate
 - Gestionează loading și error states în mod corespunzător
 
 ### Routing
+
 - Folosește convențiile App Router
 - Implementează loading și error states corespunzătoare pentru rute
 - Folosește rute dinamice în mod corespunzător
 - Gestionează rute paralele când este necesar
 
 ### Formulare și Validare
+
 - Folosește Zod pentru validarea formularelor
 - Implementează validare server-side corespunzătoare
 - Gestionează erorile de formular în mod corespunzător
 - Afișează loading states în timpul trimiterii formularului
 
 ### State Management
+
 - Minimizează state-ul client-side
 - Folosește React Context cu moderație
 - Preferă server state când este posibil
@@ -51,6 +58,7 @@
 ## ⚛️ React Best Practices
 
 ### Structura Componentelor
+
 - Folosește componente funcționale în locul componentelor class
 - Păstrează componentele mici și focusate
 - Extrage logica reutilizabilă în custom hooks
@@ -59,6 +67,7 @@
 - Împarte componentele mari în componente mai mici și focusate
 
 ### Hooks
+
 - Respectă Rules of Hooks
 - Folosește custom hooks pentru logica reutilizabilă
 - Păstrează hooks-urile focusate și simple
@@ -67,6 +76,7 @@
 - Evită hooks-uri imbricate
 
 ### State Management
+
 - Folosește useState pentru state-ul local al componentei
 - Implementează useReducer pentru logica de state complexă
 - Folosește Context API pentru state-ul partajat
@@ -75,6 +85,7 @@
 - Folosește biblioteci de state management doar când este necesar
 
 ### Performanță
+
 - Implementează memoization corespunzătoare (useMemo, useCallback)
 - Folosește React.memo pentru componente costisitoare
 - Evită re-render-uri inutile
@@ -83,6 +94,7 @@
 - Profilează și optimizează performanța render-ului
 
 ### Formulare
+
 - Folosește controlled components pentru input-urile de formular
 - Implementează validarea corespunzătoare a formularelor
 - Gestionează states-urile de trimitere a formularului în mod corespunzător
@@ -91,6 +103,7 @@
 - Implementează accesibilitate corespunzătoare pentru formulare
 
 ### Error Handling
+
 - Implementează Error Boundaries
 - Gestionează erorile async în mod corespunzător
 - Afișează mesaje de eroare user-friendly
@@ -101,6 +114,7 @@
 ## 🎨 Tailwind CSS Best Practices
 
 ### Configurarea Proiectului
+
 - Folosește configurația Tailwind corespunzătoare
 - Configurează extensia theme-ului în mod corespunzător
 - Configurează purge configuration corespunzător
@@ -109,6 +123,7 @@
 - Configurează paleta de culori corespunzătoare
 
 ### Styling Componente
+
 - Folosește utility classes în locul CSS personalizat
 - Grupează utilities înrudite cu @apply când este necesar
 - Folosește utilities de responsive design corespunzătoare
@@ -117,6 +132,7 @@
 - Păstrează stilurile componentelor consistente
 
 ### Layout
+
 - Folosește Flexbox și Grid utilities în mod eficient
 - Implementează sistemul de spacing corespunzător
 - Folosește container queries când este necesar
@@ -125,6 +141,7 @@
 - Implementează utilities de alignment corespunzătoare
 
 ### Tipografie
+
 - Folosește utilities de font size corespunzătoare
 - Implementează line height corespunzător
 - Folosește utilities de font weight corespunzătoare
@@ -133,6 +150,7 @@
 - Implementează text decoration corespunzătoare
 
 ### Culori
+
 - Folosește denumirea semantică a culorilor
 - Implementează contrast de culori corespunzător
 - Folosește utilities de opacity în mod eficient
@@ -141,6 +159,7 @@
 - Implementează hover states corespunzătoare
 
 ### Componente
+
 - Folosește componente shadcn/ui când sunt disponibile
 - Extinde componentele în mod corespunzător
 - Păstrează variants de componente consistente
@@ -151,6 +170,7 @@
 ## 📘 TypeScript Best Practices
 
 ### Sistemul de Tipuri
+
 - Preferă interfaces în locul types pentru definițiile de obiecte
 - Folosește type pentru unions, intersections și mapped types
 - Evită folosirea `any`, preferă `unknown` pentru tipuri necunoscute
@@ -159,6 +179,7 @@
 - Folosește generics pentru pattern-uri de tipuri reutilizabile
 
 ### Convenții de Denumire
+
 - Folosește PascalCase pentru numele de tipuri și interfaces
 - Folosește camelCase pentru variabile și funcții
 - Folosește UPPER_CASE pentru constante
@@ -166,6 +187,7 @@
 - Prefixează interfaces pentru React props cu 'Props' (ex: ButtonProps)
 
 ### Organizarea Codului
+
 - Păstrează definițiile de tipuri aproape de locul unde sunt folosite
 - Exportă tipuri și interfaces din fișiere de tipuri dedicate când sunt partajate
 - Folosește barrel exports (index.ts) pentru organizarea exporturilor
@@ -173,6 +195,7 @@
 - Co-localizează props-urile componentelor cu componentele lor
 
 ### Funcții
+
 - Folosește tipuri de return explicite pentru funcțiile publice
 - Folosește arrow functions pentru callback-uri și metode
 - Implementează error handling corespunzător cu tipuri de erori personalizate
@@ -180,6 +203,7 @@
 - Preferă async/await în locul Promises
 
 ### Best Practices
+
 - Activează strict mode în tsconfig.json
 - Folosește readonly pentru proprietăți immutable
 - Valorifică discriminated unions pentru type safety
@@ -188,6 +212,7 @@
 - Evită type assertions cu excepția cazurilor necesare
 
 ### Error Handling
+
 - Creează tipuri de erori personalizate pentru erori specifice domeniului
 - Folosește tipuri Result pentru operații care pot eșua
 - Implementează error boundaries corespunzătoare
@@ -195,6 +220,7 @@
 - Gestionează Promise rejections în mod corespunzător
 
 ### Pattern-uri
+
 - Folosește Builder pattern pentru crearea de obiecte complexe
 - Implementează Repository pattern pentru accesul la date
 - Folosește Factory pattern pentru crearea de obiecte
@@ -202,6 +228,7 @@
 - Folosește Module pattern pentru encapsulation
 
 ## 📝 Reguli de Logging
+
 - Folosește întotdeauna logger-ul din `@/lib/logger` în loc de `console.log`
 - Creează instanța logger-ului cu context-ul specific domeniului (ex: `createLogger('auth')`)
 - Folosește nivelurile de logare optime:

@@ -19,6 +19,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOutAction } from '@/features/auth/actions'
+import { createLogger } from '@/lib/logger'
+
+// Constante pentru configurația UI
+const UI_CONSTANTS = {
+  AVATAR_SIZE: 'h-9 w-9',
+  ICON_SIZE: 'h-4 w-4',
+  DROPDOWN_WIDTH: 'w-56',
+  INITIALS_FALLBACK: '??',
+  INITIALS_LENGTH: 2,
+} as const
+
+// Constante pentru mesaje
+const MESSAGES = {
+  SIGN_OUT_PENDING: 'Deconectare în curs...',
+  SIGN_OUT_SUCCESS: 'Deconectare reușită!',
+  SIGN_OUT_ERROR: 'Deconectarea a eșuat. Te rog încearcă din nou.',
+  DEFAULT_USER_NAME: 'Utilizator',
+} as const
 
 type UserNavClientProps = {
   user: User | null
@@ -26,66 +44,68 @@ type UserNavClientProps = {
 
 export function UserNavClient({ user }: UserNavClientProps) {
   const [isPending, startTransition] = useTransition()
+  const logger = createLogger('user-nav')
 
-  // Simplified and safer helper for initials
   const getInitials = (email?: string | null) => {
-    return email?.slice(0, 2).toUpperCase() ?? '??'
+    return email?.slice(0, UI_CONSTANTS.INITIALS_LENGTH).toUpperCase() ?? UI_CONSTANTS.INITIALS_FALLBACK
   }
 
   const handleSignOut = () => {
     startTransition(async () => {
-      toast.info('Deconectare în curs...')
+      toast.info(MESSAGES.SIGN_OUT_PENDING)
       try {
         await signOutAction()
-        toast.success('Deconectare reușită!')
+        toast.success(MESSAGES.SIGN_OUT_SUCCESS)
       } catch (error) {
-        toast.error('Deconectarea a eșuat. Te rog încearcă din nou.')
-        console.error('Eroare la deconectare:', error)
+        toast.error(MESSAGES.SIGN_OUT_ERROR)
+        logger.error('Eroare la deconectare', { error, userId: user?.id })
       }
     })
   }
 
-  // If there's no user, we don't render the component.
-  // The layout can handle showing a login button.
   if (!user) {
     return null
   }
 
+  const userName = user.user_metadata?.full_name ?? MESSAGES.DEFAULT_USER_NAME
+  const userEmail = user.email ?? ''
+  const avatarUrl = user.user_metadata?.avatar_url
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name ?? user.email ?? ''} />
-            <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
+        <Button variant="ghost" className={`relative rounded-full ${UI_CONSTANTS.AVATAR_SIZE}`}>
+          <Avatar className={UI_CONSTANTS.AVATAR_SIZE}>
+            <AvatarImage src={avatarUrl} alt={userName} />
+            <AvatarFallback>{getInitials(userEmail)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className={UI_CONSTANTS.DROPDOWN_WIDTH} align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.user_metadata?.full_name ?? 'Utilizator'}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            <p className="text-sm font-medium leading-none">{userName}</p>
+            <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href="/account/profile">
             <DropdownMenuItem>
-              <UserIcon className="mr-2 h-4 w-4" />
+              <UserIcon className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
               <span>Profil</span>
             </DropdownMenuItem>
           </Link>
           <Link href="/account/settings">
             <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
               <span>Setări</span>
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} disabled={isPending} className="cursor-pointer">
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
           <span>Deconectare</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

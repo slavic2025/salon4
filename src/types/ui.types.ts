@@ -1,15 +1,20 @@
-export type NavItem = { title: string; href: string; icon: string; disabled?: boolean }
+export type NavItem = {
+  readonly title: string
+  readonly href: string
+  readonly icon: string
+  readonly disabled?: boolean
+}
 
 export type DashboardLayoutProps = {
-  sidebarNavItems: NavItem[]
-  children: React.ReactNode
+  readonly sidebarNavItems: readonly NavItem[]
+  readonly children: React.ReactNode
 }
 
 export type MainNavProps = {
-  items: NavItem[]
-  onLinkClick?: () => void
+  readonly items: readonly NavItem[]
+  readonly onLinkClick?: () => void
 }
 
 export type MobileNavProps = {
-  navItems: NavItem[]
+  readonly navItems: readonly NavItem[]
 }

@@ -3,14 +3,17 @@
 ## 📋 Descrierea Proiectului și Obiectivele Generale
 
 ### Scopul Aplicației
+
 O platformă SaaS completă pentru managementul salonului de înfrumusețare, axată pe automatizarea proceselor, gestionarea eficientă a programărilor și optimizarea experienței atât pentru clienți, cât și pentru personalul salonului.
 
 ### Publicul Țintă
+
 - **Proprietari de salon**: Gestionarea business-ului, rapoarte, configurări
 - **Stilist/Cosmetician**: Programări, clienți, servicii
 - **Clienți**: Rezervări online, istoric, plăți
 
 ### Valori Cheie
+
 - **Securitate robustă**: Protecția datelor clienților și informațiilor business
 - **Performanță ridicată**: Răspuns rapid și scalabilitate
 - **Experiență utilizator intuitivă**: Interface simplu și eficient
@@ -19,18 +22,21 @@ O platformă SaaS completă pentru managementul salonului de înfrumusețare, ax
 ## 🔧 Stack-ul de Tehnologii la Nivel Înalt
 
 ### Frontend
+
 - **Next.js 15+**: Framework React cu App Router
 - **TypeScript**: Tipizare statică strictă
 - **Tailwind CSS**: Styling utility-first
 - **shadcn/ui**: Componente UI de bază
 
 ### Backend & Database
+
 - **Supabase**: Backend-as-a-Service cu autentificare
 - **Drizzle ORM**: Gestionarea bazei de date type-safe
 - **PostgreSQL**: Baza de date relațională
 - **Zod**: Validarea datelor
 
 ### Arhitectura Generală
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ 🎨 UI Layer (src/app, src/components)                      │
@@ -58,56 +64,67 @@ O platformă SaaS completă pentru managementul salonului de înfrumusețare, ax
 ## 🎯 Reguli Generale de Clean Code & Best Practices
 
 ### Constants Over Magic Numbers
+
 - Înlocuiește valorile hard-coded cu constante nume
 - Folosește nume descriptive pentru constante care explică scopul valorii
 - Păstrează constantele la începutul fișierului sau într-un fișier dedicat
 
 ### Meaningful Names
+
 - Variabilele, funcțiile și clasele trebuie să-și dezvăluie scopul
 - Numele trebuie să explice de ce există ceva și cum se folosește
 - Evită abrevierile cu excepția celor universal înțelese
 
 ### Smart Comments
+
 - Nu comenta ce face codul - fă codul să se auto-documenteze
 - Folosește comentariile pentru a explica de ce se face ceva într-un anumit fel
 - Documentează API-urile, algoritmii complecși și efectele laterale non-evidente
 
 ### Single Responsibility
+
 - Fiecare funcție trebuie să facă exact un singur lucru
 - Funcțiile trebuie să fie mici și focusate
 - Dacă o funcție are nevoie de un comentariu pentru a explica ce face, trebuie împărțită
 
 ### DRY (Don't Repeat Yourself)
+
 - Extrage codul repetat în funcții reutilizabile
 - Împarte logica comună prin abstracție adecvată
 - Menține surse unice de adevăr
 
 ### Clean Structure
+
 - Păstrează codul înrudit împreună
 - Organizează codul într-o ierarhie logică
 - Folosește convenții consistente pentru denumirea fișierelor și folderelor
 
 ### Encapsulation
+
 - Ascunde detaliile de implementare
 - Expune interface-uri clare
 - Mută condițiile imbricate în funcții cu nume descriptive
 
 ### Code Quality Maintenance
+
 - Refactorizează continuu
 - Remediază datoria tehnică devreme
 - Lasă codul mai curat decât l-ai găsit
 
 ### Testing
+
 - Scrie teste înainte de a remedia bug-uri
 - Păstrează testele lizibile și mentenabile
 - Testează cazurile limită și condițiile de eroare
 
 ### Version Control
+
 - Scrie mesaje de commit clare
 - Fă commit-uri mici și focusate
 - Folosește nume de branch-uri semnificative
 
 ## 🛡️ Principii de Securitate
+
 - Implementează autentificare și autorizare la toate nivelurile
 - Validează toate input-urile utilizatorului
 - Folosește HTTPS pentru toate comunicările
@@ -115,6 +132,7 @@ O platformă SaaS completă pentru managementul salonului de înfrumusețare, ax
 - Implementează logging pentru auditare
 
 ## 📁 Structura de Bază a Proiectului
+
 ```
 src/
 ├── app/                 # Next.js App Router
@@ -130,12 +148,14 @@ src/
 ```
 
 ## 🎨 Reguli de Styling
+
 - Folosește Tailwind CSS pentru toate stilurile
 - Evită CSS custom cu excepția cazurilor absolut necesare
 - Menține consistență în design system
 - Folosește shadcn/ui ca bază pentru componente
 
 ## ⚡ Performance & Optimization
+
 - Folosește Server Components pentru data fetching
 - Implementează lazy loading pentru componente mari
 - Optimizează imaginile și asset-urile

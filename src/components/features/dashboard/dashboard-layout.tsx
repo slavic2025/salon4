@@ -1,49 +1,51 @@
-// src/components/dashboard/dashboard-layout.tsx
+// src/components/features/dashboard/dashboard-layout.tsx
 import Link from 'next/link'
 
 import { DashboardLayoutProps } from '@/types/ui.types'
 
+import { DASHBOARD_CONSTANTS, DASHBOARD_CSS_CLASSES } from './dashboard.constants'
 import { MainNav } from './main-nav'
 import { MobileNav } from './mobile-nav'
 import { UserNav } from './user-nav'
 
+// Constante pentru clase CSS specifice
+const CSS_CLASSES = {
+  SIDEBAR_CONTENT: 'flex h-full max-h-screen flex-col gap-2',
+  SIDEBAR_HEADER: `flex items-center border-b px-4 ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_MOBILE} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_DESKTOP} lg:px-6`,
+  BRAND_LINK: 'flex items-center gap-2 font-semibold',
+  SIDEBAR_NAV_CONTAINER: 'flex-1 overflow-auto py-4',
+  SIDEBAR_NAV: 'grid items-start px-2 text-sm font-medium lg:px-4',
+  HEADER: `${DASHBOARD_CSS_CLASSES.HEADER.CONTAINER} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_MOBILE} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_DESKTOP} lg:px-6`,
+  MAIN: `flex flex-1 flex-col ${DASHBOARD_CONSTANTS.SPACING.GAP_MEDIUM} p-4 ${DASHBOARD_CONSTANTS.SPACING.GAP_LARGE} lg:p-6`,
+} as const
+
 export function DashboardLayout({ sidebarNavItems, children }: DashboardLayoutProps) {
+  const gridClasses = `${DASHBOARD_CSS_CLASSES.LAYOUT.MAIN_CONTAINER} md:grid-cols-[${DASHBOARD_CONSTANTS.BREAKPOINTS.SIDEBAR_WIDTH_MD}_1fr] lg:grid-cols-[${DASHBOARD_CONSTANTS.BREAKPOINTS.SIDEBAR_WIDTH_LG}_1fr]`
+
   return (
-    // Folosim CSS Grid pentru structura principală: o coloană pentru sidebar, o coloană pentru conținut.
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      {/* --- Sidebar pentru Desktop --- */}
-      {/* Acesta este vizibil doar pe ecrane medii și mai mari. */}
-      <aside className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          {/* Header-ul Sidebar-ului */}
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              {/* Aici poți adăuga un logo SVG */}
-              <span className="">Salon App</span>
+    <div className={gridClasses}>
+      <aside className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR}>
+        <div className={CSS_CLASSES.SIDEBAR_CONTENT}>
+          <div className={CSS_CLASSES.SIDEBAR_HEADER}>
+            <Link href="/" className={CSS_CLASSES.BRAND_LINK}>
+              <span>{DASHBOARD_CONSTANTS.BRAND_NAME}</span>
             </Link>
           </div>
-          {/* Conținutul Sidebar-ului (Meniul) */}
-          <div className="flex-1 overflow-auto py-4">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+          <div className={CSS_CLASSES.SIDEBAR_NAV_CONTAINER}>
+            <nav className={CSS_CLASSES.SIDEBAR_NAV}>
               <MainNav items={sidebarNavItems} />
             </nav>
           </div>
         </div>
       </aside>
 
-      {/* --- Conținutul Principal (Header + Pagina) --- */}
-      <div className="flex flex-col">
-        {/* Header-ul de sus */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          {/* Meniul pentru mobil, care apare doar pe ecrane mici */}
+      <div className={DASHBOARD_CSS_CLASSES.LAYOUT.MAIN_CONTENT}>
+        <header className={CSS_CLASSES.HEADER}>
           <MobileNav navItems={sidebarNavItems} />
-          {/* Un div gol pentru a împinge meniul de utilizator la dreapta */}
-          <div className="w-full flex-1" />
+          <div className={DASHBOARD_CSS_CLASSES.HEADER.SPACER} />
           <UserNav />
         </header>
-
-        {/* Conținutul paginii curente, cu padding și scroll */}
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">{children}</main>
+        <main className={CSS_CLASSES.MAIN}>{children}</main>
       </div>
     </div>
   )
