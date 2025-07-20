@@ -1,49 +1,56 @@
 // src/components/features/dashboard/dashboard-layout.tsx
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 import { DashboardLayoutProps } from '@/types/ui.types'
 
 import { DASHBOARD_CONSTANTS, DASHBOARD_CSS_CLASSES } from './dashboard.constants'
 import { MainNav } from './main-nav'
+import { MobileNav } from './mobile-nav'
 import { UserNav } from './user-nav'
 
-// Constante pentru clase CSS specifice
-const CSS_CLASSES = {
-  SIDEBAR_CONTENT: 'flex h-full max-h-screen flex-col gap-2',
-  SIDEBAR_HEADER: `flex items-center border-b px-3 ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_MOBILE} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_DESKTOP} md:px-4 lg:px-6`,
-  BRAND_LINK: 'flex items-center gap-2 font-semibold',
-  SIDEBAR_NAV_CONTAINER: 'flex-1 overflow-auto py-4',
-  SIDEBAR_NAV: 'grid items-start px-2 text-sm font-medium md:px-3 lg:px-4',
-  HEADER: `${DASHBOARD_CSS_CLASSES.HEADER.CONTAINER} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_MOBILE} ${DASHBOARD_CONSTANTS.HEIGHTS.HEADER_DESKTOP} lg:px-6`,
-  MAIN: `flex flex-1 flex-col ${DASHBOARD_CONSTANTS.SPACING.GAP_MEDIUM} p-4 ${DASHBOARD_CONSTANTS.SPACING.GAP_LARGE} lg:p-6`,
+// Constante pentru grid classes - optimizate pentru performanță
+const GRID_CLASSES = {
+  MOBILE: 'grid-cols-1',
+  DESKTOP: 'grid-cols-[180px_1fr] md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]',
 } as const
 
 export function DashboardLayout({ sidebarNavItems, children }: DashboardLayoutProps) {
-  const gridClasses = `${DASHBOARD_CSS_CLASSES.LAYOUT.MAIN_CONTAINER} grid-cols-[180px_1fr] md:grid-cols-[${DASHBOARD_CONSTANTS.BREAKPOINTS.SIDEBAR_WIDTH_MD}_1fr] lg:grid-cols-[${DASHBOARD_CONSTANTS.BREAKPOINTS.SIDEBAR_WIDTH_LG}_1fr]`
+  const gridClasses = `${DASHBOARD_CSS_CLASSES.LAYOUT.MAIN_CONTAINER} ${GRID_CLASSES.MOBILE} ${GRID_CLASSES.DESKTOP}`
 
   return (
     <div className={gridClasses}>
-      <aside className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR}>
-        <div className={CSS_CLASSES.SIDEBAR_CONTENT}>
-          <div className={CSS_CLASSES.SIDEBAR_HEADER}>
-            <Link href="/" className={CSS_CLASSES.BRAND_LINK}>
+      {/* Sidebar - ascuns pe mobile */}
+      <aside className={`${DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR} hidden md:block`}>
+        <div className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR_CONTENT}>
+          <div className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR_HEADER}>
+            <Link href="/" className={DASHBOARD_CSS_CLASSES.BRAND.LINK}>
               <span>{DASHBOARD_CONSTANTS.BRAND_NAME}</span>
             </Link>
           </div>
-          <div className={CSS_CLASSES.SIDEBAR_NAV_CONTAINER}>
-            <nav className={CSS_CLASSES.SIDEBAR_NAV}>
+          <div className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR_NAV_CONTAINER}>
+            <nav className={DASHBOARD_CSS_CLASSES.LAYOUT.SIDEBAR_NAV}>
               <MainNav items={sidebarNavItems} />
             </nav>
           </div>
         </div>
       </aside>
 
+      {/* Main Content */}
       <div className={DASHBOARD_CSS_CLASSES.LAYOUT.MAIN_CONTENT}>
-        <header className={CSS_CLASSES.HEADER}>
+        <header className={DASHBOARD_CSS_CLASSES.HEADER.CONTAINER}>
+          {/* Mobile Navigation Trigger */}
+          <MobileNav navItems={sidebarNavItems} />
+
           <div className={DASHBOARD_CSS_CLASSES.HEADER.SPACER} />
-          <UserNav />
+
+          {/* User Navigation */}
+          <Suspense fallback={<div className="h-9 w-9 animate-pulse rounded-full bg-muted" />}>
+            <UserNav />
+          </Suspense>
         </header>
-        <main className={CSS_CLASSES.MAIN}>{children}</main>
+
+        <main className={DASHBOARD_CSS_CLASSES.MAIN.CONTAINER}>{children}</main>
       </div>
     </div>
   )

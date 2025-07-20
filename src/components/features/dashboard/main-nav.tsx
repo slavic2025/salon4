@@ -9,14 +9,7 @@ import { getIconComponent } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import type { MainNavProps } from '@/types/ui.types'
 
-import { DASHBOARD_CSS_CLASSES } from './dashboard.constants'
-
-// Constante pentru configurația UI
-const UI_CONSTANTS = {
-  ICON_SIZE: 'h-4 w-4',
-  TOOLTIP_DELAY: 0,
-  TOOLTIP_SIDE: 'right' as const,
-} as const
+import { DASHBOARD_CSS_CLASSES, DASHBOARD_UI_CONSTANTS } from './dashboard.constants'
 
 export function MainNav({ items, onLinkClick }: MainNavProps) {
   const pathname = usePathname()
@@ -30,14 +23,14 @@ export function MainNav({ items, onLinkClick }: MainNavProps) {
   }
 
   return (
-    <TooltipProvider delayDuration={UI_CONSTANTS.TOOLTIP_DELAY}>
-      <nav className={DASHBOARD_CSS_CLASSES.NAVIGATION.CONTAINER}>
+    <TooltipProvider delayDuration={DASHBOARD_UI_CONSTANTS.TOOLTIP.DELAY}>
+      <nav className={DASHBOARD_CSS_CLASSES.NAVIGATION.CONTAINER} role="navigation" aria-label="Navigația principală">
         {items.map((item, index) => {
           const Icon = getIconComponent(item.icon)
           const isActive = isActiveLink(item.href)
 
           return (
-            <Tooltip key={index}>
+            <Tooltip key={`nav-item-${index}`}>
               <TooltipTrigger asChild>
                 <Link
                   href={item.disabled ? '#' : item.href}
@@ -46,13 +39,17 @@ export function MainNav({ items, onLinkClick }: MainNavProps) {
                     DASHBOARD_CSS_CLASSES.NAVIGATION.LINK,
                     isActive && DASHBOARD_CSS_CLASSES.NAVIGATION.ACTIVE,
                     item.disabled && DASHBOARD_CSS_CLASSES.NAVIGATION.DISABLED,
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                   )}
+                  aria-current={isActive ? 'page' : undefined}
+                  aria-disabled={item.disabled}
+                  tabIndex={item.disabled ? -1 : 0}
                 >
-                  <Icon className={UI_CONSTANTS.ICON_SIZE} />
-                  <span>{item.title}</span>
+                  <Icon className={DASHBOARD_UI_CONSTANTS.ICONS.SIZE_SMALL} aria-hidden="true" />
+                  <span className="truncate">{item.title}</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side={UI_CONSTANTS.TOOLTIP_SIDE}>
+              <TooltipContent side={DASHBOARD_UI_CONSTANTS.TOOLTIP.SIDE}>
                 <p>{item.title}</p>
               </TooltipContent>
             </Tooltip>

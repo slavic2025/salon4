@@ -1,5 +1,8 @@
 // src/app/(dashboard)/stylist/layout.tsx
+import { Suspense } from 'react'
+
 import { DashboardLayout } from '@/components/features/dashboard/dashboard-layout'
+import { DashboardLoading } from '@/components/features/dashboard/dashboard-loading'
 import { STYLIST_NAV_ITEMS } from '@/core/domains/stylists/stylist.constants'
 import { ROLES } from '@/lib/constants'
 import { enforceRouteAccess } from '@/lib/route-protection'
@@ -13,5 +16,9 @@ export default async function StylistDashboardLayout({ children }: { children: R
     throw new Error('Acces neautorizat la secțiunea de stilist')
   }
 
-  return <DashboardLayout sidebarNavItems={STYLIST_NAV_ITEMS}>{children}</DashboardLayout>
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardLayout sidebarNavItems={STYLIST_NAV_ITEMS}>{children}</DashboardLayout>
+    </Suspense>
+  )
 }

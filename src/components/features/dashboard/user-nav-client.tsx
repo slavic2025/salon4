@@ -21,14 +21,7 @@ import {
 import { signOutAction } from '@/features/auth/actions'
 import { createLogger } from '@/lib/logger'
 
-// Constante pentru configurația UI
-const UI_CONSTANTS = {
-  AVATAR_SIZE: 'h-9 w-9',
-  ICON_SIZE: 'h-4 w-4',
-  DROPDOWN_WIDTH: 'w-56',
-  INITIALS_FALLBACK: '??',
-  INITIALS_LENGTH: 2,
-} as const
+import { DASHBOARD_UI_CONSTANTS } from './dashboard.constants'
 
 // Constante pentru mesaje
 const MESSAGES = {
@@ -36,6 +29,12 @@ const MESSAGES = {
   SIGN_OUT_SUCCESS: 'Deconectare reușită!',
   SIGN_OUT_ERROR: 'Deconectarea a eșuat. Te rog încearcă din nou.',
   DEFAULT_USER_NAME: 'Utilizator',
+  INITIALS_FALLBACK: '??',
+} as const
+
+// Constante pentru configurația UI
+const UI_CONFIG = {
+  INITIALS_LENGTH: 2,
 } as const
 
 type UserNavClientProps = {
@@ -47,7 +46,7 @@ export function UserNavClient({ user }: UserNavClientProps) {
   const logger = createLogger('user-nav')
 
   const getInitials = (email?: string | null) => {
-    return email?.slice(0, UI_CONSTANTS.INITIALS_LENGTH).toUpperCase() ?? UI_CONSTANTS.INITIALS_FALLBACK
+    return email?.slice(0, UI_CONFIG.INITIALS_LENGTH).toUpperCase() ?? MESSAGES.INITIALS_FALLBACK
   }
 
   const handleSignOut = () => {
@@ -74,14 +73,18 @@ export function UserNavClient({ user }: UserNavClientProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`relative rounded-full ${UI_CONSTANTS.AVATAR_SIZE}`}>
-          <Avatar className={UI_CONSTANTS.AVATAR_SIZE}>
+        <Button
+          variant="ghost"
+          className={`relative rounded-full ${DASHBOARD_UI_CONSTANTS.AVATAR.SIZE} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2`}
+          aria-label={`Meniu utilizator pentru ${userName}`}
+        >
+          <Avatar className={DASHBOARD_UI_CONSTANTS.AVATAR.SIZE}>
             <AvatarImage src={avatarUrl} alt={userName} />
             <AvatarFallback>{getInitials(userEmail)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className={UI_CONSTANTS.DROPDOWN_WIDTH} align="end" forceMount>
+      <DropdownMenuContent className={DASHBOARD_UI_CONSTANTS.DROPDOWN.WIDTH} align="end" forceMount sideOffset={8}>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{userName}</p>
@@ -91,22 +94,27 @@ export function UserNavClient({ user }: UserNavClientProps) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href="/account/profile">
-            <DropdownMenuItem>
-              <UserIcon className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
+            <DropdownMenuItem className="cursor-pointer">
+              <UserIcon className={`mr-2 ${DASHBOARD_UI_CONSTANTS.ICONS.SIZE_SMALL}`} />
               <span>Profil</span>
             </DropdownMenuItem>
           </Link>
           <Link href="/account/settings">
-            <DropdownMenuItem>
-              <Settings className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
+            <DropdownMenuItem className="cursor-pointer">
+              <Settings className={`mr-2 ${DASHBOARD_UI_CONSTANTS.ICONS.SIZE_SMALL}`} />
               <span>Setări</span>
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} disabled={isPending} className="cursor-pointer">
-          <LogOut className={`mr-2 ${UI_CONSTANTS.ICON_SIZE}`} />
-          <span>Deconectare</span>
+        <DropdownMenuItem
+          onClick={handleSignOut}
+          disabled={isPending}
+          className="cursor-pointer"
+          aria-label="Deconectare"
+        >
+          <LogOut className={`mr-2 ${DASHBOARD_UI_CONSTANTS.ICONS.SIZE_SMALL}`} />
+          <span>{isPending ? 'Deconectare...' : 'Deconectare'}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
