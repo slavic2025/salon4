@@ -127,6 +127,64 @@ function createStylistOwnScheduleActionFactory<T extends z.ZodType<any, any, any
   }
 }
 
+/**
+ * FACTORY FUNCTION: Creează o acțiune sigură pentru fetch-ul programelor cu validare de autorizare.
+ * Încorporează validarea, autorizarea și execuția.
+ *
+ * @param schema - Schema Zod pentru validarea datelor de intrare.
+ * @param actionLogic - Funcția care conține logica de business specifică.
+ * @returns O Server Action completă și sigură.
+ */
+function createFetchScheduleAction<T extends z.ZodType<any, any, any>>(
+  schema: T,
+  actionLogic: (payload: z.infer<T>, user: any) => Promise<any>,
+) {
+  return (payload: z.infer<T>) => {
+    return executeSafeAction(schema, payload, async (validatedPayload) => {
+      const user = await ensureUserIsStylist()
+
+      // Stilistul poate vedea doar propriul program, adminul poate vedea pe toți
+      if (user.role !== ROLES.ADMIN && validatedPayload.stylistId !== user.id) {
+        logger.warn('Încercare de acces la programul altui stilist', {
+          requestedStylistId: validatedPayload.stylistId,
+          userId: user.id,
+          userRole: user.role,
+          action: 'get-stylist-schedule',
+        })
+        throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_ACCESS)
+      }
+
+      logger.info('Acces la programul stilistului', {
+        stylistId: validatedPayload.stylistId,
+        userId: user.id,
+        userRole: user.role,
+        action: 'get-stylist-schedule',
+      })
+
+      return await actionLogic(validatedPayload, user)
+    })
+  }
+}
+
+/**
+ * FACTORY FUNCTION: Creează o acțiune sigură pentru verificarea disponibilității stilistului.
+ * Încorporează validarea și execuția.
+ *
+ * @param schema - Schema Zod pentru validarea datelor de intrare.
+ * @param actionLogic - Funcția care conține logica de business specifică.
+ * @returns O Server Action completă și sigură.
+ */
+function createCheckAvailabilityAction<T extends z.ZodType<any, any, any>>(
+  schema: T,
+  actionLogic: (payload: z.infer<T>) => Promise<{ data: boolean }>,
+) {
+  return (payload: z.infer<T>) => {
+    return executeSafeAction(schema, payload, async (validatedPayload) => {
+      return await actionLogic(validatedPayload)
+    })
+  }
+}
+
 // --- ADMIN SERVER ACTIONS ---
 
 export const createWorkScheduleAction = createAdminWorkScheduleAction(
@@ -193,7 +251,7 @@ export const updateStylistOwnScheduleAction = createStylistOwnScheduleActionFact
 export const deleteStylistOwnScheduleAction = createStylistOwnScheduleActionFactory(
   DeleteWorkScheduleActionSchema,
   async (payload: DeleteWorkSchedulePayload, userId: string) => {
-    // Verificăm că intervalul aparține stilistului
+    // Verificăm că intervalul aparține stylistului
     const schedule = await workScheduleService.getScheduleById(payload.id)
     if (schedule.stylistId !== userId) {
       logger.warn('Încercare de ștergere interval pentru alt stilist', {
@@ -221,56 +279,32 @@ export async function getAllWorkSchedulesAction() {
   return await workScheduleService.getAllSchedules()
 }
 
-export async function getStylistScheduleAction(payload: { stylistId: string }) {
-  const schema = z.object({ stylistId: z.string().uuid() })
-  const { stylistId } = schema.parse(payload)
-
-  const user = await ensureUserIsStylist()
-
-  // Stilistul poate vedea doar propriul program, adminul poate vedea pe toți
-  if (user.role !== ROLES.ADMIN && stylistId !== user.id) {
-    logger.warn('Încercare de acces la programul altui stilist', {
-      requestedStylistId: stylistId,
-      userId: user.id,
-      userRole: user.role,
-      action: 'get-stylist-schedule',
-    })
-    throw new Error(WORK_SCHEDULE_MESSAGES.ERROR.UNAUTHORIZED_ACCESS)
-  }
-
-  logger.info('Acces la programul stilistului', {
-    stylistId,
-    userId: user.id,
-    userRole: user.role,
-    action: 'get-stylist-schedule',
-  })
-  return await workScheduleService.getStylistSchedule(stylistId)
-}
+export const getStylistScheduleAction = createFetchScheduleAction(
+  z.object({ stylistId: z.string().uuid() }),
+  async (payload: { stylistId: string }) => {
+    return await workScheduleService.getStylistSchedule(payload.stylistId)
+  },
+)
 
 export async function getStylistOwnScheduleAction() {
   const user = await ensureUserIsStylist()
   return await workScheduleService.getStylistSchedule(user.id)
 }
 
-export async function checkStylistAvailabilityAction(payload: {
-  stylistId: string
-  dayOfWeek: number
-  startTime: string
-  endTime: string
-}) {
-  const schema = z.object({
+export const checkStylistAvailabilityAction = createCheckAvailabilityAction(
+  z.object({
     stylistId: z.string().uuid(),
     dayOfWeek: z.number().int().min(0).max(6),
     startTime: z.string(),
     endTime: z.string(),
-  })
-
-  const validatedPayload = schema.parse(payload)
-
-  return await workScheduleService.isStylistAvailable(
-    validatedPayload.stylistId,
-    validatedPayload.dayOfWeek as any, // Type assertion temporară
-    validatedPayload.startTime,
-    validatedPayload.endTime,
-  )
-}
+  }),
+  async (payload: { stylistId: string; dayOfWeek: number; startTime: string; endTime: string }) => {
+    const result = await workScheduleService.isStylistAvailable(
+      payload.stylistId,
+      payload.dayOfWeek as any, // Type assertion temporară
+      payload.startTime,
+      payload.endTime,
+    )
+    return { data: result }
+  },
+)

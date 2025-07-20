@@ -34,10 +34,10 @@ export function UnavailabilityTable({ unavailabilities, stylistId }: Unavailabil
       startTransition(async () => {
         try {
           const result = await deleteUnavailabilityStylistAction(id)
-          if (result.success) {
+          if (result.data?.success) {
             toast.success(UNAVAILABILITY_SUCCESS_MESSAGES.DELETED)
           } else {
-            toast.error(result.error || UNAVAILABILITY_ERROR_MESSAGES.DELETE_FAILED)
+            toast.error(result.serverError || UNAVAILABILITY_ERROR_MESSAGES.DELETE_FAILED)
           }
         } catch (error) {
           console.error('Eroare la ștergerea indisponibilității:', error)

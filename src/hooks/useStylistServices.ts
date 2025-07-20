@@ -19,12 +19,21 @@ export function useStylistServices(stylistId: string, open: boolean) {
 
   const fetchData = async () => {
     const allServices = await getAllServicesAction()
-    const stylistLinks = await getStylistServiceLinksAction({ stylistId })
+    const stylistLinksResponse = await getStylistServiceLinksAction({ stylistId })
 
-    const linked = new Set(stylistLinks.map((l) => l.serviceId))
+    // Verificăm că răspunsul este valid și conține date
+    if (!stylistLinksResponse.data) {
+      console.error('Eroare la încărcarea serviciilor stilistului:', stylistLinksResponse)
+      setLoading(false)
+      return
+    }
+
+    const stylistLinks = stylistLinksResponse.data
+
+    const linked = new Set(stylistLinks.map((l: any) => l.serviceId))
     const initialCustom: Record<string, { customPrice?: string; customDuration?: string }> = {}
 
-    stylistLinks.forEach((l) => {
+    stylistLinks.forEach((l: any) => {
       if (l.customPrice || l.customDuration) {
         initialCustom[l.serviceId] = {
           customPrice: l.customPrice ?? '',
@@ -34,8 +43,8 @@ export function useStylistServices(stylistId: string, open: boolean) {
     })
 
     setServices(allServices)
-    setSelected(linked)
-    setInitial(linked)
+    setSelected(linked as Set<string>)
+    setInitial(linked as Set<string>)
     setCustomMap(initialCustom)
     setLoading(false)
   }

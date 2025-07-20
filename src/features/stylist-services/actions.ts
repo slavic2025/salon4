@@ -127,6 +127,113 @@ function createStylistOwnServiceLinkAction<T extends z.ZodType<any, any, any>>(
   }
 }
 
+/**
+ * FACTORY FUNCTION: Creează o acțiune sigură pentru actualizarea serviciilor stylist.
+ * Încorporează validarea, autorizarea, execuția, gestionarea erorilor și revalidarea.
+ *
+ * @param schema - Schema Zod pentru validarea datelor de intrare.
+ * @param actionLogic - Funcția care conține logica de business specifică.
+ * @returns O Server Action completă și sigură.
+ */
+function createUpdateStylistServiceAction<T extends z.ZodType<any, any, any>>(
+  schema: T,
+  actionLogic: (payload: z.infer<T>) => Promise<any>,
+) {
+  return (payload: z.infer<T>) => {
+    return executeSafeAction(schema, payload, async (validatedPayload) => {
+      await _ensureUserIsAdmin()
+
+      try {
+        const result = await actionLogic(validatedPayload)
+        revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
+        logger.info('Actualizare stylist service link cu succes', {
+          stylistId: validatedPayload.stylistId,
+          serviceId: validatedPayload.serviceId,
+          action: 'admin-update-stylist-service',
+        })
+        return { data: result }
+      } catch (error) {
+        if (error instanceof UniquenessError) {
+          logger.warn('Eroare de unicitate la actualizarea stylist service link', {
+            fields: error.fields.map((f) => f.field),
+            stylistId: validatedPayload.stylistId,
+            serviceId: validatedPayload.serviceId,
+            action: 'admin-update-stylist-service',
+          })
+          return {
+            validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
+          }
+        }
+        logger.error('Eroare la actualizarea stylist service link', {
+          error,
+          stylistId: validatedPayload.stylistId,
+          serviceId: validatedPayload.serviceId,
+          action: 'admin-update-stylist-service',
+        })
+        throw error
+      }
+    })
+  }
+}
+
+/**
+ * FACTORY FUNCTION: Creează o acțiune sigură pentru actualizarea propriilor servicii de stylist.
+ * Încorporează validarea, autorizarea, execuția, gestionarea erorilor și revalidarea.
+ *
+ * @param schema - Schema Zod pentru validarea datelor de intrare.
+ * @param actionLogic - Funcția care conține logica de business specifică.
+ * @returns O Server Action completă și sigură.
+ */
+function createUpdateStylistOwnServiceAction<T extends z.ZodType<any, any, any>>(
+  schema: T,
+  actionLogic: (payload: z.infer<T>, userId: string) => Promise<any>,
+) {
+  return (payload: z.infer<T>) => {
+    return executeSafeAction(schema, payload, async (validatedPayload) => {
+      const user = await ensureUserIsStylist()
+
+      // Verificăm că stilistul încearcă să actualizeze serviciu pentru el însuși
+      if (validatedPayload.stylistId !== user.id) {
+        logger.warn('Încercare de actualizare serviciu pentru alt stilist', {
+          requestedStylistId: validatedPayload.stylistId,
+          userId: user.id,
+          action: 'stylist-update-service',
+        })
+        throw new Error(STYLIST_SERVICE_LINK_MESSAGES.ERROR.UNAUTHORIZED_UPDATE)
+      }
+
+      try {
+        const result = await actionLogic(validatedPayload, user.id)
+        revalidatePath(APP_ROUTES.STYLIST_SERVICES)
+        logger.info('Actualizare serviciu pentru stilist cu succes', {
+          stylistId: validatedPayload.stylistId,
+          serviceId: validatedPayload.serviceId,
+          userId: user.id,
+          action: 'stylist-update-service',
+        })
+        return { data: result }
+      } catch (error) {
+        if (error instanceof UniquenessError) {
+          logger.warn('Eroare de unicitate în acțiunea stylist update service', {
+            fields: error.fields.map((f) => f.field),
+            userId: user.id,
+            action: 'stylist-update-service',
+          })
+          return {
+            validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
+          }
+        }
+        logger.error('Eroare în acțiunea stylist update service', {
+          error,
+          userId: user.id,
+          action: 'stylist-update-service',
+        })
+        throw error
+      }
+    })
+  }
+}
+
 // --- ADMIN SERVER ACTIONS ---
 
 export const createStylistServiceLinkAction = createAdminStylistServiceLinkAction(
@@ -143,62 +250,25 @@ export const deleteStylistServiceLinkAction = createAdminStylistServiceLinkActio
   },
 )
 
-export const updateStylistServiceLinkAction = async (payload: {
-  stylistId: string
-  serviceId: string
-  customPrice?: string | number | null
-  customDuration?: number | null
-}) => {
-  const schema = z.object({
+export const updateStylistServiceLinkAction = createUpdateStylistServiceAction(
+  z.object({
     stylistId: z.string().uuid(),
     serviceId: z.string().uuid(),
     customPrice: z.union([z.string(), z.number()]).optional().nullable(),
     customDuration: z.number().int().positive().optional().nullable(),
-  })
+  }),
+  async (validatedPayload) => {
+    const { stylistId, serviceId, customPrice, customDuration } = validatedPayload
+    const priceString = typeof customPrice === 'number' ? String(customPrice) : customPrice
 
-  return executeSafeAction(schema, payload, async (validatedPayload) => {
-    await _ensureUserIsAdmin()
-
-    try {
-      const { stylistId, serviceId, customPrice, customDuration } = validatedPayload
-      const priceString = typeof customPrice === 'number' ? String(customPrice) : customPrice
-
-      const result = await stylistServiceLinkService.updateLink(stylistId, serviceId, {
-        stylistId,
-        serviceId,
-        customPrice: priceString,
-        customDuration,
-      })
-
-      revalidatePath(APP_ROUTES.ADMIN_STYLISTS_PAGE)
-      logger.info('Actualizare stylist service link cu succes', {
-        stylistId,
-        serviceId,
-        action: 'admin-update-stylist-service',
-      })
-      return { data: result }
-    } catch (error) {
-      if (error instanceof UniquenessError) {
-        logger.warn('Eroare de unicitate la actualizarea stylist service link', {
-          fields: error.fields.map((f) => f.field),
-          stylistId: validatedPayload.stylistId,
-          serviceId: validatedPayload.serviceId,
-          action: 'admin-update-stylist-service',
-        })
-        return {
-          validationErrors: Object.fromEntries(error.fields.map((f) => [f.field, [f.message]])),
-        }
-      }
-      logger.error('Eroare la actualizarea stylist service link', {
-        error,
-        stylistId: validatedPayload.stylistId,
-        serviceId: validatedPayload.serviceId,
-        action: 'admin-update-stylist-service',
-      })
-      throw error
-    }
-  })
-}
+    return stylistServiceLinkService.updateLink(stylistId, serviceId, {
+      stylistId,
+      serviceId,
+      customPrice: priceString,
+      customDuration,
+    })
+  },
+)
 
 // --- STYLIST OWN SERVICE SERVER ACTIONS ---
 
@@ -246,52 +316,25 @@ export const deleteStylistOwnServiceAction = createStylistOwnServiceLinkAction(
   },
 )
 
-export const updateStylistOwnServiceAction = async (payload: {
-  stylistId: string
-  serviceId: string
-  customPrice?: string | number | null
-  customDuration?: number | null
-}) => {
-  const schema = z.object({
+export const updateStylistOwnServiceAction = createUpdateStylistOwnServiceAction(
+  z.object({
     stylistId: z.string().uuid(),
     serviceId: z.string().uuid(),
     customPrice: z.union([z.string(), z.number()]).optional().nullable(),
     customDuration: z.number().int().positive().optional().nullable(),
-  })
-
-  return executeSafeAction(schema, payload, async (validatedPayload) => {
-    const user = await ensureUserIsStylist()
-
-    // Verificăm că stilistul încearcă să actualizeze serviciu pentru el însuși
-    if (validatedPayload.stylistId !== user.id) {
-      logger.warn('Încercare de actualizare serviciu pentru alt stilist', {
-        requestedStylistId: validatedPayload.stylistId,
-        userId: user.id,
-        action: 'stylist-update-service',
-      })
-      throw new Error(STYLIST_SERVICE_LINK_MESSAGES.ERROR.UNAUTHORIZED_UPDATE)
-    }
-
+  }),
+  async (validatedPayload, userId: string) => {
     const { stylistId, serviceId, customPrice, customDuration } = validatedPayload
     const priceString = typeof customPrice === 'number' ? String(customPrice) : customPrice
 
-    const result = await stylistServiceLinkService.updateLink(stylistId, serviceId, {
+    return stylistServiceLinkService.updateLink(stylistId, serviceId, {
       stylistId,
       serviceId,
       customPrice: priceString,
       customDuration,
     })
-
-    revalidatePath(APP_ROUTES.STYLIST_SERVICES)
-    logger.info('Actualizare serviciu pentru stilist cu succes', {
-      stylistId,
-      serviceId,
-      userId: user.id,
-      action: 'stylist-update-service',
-    })
-    return { data: result }
-  })
-}
+  },
+)
 
 // --- FETCH SERVER ACTIONS ---
 
@@ -299,11 +342,21 @@ export async function getAllServicesAction() {
   return await serviceService.getAllServices()
 }
 
-export async function getStylistServiceLinksAction(payload: { stylistId: string }) {
-  const schema = z.object({ stylistId: z.string().uuid() })
-  const { stylistId } = schema.parse(payload)
-  return await stylistServiceLinkService.getLinksByStylistId(stylistId)
-}
+export const getStylistServiceLinksAction = createStylistOwnServiceLinkAction(
+  z.object({ stylistId: z.string().uuid() }),
+  async (payload: { stylistId: string }, userId: string) => {
+    // Verificăm că stilistul încearcă să acceseze propriile servicii
+    if (payload.stylistId !== userId) {
+      logger.warn('Încercare de acces la serviciile altui stilist', {
+        requestedStylistId: payload.stylistId,
+        userId,
+        action: 'stylist-get-services',
+      })
+      throw new Error(STYLIST_SERVICE_LINK_MESSAGES.ERROR.UNAUTHORIZED_ACCESS)
+    }
+    return await stylistServiceLinkService.getLinksByStylistId(payload.stylistId)
+  },
+)
 
 export async function getStylistOwnServicesAction() {
   const user = await ensureUserIsStylist()
