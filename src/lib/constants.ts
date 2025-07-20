@@ -37,6 +37,7 @@ export const APP_ROUTES = {
   // Rute specifice pentru pagini
   ADMIN_SERVICES_PAGE: '/admin/services',
   ADMIN_STYLISTS_PAGE: '/admin/stylists',
+  ADMIN_APPOINTMENTS_PAGE: '/admin/appointments',
   // Rute specifice pentru stylist
   STYLIST_UNAVAILABILITY: '/stylist/unavailability',
   STYLIST_SCHEDULE: '/stylist/schedule',
@@ -83,6 +84,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     title: 'Servicii',
     href: '/admin/services',
     icon: 'scissors',
+  },
+  {
+    title: 'Programări',
+    href: '/admin/appointments',
+    icon: 'calendar',
   },
   // Adaugă aici alte linkuri pentru admin
 ]
