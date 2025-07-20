@@ -20,7 +20,7 @@ export const DASHBOARD_CONSTANTS = {
 export const DASHBOARD_CSS_CLASSES = {
   LAYOUT: {
     MAIN_CONTAINER: 'grid min-h-screen w-full',
-    SIDEBAR: 'hidden border-r bg-muted/40 md:block',
+    SIDEBAR: 'border-r bg-muted/40',
     MAIN_CONTENT: 'flex flex-col',
   },
   HEADER: {
@@ -28,8 +28,8 @@ export const DASHBOARD_CSS_CLASSES = {
     SPACER: 'w-full flex-1',
   },
   NAVIGATION: {
-    CONTAINER: 'grid items-start gap-1 px-2 text-sm font-medium lg:px-4',
-    LINK: 'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+    CONTAINER: 'grid items-start gap-1 px-1 text-sm font-medium md:px-2 lg:px-4',
+    LINK: 'flex items-center gap-2 rounded-lg px-2 py-2 text-muted-foreground transition-all hover:text-primary md:gap-3 md:px-3',
     ACTIVE: 'bg-muted text-primary',
     DISABLED: 'cursor-not-allowed opacity-50',
   },

@@ -23,7 +23,7 @@ export type ServiceFilters = {
   showActiveOnly: boolean
 }
 
-export function ServiceFilters({ services, onFiltersChange, className }: ServiceFiltersProps) {
+export function ServiceFilters({ services: _services, onFiltersChange, className }: ServiceFiltersProps) {
   const [filters, setFilters] = useState<ServiceFilters>({
     search: '',
     category: 'all',
