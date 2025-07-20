@@ -20,7 +20,7 @@ export { StylistServiceForm } from './StylistServiceForm'
 
 // Export componente noi pentru UI modern
 export { StylistServiceCard } from './StylistServiceCard'
-export { StylistServiceFilters, type StylistServiceFilters } from './StylistServiceFilters'
+export { StylistServiceFilters } from './StylistServiceFilters'
 export { StylistServicesGridView } from './StylistServicesGridView'
 export { StylistServiceSkeleton } from './StylistServiceSkeleton'
 export { StylistServiceViewToggle } from './StylistServiceViewToggle'

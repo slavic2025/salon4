@@ -30,7 +30,11 @@ export function StylistServiceFilters({ services: _services, onFiltersChange, cl
 
   // Obținem categoriile unice din servicii
   const categories = useMemo(() => {
-    const uniqueCategories = new Set(_services.map((link) => link.service.category).filter(Boolean))
+    const uniqueCategories = new Set(
+      _services
+        .map((link) => link.service.category)
+        .filter((category): category is NonNullable<typeof category> => category !== null),
+    )
     return Array.from(uniqueCategories).sort()
   }, [_services])
 
