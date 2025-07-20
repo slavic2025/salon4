@@ -1,17 +1,15 @@
-// src/components/features/services/ServicesTable.tsx
 'use client'
 
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { Service } from '@/core/domains/services/service.types'
 
-import { ServiceTableRow } from './ServiceTableRow'
+import { ServiceCard } from './ServiceCard'
 
-type ServicesTableProps = {
+type ServicesGridViewProps = {
   services: Service[]
   className?: string
 }
 
-export function ServicesTable({ services, className }: ServicesTableProps) {
+export function ServicesGridView({ services, className }: ServicesGridViewProps) {
   if (services.length === 0) {
     return (
       <div className={`flex flex-col items-center justify-center py-12 text-center ${className}`}>
@@ -32,24 +30,10 @@ export function ServicesTable({ services, className }: ServicesTableProps) {
   }
 
   return (
-    <div className={`rounded-lg border ${className}`}>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[300px]">Serviciu</TableHead>
-            <TableHead>Categorie</TableHead>
-            <TableHead>Preț</TableHead>
-            <TableHead>Durată</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Acțiuni</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {services.map((service) => (
-            <ServiceTableRow key={service.id} service={service} />
-          ))}
-        </TableBody>
-      </Table>
+    <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${className}`}>
+      {services.map((service) => (
+        <ServiceCard key={service.id} service={service} />
+      ))}
     </div>
   )
 }

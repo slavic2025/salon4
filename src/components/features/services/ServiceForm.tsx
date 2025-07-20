@@ -10,8 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
-import { CreateServiceFormValidator, SERVICE_CATEGORIES, type ServiceFormValues } from '@/core/domains/services'
-import { DEFAULT_CURRENCY } from '@/lib/constants'
+import {
+  CreateServiceFormValidator,
+  SERVICE_CATEGORIES,
+  SERVICE_CATEGORY_LABELS,
+  SERVICE_FORMATS,
+  type ServiceFormValues,
+} from '@/core/domains/services'
 
 type ServiceFormProps = {
   defaultValues?: Partial<ServiceFormValues>
@@ -68,7 +73,7 @@ export function ServiceForm({ defaultValues, onSubmit, isPending, submitButtonTe
             name="price"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Preț ({DEFAULT_CURRENCY})</FormLabel>
+                <FormLabel>Preț ({SERVICE_FORMATS.CURRENCY})</FormLabel>
                 <FormControl>
                   <Input type="number" min={0} step={1} {...field} />
                 </FormControl>
@@ -105,7 +110,7 @@ export function ServiceForm({ defaultValues, onSubmit, isPending, submitButtonTe
                 <SelectContent>
                   {SERVICE_CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {cat}
+                      {SERVICE_CATEGORY_LABELS[cat]}
                     </SelectItem>
                   ))}
                 </SelectContent>
