@@ -46,8 +46,8 @@ export {
   UpdateAppointmentStatusActionSchema,
 } from './appointment.validators'
 
-// --- REPOSITORY ---
-export { AppointmentRepositoryImpl, createAppointmentRepository } from './appointment.repository'
+// Appointment Repository
+export { createAppointmentRepository } from './appointment.repository'
 
-// --- SERVICE ---
-export { AppointmentServiceImpl, createAppointmentService } from './appointment.service'
+// Appointment Service
+export { createAppointmentService } from './appointment.service'

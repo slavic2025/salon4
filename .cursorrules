@@ -63,6 +63,13 @@ O platformă SaaS completă pentru managementul salonului de înfrumusețare, ax
 
 ## 🎯 Reguli Generale de Clean Code & Best Practices
 
+### Package Management
+
+- **Folosește EXCLUSIV pnpm** ca manager de pachete
+- **NU folosi npm sau yarn** pentru instalare, lint sau alte operațiuni
+- **Toate comenzile de package management** trebuie să folosească pnpm
+- **Exemple corecte**: `pnpm install`, `pnpm add`, `pnpm lint`, `pnpm dev`
+
 ### Constants Over Magic Numbers
 
 - Înlocuiește valorile hard-coded cu constante nume

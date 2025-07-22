@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import BookingFormStepper from '@/components/features/appointments/BookingFormStepper'
 import { NavigationTest } from '@/components/shared/NavigationTest'
 
 export default function Home() {
@@ -70,6 +71,11 @@ export default function Home() {
           >
             Read our docs
           </a>
+        </div>
+
+        {/* --- FORMULAR PUBLIC DE PROGRAMARE --- */}
+        <div className="w-full max-w-7xl mt-12">
+          <BookingFormStepper />
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">

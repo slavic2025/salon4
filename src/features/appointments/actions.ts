@@ -16,6 +16,17 @@ import {
 } from '@/core/domains/appointments'
 import { createAppointmentRepository } from '@/core/domains/appointments/appointment.repository'
 import { createAppointmentService } from '@/core/domains/appointments/appointment.service'
+import { generateAvailableSlots } from '@/core/domains/appointments/appointment.utils'
+import { createServiceRepository } from '@/core/domains/services/service.repository'
+import { createServiceService } from '@/core/domains/services/service.service'
+import { createStylistServiceLinkRepository } from '@/core/domains/stylist-services/stylist-service.repository'
+import { createStylistServiceLinkService } from '@/core/domains/stylist-services/stylist-service.service'
+import { createStylistRepository } from '@/core/domains/stylists/stylist.repository'
+import { createStylistService } from '@/core/domains/stylists/stylist.service'
+import { createUnavailabilityRepository } from '@/core/domains/unavailability/unavailability.repository'
+import { createUnavailabilityService } from '@/core/domains/unavailability/unavailability.service'
+import { createWorkScheduleRepository } from '@/core/domains/work-schedule/workSchedule.repository'
+import { createWorkScheduleService } from '@/core/domains/work-schedule/workSchedule.service'
 import { db } from '@/db'
 import { APP_ROUTES } from '@/lib/constants'
 import { UniquenessError } from '@/lib/errors'
@@ -33,6 +44,11 @@ const logger = createLogger('appointments')
  * Acest lucru este eficient și simplifică corpul acțiunilor.
  */
 const appointmentService = createAppointmentService(createAppointmentRepository(db))
+const serviceService = createServiceService(createServiceRepository(db))
+const stylistService = createStylistService(createStylistRepository(db), null as any)
+const workScheduleService = createWorkScheduleService(createWorkScheduleRepository(db))
+const unavailabilityService = createUnavailabilityService(createUnavailabilityRepository(db))
+const stylistServiceLinkService = createStylistServiceLinkService(createStylistServiceLinkRepository(db))
 
 /**
  * Helper intern pentru a verifica dacă utilizatorul este admin.
@@ -105,3 +121,57 @@ export const updateAppointmentStatusAction = createAdminAppointmentAction(
   async (payload: UpdateAppointmentStatusPayload) =>
     appointmentService.updateAppointmentStatus(payload.id, payload.status),
 )
+
+export async function getActiveServicesPublicAction() {
+  return await serviceService.getActiveServices()
+}
+
+export async function getAllStylistsPublicAction() {
+  return await stylistService.getAllStylists()
+}
+
+export async function getStylistsForServicePublicAction(serviceId: string) {
+  // Obține toate legăturile pentru serviciul dat
+  const links = await stylistServiceLinkService.getLinksByServiceId(serviceId)
+  if (!links.length) return []
+  // Extrage id-urile stiliștilor
+  const stylistIds = links.map((link) => link.stylistId)
+  // Obține toți stiliștii activi cu aceste id-uri
+  const allStylists = await stylistService.getAllStylists()
+  return allStylists.filter((stylist) => stylistIds.includes(stylist.id) && stylist.isActive)
+}
+
+export const getAvailableSlotsPublicAction = async (payload: {
+  stylistId: string
+  serviceId: string
+  fromDate: string // ISO date
+  days: number
+}) => {
+  const schedule = await workScheduleService.getStylistSchedule(payload.stylistId)
+  const from = new Date(payload.fromDate)
+  const to = new Date(from)
+  to.setDate(from.getDate() + payload.days)
+  const appointments = await appointmentService.getAppointmentsByStylist(payload.stylistId)
+  const unavailabilities = await unavailabilityService.getUnavailabilitiesByStylist(
+    payload.stylistId,
+    payload.fromDate,
+    to.toISOString().slice(0, 10),
+  )
+  const service = await serviceService.getServiceById(payload.serviceId)
+  if (!service) throw new Error('Serviciul nu a fost găsit')
+  return generateAvailableSlots({
+    schedule,
+    appointments,
+    unavailabilities,
+    serviceDuration: service.duration,
+    fromDate: payload.fromDate,
+    days: payload.days,
+  })
+}
+
+export async function createPublicAppointmentAction(payload: CreateAppointmentPayload) {
+  return executeSafeAction(CreateAppointmentActionSchema, payload, async (validatedPayload) => {
+    logger.info('Creare programare publică', validatedPayload)
+    return appointmentService.createAppointment(validatedPayload)
+  })
+}

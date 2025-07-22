@@ -9,7 +9,7 @@ import type { StylistServiceLinkWithService } from '@/core/domains/stylist-servi
 import { DEFAULT_CURRENCY } from '@/lib/constants'
 
 import { AddStylistServiceDialog } from './AddStylistServiceDialog'
-import { StylistServiceFilters, type StylistServiceFilters as Filters } from './StylistServiceFilters'
+import { type StylistServiceFilters as Filters,StylistServiceFilters } from './StylistServiceFilters'
 import { StylistServicesGridView } from './StylistServicesGridView'
 import { StylistServicesTable } from './StylistServicesTable'
 import { StylistServiceViewToggle } from './StylistServiceViewToggle'
