@@ -1,6 +1,6 @@
 // src/core/domains/unavailability/unavailability.repository.ts
 
-import { and, eq, gte, lte, not, or } from 'drizzle-orm'
+import { and, eq, gte, inArray, lte, not, or } from 'drizzle-orm'
 
 import type { DbClient } from '@/db'
 import { stylists } from '@/db/schema/stylists'
@@ -70,6 +70,29 @@ export const createUnavailabilityRepository = (db: DbClient): UnavailabilityRepo
      */
     async findByStylistId(stylistId: string, dateFrom?: string, dateTo?: string): Promise<Unavailability[]> {
       const conditions = [eq(unavailabilities.stylistId, stylistId)]
+
+      if (dateFrom) {
+        conditions.push(gte(unavailabilities.date, dateFrom))
+      }
+
+      if (dateTo) {
+        conditions.push(lte(unavailabilities.date, dateTo))
+      }
+
+      return await db
+        .select()
+        .from(unavailabilities)
+        .where(and(...conditions))
+        .orderBy(unavailabilities.date, unavailabilities.startTime)
+    },
+
+    /**
+     * Găsește indisponibilități pentru mai mulți stiliști în interval de date
+     */
+    async findByStylistIds(stylistIds: string[], dateFrom?: string, dateTo?: string): Promise<Unavailability[]> {
+      if (!stylistIds.length) return []
+
+      const conditions = [inArray(unavailabilities.stylistId, stylistIds)]
 
       if (dateFrom) {
         conditions.push(gte(unavailabilities.date, dateFrom))

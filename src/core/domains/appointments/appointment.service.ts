@@ -107,6 +107,13 @@ export function createAppointmentService(repository: AppointmentRepository): App
     },
 
     /**
+     * Obține programările pentru mai mulți stiliști într-un interval de date
+     */
+    async getAppointmentsByStylistIds(stylistIds: string[], startDate: Date, endDate: Date) {
+      return repository.findByStylistIdsAndDateRange(stylistIds, startDate, endDate)
+    },
+
+    /**
      * Obține programările pentru un serviciu
      */
     async getAppointmentsByService(serviceId: string) {

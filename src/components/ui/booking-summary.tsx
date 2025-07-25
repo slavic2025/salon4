@@ -3,6 +3,7 @@
 import { format } from 'date-fns'
 import { ro } from 'date-fns/locale'
 import { Calendar, Clock, Scissors, User } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getServiceIcon } from '@/lib/service-icons'
@@ -16,9 +17,15 @@ interface BookingSummaryProps {
 
 export function BookingSummary({ className, showTitle = true }: BookingSummaryProps) {
   const { service, stylist, slot, clientData } = useBookingStore()
+  const [isHydrated, setIsHydrated] = useState(false)
 
-  // Nu afișa componenta dacă nu avem date să afișăm
-  if (!service) {
+  // Detectăm când componenta este hidratată
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  // Nu afișa componenta dacă nu avem date să afișăm sau dacă nu suntem hidratați
+  if (!service || !isHydrated) {
     return null
   }
 

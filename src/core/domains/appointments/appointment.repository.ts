@@ -1,6 +1,6 @@
 // src/core/domains/appointments/appointment.repository.ts
 
-import { and, asc, desc, eq, gte, lte } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, inArray, lte } from 'drizzle-orm'
 
 import { type DbClient } from '@/db'
 import { appointments } from '@/db/schema/_schema'
@@ -99,6 +99,22 @@ export function createAppointmentRepository(db: DbClient): AppointmentRepository
     async findByStylistAndDateRange(stylistId: string, startDate: Date, endDate: Date): Promise<Appointment[]> {
       return db.query.appointments.findMany({
         where: and(eq(TABLE.stylistId, stylistId), gte(TABLE.startTime, startDate), lte(TABLE.startTime, endDate)),
+        orderBy: [asc(appointments.startTime)],
+      })
+    },
+
+    /**
+     * Găsește programările pentru mai mulți stiliști într-un interval de date
+     */
+    async findByStylistIdsAndDateRange(stylistIds: string[], startDate: Date, endDate: Date): Promise<Appointment[]> {
+      if (!stylistIds.length) return []
+
+      return db.query.appointments.findMany({
+        where: and(
+          inArray(TABLE.stylistId, stylistIds),
+          gte(TABLE.startTime, startDate),
+          lte(TABLE.startTime, endDate),
+        ),
         orderBy: [asc(appointments.startTime)],
       })
     },

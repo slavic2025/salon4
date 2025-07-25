@@ -70,6 +70,7 @@ export interface UnavailabilityRepository {
   findById(id: string): Promise<Unavailability | null>
   findByFilters(filters: UnavailabilityFilters): Promise<Unavailability[]>
   findByStylistId(stylistId: string, dateFrom?: string, dateTo?: string): Promise<Unavailability[]>
+  findByStylistIds(stylistIds: string[], dateFrom?: string, dateTo?: string): Promise<Unavailability[]>
   findWithStylistDetails(filters: UnavailabilityFilters): Promise<UnavailabilityWithStylist[]>
   create(data: CreateUnavailabilityData): Promise<Unavailability>
   update(id: string, data: UpdateUnavailabilityData): Promise<Unavailability | null>
@@ -89,6 +90,7 @@ export interface UnavailabilityService {
   getUnavailabilityById(id: string): Promise<Unavailability | null>
   getUnavailabilitiesByFilters(filters: UnavailabilityFilters): Promise<Unavailability[]>
   getUnavailabilitiesByStylist(stylistId: string, dateFrom?: string, dateTo?: string): Promise<Unavailability[]>
+  getUnavailabilitiesByStylistIds(stylistIds: string[], dateFrom?: string, dateTo?: string): Promise<Unavailability[]>
   getUnavailabilitiesWithStylistDetails(filters: UnavailabilityFilters): Promise<UnavailabilityWithStylist[]>
   createUnavailability(data: CreateUnavailabilityData): Promise<Unavailability>
   updateUnavailability(id: string, data: UpdateUnavailabilityData): Promise<Unavailability | null>

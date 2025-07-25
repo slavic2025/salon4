@@ -16,7 +16,10 @@ import {
 } from '@/core/domains/appointments'
 import { createAppointmentRepository } from '@/core/domains/appointments/appointment.repository'
 import { createAppointmentService } from '@/core/domains/appointments/appointment.service'
-import { generateAvailableSlots } from '@/core/domains/appointments/appointment.utils'
+import {
+  generateAvailableSlots,
+  generateAvailableSlotsForMultipleStylists,
+} from '@/core/domains/appointments/appointment.utils'
 import { createServiceRepository } from '@/core/domains/services/service.repository'
 import { createServiceService } from '@/core/domains/services/service.service'
 import { createStylistServiceLinkRepository } from '@/core/domains/stylist-services/stylist-service.repository'
@@ -147,6 +150,47 @@ export const getAvailableSlotsPublicAction = async (payload: {
   fromDate: string // ISO date
   days: number
 }) => {
+  // Dacă nu avem un stilist specific, obținem toți stiliștii care oferă serviciul
+  if (!payload.stylistId) {
+    const stylistsForService = await getStylistsForServicePublicAction(payload.serviceId)
+    if (!stylistsForService.length) {
+      return [] // Nu există stiliști pentru acest serviciu
+    }
+
+    const stylistIds = stylistsForService.map((stylist) => stylist.id)
+
+    // Obținem programele pentru toți stiliștii
+    const schedules = await workScheduleService.getMultipleStylists(stylistIds)
+
+    const from = new Date(payload.fromDate)
+    const to = new Date(from)
+    to.setDate(from.getDate() + payload.days)
+
+    // Obținem programările pentru toți stiliștii
+    const appointments = await appointmentService.getAppointmentsByStylistIds(stylistIds, from, to)
+
+    // Obținem indisponibilitățile pentru toți stiliștii
+    const unavailabilities = await unavailabilityService.getUnavailabilitiesByStylistIds(
+      stylistIds,
+      payload.fromDate,
+      to.toISOString().slice(0, 10),
+    )
+
+    const service = await serviceService.getServiceById(payload.serviceId)
+    if (!service) throw new Error('Serviciul nu a fost găsit')
+
+    // Generăm sloturile disponibile pentru toți stiliștii
+    return generateAvailableSlotsForMultipleStylists({
+      schedules,
+      appointments,
+      unavailabilities,
+      serviceDuration: service.duration,
+      fromDate: payload.fromDate,
+      days: payload.days,
+    })
+  }
+
+  // Cazul când avem un stilist specific (logica existentă)
   const schedule = await workScheduleService.getStylistSchedule(payload.stylistId)
   const from = new Date(payload.fromDate)
   const to = new Date(from)
@@ -172,6 +216,13 @@ export const getAvailableSlotsPublicAction = async (payload: {
 export async function createPublicAppointmentAction(payload: CreateAppointmentPayload) {
   return executeSafeAction(CreateAppointmentActionSchema, payload, async (validatedPayload) => {
     logger.info('Creare programare publică', validatedPayload)
-    return appointmentService.createAppointment(validatedPayload)
+    const result = await appointmentService.createAppointment(validatedPayload)
+
+    // Returnează formatul corect pentru executeSafeAction
+    if (result.success) {
+      return { data: result }
+    } else {
+      return { serverError: result.message }
+    }
   })
 }

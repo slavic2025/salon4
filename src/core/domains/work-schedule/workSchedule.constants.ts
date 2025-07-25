@@ -20,6 +20,26 @@ export const DAY_NAMES = {
   [DAYS_OF_WEEK.SUNDAY]: 'Duminică',
 } as const
 
+/**
+ * Convertește JavaScript Date.getDay() în sistemul de zile al aplicației
+ * JavaScript: 0=duminică, 1=luni, 2=marți, 3=miercuri, 4=joi, 5=vineri, 6=sâmbătă
+ * Aplicație: 0=luni, 1=marți, 2=miercuri, 3=joi, 4=vineri, 5=sâmbătă, 6=duminică
+ */
+export function convertJsDayToAppDay(jsDay: number): number {
+  // Mapare: JS day -> App day
+  const conversionMap: Record<number, number> = {
+    0: 6, // JS duminică -> App duminică
+    1: 0, // JS luni -> App luni
+    2: 1, // JS marți -> App marți
+    3: 2, // JS miercuri -> App miercuri
+    4: 3, // JS joi -> App joi
+    5: 4, // JS vineri -> App vineri
+    6: 5, // JS sâmbătă -> App sâmbătă
+  }
+
+  return conversionMap[jsDay] ?? 0
+}
+
 export const WORK_SCHEDULE_MESSAGES = {
   VALIDATION: {
     DAY_OF_WEEK_REQUIRED: 'Ziua săptămânii este obligatorie.',

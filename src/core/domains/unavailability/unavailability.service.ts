@@ -63,6 +63,24 @@ export const createUnavailabilityService = (repository: UnavailabilityRepository
     },
 
     /**
+     * Găsește indisponibilități pentru mai mulți stiliști
+     */
+    async getUnavailabilitiesByStylistIds(
+      stylistIds: string[],
+      dateFrom?: string,
+      dateTo?: string,
+    ): Promise<Unavailability[]> {
+      if (!stylistIds.length) return []
+
+      // Validare interval de date
+      if (dateFrom && dateTo && dateFrom > dateTo) {
+        throw new Error('Data de început nu poate fi după data de sfârșit')
+      }
+
+      return await repository.findByStylistIds(stylistIds, dateFrom, dateTo)
+    },
+
+    /**
      * Găsește indisponibilități cu detalii stylist
      */
     async getUnavailabilitiesWithStylistDetails(filters: UnavailabilityFilters): Promise<UnavailabilityWithStylist[]> {

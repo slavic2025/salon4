@@ -88,6 +88,7 @@ export interface AppointmentRepository {
   findByStatus(status: AppointmentStatus): Promise<Appointment[]>
   findByDateRange(startDate: Date, endDate: Date): Promise<Appointment[]>
   findByStylistAndDateRange(stylistId: string, startDate: Date, endDate: Date): Promise<Appointment[]>
+  findByStylistIdsAndDateRange(stylistIds: string[], startDate: Date, endDate: Date): Promise<Appointment[]>
   findWithDetails(filters?: AppointmentFilters): Promise<AppointmentWithDetails[]>
   create(newAppointment: CreateAppointmentData): Promise<Appointment>
   update(id: string, data: UpdateAppointmentData): Promise<Appointment>
@@ -102,6 +103,7 @@ export interface AppointmentService {
   getAppointmentById(id: string): Promise<Appointment | null>
   getAppointmentsByClient(email: string): Promise<Appointment[]>
   getAppointmentsByStylist(stylistId: string): Promise<Appointment[]>
+  getAppointmentsByStylistIds(stylistIds: string[], startDate: Date, endDate: Date): Promise<Appointment[]>
   getAppointmentsByService(serviceId: string): Promise<Appointment[]>
   getAppointmentsByStatus(status: AppointmentStatus): Promise<Appointment[]>
   getAppointmentsByDateRange(startDate: Date, endDate: Date): Promise<Appointment[]>
