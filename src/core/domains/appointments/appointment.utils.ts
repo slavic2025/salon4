@@ -2,15 +2,21 @@
 import type { Unavailability } from '@/core/domains/unavailability/unavailability.types'
 import { convertJsDayToAppDay } from '@/core/domains/work-schedule'
 import type { DayOfWeek, StylistWeeklySchedule } from '@/core/domains/work-schedule/workSchedule.types'
+import { addDaysToDate, formatDateToISO, toSalonTimezone } from '@/lib/utils/date'
+import type { Slot } from '@/lib/utils/slot-helpers'
+import {
+  createAppointmentsByDateMap,
+  createUnavailabilitiesByDateMap,
+  generateMultipleStylistsSlotsSchema,
+  generateSlotsForDay,
+  generateSlotsForMultipleStylists,
+  generateSlotsSchema,
+} from '@/lib/utils/slot-helpers'
+
+// Re-export tipul Slot pentru compatibilitate
+export type { Slot }
 
 import type { Appointment } from './appointment.types'
-
-export interface Slot {
-  start: string // ISO
-  end: string // ISO
-  available: boolean
-  stylistId?: string // ID-ul stilistului disponibil pentru acest slot
-}
 
 export interface GenerateAvailableSlotsParams {
   schedule: StylistWeeklySchedule
@@ -30,10 +36,9 @@ export interface GenerateAvailableSlotsForMultipleStylistsParams {
   days: number
 }
 
-function addMinutes(date: Date, minutes: number) {
-  return new Date(date.getTime() + minutes * 60000)
-}
-
+/**
+ * Generează slot-uri disponibile pentru un stilist cu optimizări de performanță
+ */
 export function generateAvailableSlots({
   schedule,
   appointments,
@@ -42,53 +47,54 @@ export function generateAvailableSlots({
   fromDate,
   days,
 }: GenerateAvailableSlotsParams): Slot[] {
-  const slots: Slot[] = []
-  const startDate = new Date(fromDate)
+  // Validare input cu Zod
+  const validatedParams = generateSlotsSchema.parse({
+    schedule,
+    appointments,
+    unavailabilities,
+    serviceDuration,
+    fromDate,
+    days,
+  })
 
-  for (let d = 0; d < days; d++) {
-    const currentDate = new Date(startDate)
-    currentDate.setDate(startDate.getDate() + d)
+  const slots: Slot[] = []
+  const startDate = toSalonTimezone(validatedParams.fromDate)
+
+  // Preprocesează datele pentru performanță optimă
+  const appointmentsByDate = createAppointmentsByDateMap(validatedParams.appointments)
+  const unavailabilitiesByDate = createUnavailabilitiesByDateMap(validatedParams.unavailabilities)
+
+  for (let d = 0; d < validatedParams.days; d++) {
+    const currentDate = addDaysToDate(startDate, d)
     const jsDayOfWeek = currentDate.getDay()
     const appDayOfWeek = convertJsDayToAppDay(jsDayOfWeek) as DayOfWeek
-    const daySchedule = schedule.schedule[appDayOfWeek] || []
+    const daySchedule = validatedParams.schedule.schedule[appDayOfWeek] || []
+
     if (!daySchedule.length) continue
 
-    for (const interval of daySchedule) {
-      let slotStart = new Date(currentDate)
-      slotStart.setHours(Number(interval.startTime.split(':')[0]), Number(interval.startTime.split(':')[1]), 0, 0)
-      const slotEnd = new Date(currentDate)
-      slotEnd.setHours(Number(interval.endTime.split(':')[0]), Number(interval.endTime.split(':')[1]), 0, 0)
+    // Obține programările și indisponibilitățile pentru această zi
+    const dayKey = formatDateToISO(currentDate).slice(0, 10) // YYYY-MM-DD
+    const dayAppointments = appointmentsByDate.get(dayKey) || []
+    const dayUnavailabilities = unavailabilitiesByDate.get(dayKey) || []
 
-      while (addMinutes(slotStart, serviceDuration) <= slotEnd) {
-        const slotFinish = addMinutes(slotStart, serviceDuration)
-        // Verifică suprapuneri cu programări existente
-        const hasAppointmentConflict = appointments.some((app) => {
-          const appStart = new Date(app.startTime)
-          const appEnd = new Date(app.endTime)
-          return slotStart < appEnd && slotFinish > appStart
-        })
-        // Verifică suprapuneri cu indisponibilități
-        const hasUnavailability = unavailabilities.some((unav) => {
-          if (unav.allDay && new Date(unav.date).toDateString() === currentDate.toDateString()) return true
-          if (!unav.startTime || !unav.endTime) return false
-          const unavStart = new Date(currentDate)
-          unavStart.setHours(Number(unav.startTime.split(':')[0]), Number(unav.startTime.split(':')[1]), 0, 0)
-          const unavEnd = new Date(currentDate)
-          unavEnd.setHours(Number(unav.endTime.split(':')[0]), Number(unav.endTime.split(':')[1]), 0, 0)
-          return slotStart < unavEnd && slotFinish > unavStart
-        })
-        slots.push({
-          start: slotStart.toISOString(),
-          end: slotFinish.toISOString(),
-          available: !hasAppointmentConflict && !hasUnavailability,
-        })
-        slotStart = addMinutes(slotStart, serviceDuration)
-      }
-    }
+    // Generează slot-uri pentru această zi
+    const daySlots = generateSlotsForDay(
+      currentDate,
+      daySchedule,
+      dayAppointments,
+      dayUnavailabilities,
+      validatedParams.serviceDuration,
+    )
+
+    slots.push(...daySlots)
   }
+
   return slots
 }
 
+/**
+ * Generează slot-uri disponibile pentru mai mulți stiliștii cu optimizări de performanță
+ */
 export function generateAvailableSlotsForMultipleStylists({
   schedules,
   appointments,
@@ -97,76 +103,55 @@ export function generateAvailableSlotsForMultipleStylists({
   fromDate,
   days,
 }: GenerateAvailableSlotsForMultipleStylistsParams): Slot[] {
+  // Validare input cu Zod
+  const validatedParams = generateMultipleStylistsSlotsSchema.parse({
+    schedules,
+    appointments,
+    unavailabilities,
+    serviceDuration,
+    fromDate,
+    days,
+  })
+
   const slots: Slot[] = []
-  const startDate = new Date(fromDate)
+  const startDate = toSalonTimezone(validatedParams.fromDate)
 
-  for (let d = 0; d < days; d++) {
-    const currentDate = new Date(startDate)
-    currentDate.setDate(startDate.getDate() + d)
-    const jsDayOfWeek = currentDate.getDay()
-    const appDayOfWeek = convertJsDayToAppDay(jsDayOfWeek) as DayOfWeek
+  // Preprocesează datele pentru performanță optimă
+  const appointmentsByStylist = new Map<string, Appointment[]>()
+  const unavailabilitiesByStylist = new Map<string, Unavailability[]>()
 
-    // Pentru fiecare stilist, verificăm disponibilitatea
-    for (const schedule of schedules) {
-      const daySchedule = schedule.schedule[appDayOfWeek] || []
-      if (!daySchedule.length) continue
-
-      for (const interval of daySchedule) {
-        let slotStart = new Date(currentDate)
-        slotStart.setHours(Number(interval.startTime.split(':')[0]), Number(interval.startTime.split(':')[1]), 0, 0)
-        const slotEnd = new Date(currentDate)
-        slotEnd.setHours(Number(interval.endTime.split(':')[0]), Number(interval.endTime.split(':')[1]), 0, 0)
-
-        while (addMinutes(slotStart, serviceDuration) <= slotEnd) {
-          const slotFinish = addMinutes(slotStart, serviceDuration)
-
-          // Verifică suprapuneri cu programări existente pentru acest stilist
-          const stylistAppointments = appointments.filter((app) => app.stylistId === schedule.stylistId)
-          const hasAppointmentConflict = stylistAppointments.some((app) => {
-            const appStart = new Date(app.startTime)
-            const appEnd = new Date(app.endTime)
-            return slotStart < appEnd && slotFinish > appStart
-          })
-
-          // Verifică suprapuneri cu indisponibilități pentru acest stilist
-          const stylistUnavailabilities = unavailabilities.filter((unav) => unav.stylistId === schedule.stylistId)
-          const hasUnavailability = stylistUnavailabilities.some((unav) => {
-            if (unav.allDay && new Date(unav.date).toDateString() === currentDate.toDateString()) return true
-            if (!unav.startTime || !unav.endTime) return false
-            const unavStart = new Date(currentDate)
-            unavStart.setHours(Number(unav.startTime.split(':')[0]), Number(unav.startTime.split(':')[1]), 0, 0)
-            const unavEnd = new Date(currentDate)
-            unavEnd.setHours(Number(unav.endTime.split(':')[0]), Number(unav.endTime.split(':')[1]), 0, 0)
-            return slotStart < unavEnd && slotFinish > unavStart
-          })
-
-          const isAvailable = !hasAppointmentConflict && !hasUnavailability
-
-          // Verifică dacă slot-ul există deja pentru această perioadă
-          const existingSlotIndex = slots.findIndex(
-            (slot) => slot.start === slotStart.toISOString() && slot.end === slotFinish.toISOString(),
-          )
-
-          if (existingSlotIndex >= 0) {
-            // Dacă slot-ul există și stilistul curent este disponibil, îl marcăm ca disponibil
-            if (isAvailable) {
-              slots[existingSlotIndex].available = true
-              slots[existingSlotIndex].stylistId = schedule.stylistId
-            }
-          } else {
-            // Adaugă un nou slot
-            slots.push({
-              start: slotStart.toISOString(),
-              end: slotFinish.toISOString(),
-              available: isAvailable,
-              stylistId: isAvailable ? schedule.stylistId : undefined,
-            })
-          }
-
-          slotStart = addMinutes(slotStart, serviceDuration)
-        }
+  // Grupează programările și indisponibilitățile pe stiliști
+  validatedParams.appointments.forEach((appointment) => {
+    if (appointment.stylistId) {
+      if (!appointmentsByStylist.has(appointment.stylistId)) {
+        appointmentsByStylist.set(appointment.stylistId, [])
       }
+      appointmentsByStylist.get(appointment.stylistId)!.push(appointment)
     }
+  })
+
+  validatedParams.unavailabilities.forEach((unavailability) => {
+    if (unavailability.stylistId) {
+      if (!unavailabilitiesByStylist.has(unavailability.stylistId)) {
+        unavailabilitiesByStylist.set(unavailability.stylistId, [])
+      }
+      unavailabilitiesByStylist.get(unavailability.stylistId)!.push(unavailability)
+    }
+  })
+
+  for (let d = 0; d < validatedParams.days; d++) {
+    const currentDate = addDaysToDate(startDate, d)
+
+    // Generează slot-uri pentru toți stiliștii în această zi
+    const daySlots = generateSlotsForMultipleStylists(
+      currentDate,
+      validatedParams.schedules,
+      appointmentsByStylist,
+      unavailabilitiesByStylist,
+      validatedParams.serviceDuration,
+    )
+
+    slots.push(...daySlots)
   }
 
   return slots
