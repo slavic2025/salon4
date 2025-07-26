@@ -48,7 +48,7 @@ async function checkWorkSchedules() {
     schedulesByStylist.forEach((schedules, stylistId) => {
       const stylist = allStylists.find((s) => s.id === stylistId)
       console.log(`  ${stylist?.fullName} (${stylistId}):`)
-      schedules.forEach((schedule) => {
+      schedules.forEach((schedule: { dayOfWeek: number; startTime: string; endTime: string }) => {
         const dayNames = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică']
         console.log(`    - ${dayNames[schedule.dayOfWeek]}: ${schedule.startTime} - ${schedule.endTime}`)
       })

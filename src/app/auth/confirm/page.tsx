@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 
 import { SetPasswordForm } from '@/components/features/auth/SetPasswordForm'
+import { ReloadButton } from '@/components/shared/ReloadButton'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createLogger } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/server'
@@ -78,12 +79,7 @@ export default async function ConfirmPage() {
             <CardDescription>A apărut o problemă la încărcarea paginii. Te rog încearcă din nou.</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            >
-              Încearcă din nou
-            </button>
+            <ReloadButton />
           </CardContent>
         </Card>
       </main>

@@ -3,6 +3,7 @@ import './globals.css'
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 
 import { GlobalPreloader } from '@/components/shared/GlobalPreloader'
 import { Toaster } from '@/components/ui/sonner'
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="ro" className="h-full">
       <body className={`${inter.className} h-full`}>
         {children}
-        <GlobalPreloader />
+        <Suspense fallback={null}>
+          <GlobalPreloader />
+        </Suspense>
         <Toaster richColors />
       </body>
     </html>
