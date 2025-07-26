@@ -249,7 +249,7 @@ export default function BookingFormStepper() {
   if (isSubmitted) {
     return (
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 flex items-center justify-center p-4 sm:p-6"
+        className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4 sm:p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -265,7 +265,7 @@ export default function BookingFormStepper() {
             variants={itemVariants}
           >
             <motion.div
-              className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full flex items-center justify-center mx-auto mb-6"
               variants={itemVariants}
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ duration: 0.3 }}
@@ -275,7 +275,7 @@ export default function BookingFormStepper() {
               </svg>
             </motion.div>
 
-            <motion.h2 className="text-3xl font-bold text-purple-600 mb-4" variants={itemVariants}>
+            <motion.h2 className="text-3xl font-bold text-purple-700 mb-4" variants={itemVariants}>
               Programarea a fost trimisă cu succes! 🎉
             </motion.h2>
 
@@ -290,7 +290,7 @@ export default function BookingFormStepper() {
 
             {/* Detalii programare în success - design îmbunătățit */}
             <motion.div
-              className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 text-left border border-purple-200"
+              className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8 text-left border border-purple-200"
               variants={itemVariants}
             >
               <h3 className="font-bold text-gray-900 mb-4 text-base flex items-center">
@@ -337,7 +337,7 @@ export default function BookingFormStepper() {
 
             <motion.button
               onClick={reset}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-semibold text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+              className="px-8 py-3 bg-gradient-to-r from-purple-700 to-indigo-800 text-white rounded-xl hover:from-purple-800 hover:to-indigo-900 transition-all duration-300 font-semibold text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -500,7 +500,7 @@ export default function BookingFormStepper() {
               {/* Navigation îmbunătățită și compactă */}
               {currentStep !== 3 && (
                 <motion.div
-                  className="border-t border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50 p-4 sm:p-6"
+                  className="border-t border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 sm:p-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.3 }}

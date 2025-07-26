@@ -25,7 +25,8 @@
     "db:check-schedules": "dotenv -e .env.local -- tsx src/lib/cli/check-work-schedules.ts",
     "db:create-links": "dotenv -e .env.local -- tsx src/lib/cli/create-stylist-service-links.ts",
     "test:slots": "dotenv -e .env.local -- tsx src/lib/cli/test-slots.ts",
-    "test:booking": "dotenv -e .env.local -- tsx src/lib/cli/test-booking-action.ts"
+    "test:booking": "dotenv -e .env.local -- tsx src/lib/cli/test-booking-action.ts",
+    "db:seed-stylists": "dotenv -e .env.local -- tsx src/lib/cli/seed-stylists.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

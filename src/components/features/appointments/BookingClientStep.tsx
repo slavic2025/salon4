@@ -140,7 +140,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"
+            className="h-full bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -269,7 +269,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Button
             type="submit"
-            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white"
             disabled={form.formState.isSubmitting || !form.formState.isValid}
           >
             {form.formState.isSubmitting ? (
@@ -285,7 +285,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
 
         {/* Informații de confidențialitate îmbunătățite și compacte */}
         <motion.div
-          className="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200"
+          className="text-center p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}

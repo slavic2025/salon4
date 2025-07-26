@@ -29,7 +29,7 @@ const InfoItem = ({
   className?: string
 }) => (
   <div className={`flex items-start space-x-2 ${className}`}>
-    <div className="p-1.5 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg text-purple-600 flex-shrink-0">
+    <div className="p-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg text-purple-700 flex-shrink-0">
       <Icon className="w-4 h-4" />
     </div>
     <div className="flex-1 min-w-0">
@@ -76,10 +76,10 @@ export default function BookingConfirmationStep({ onConfirm, onEdit }: BookingCo
 
       <div className="space-y-6">
         {/* Serviciu Card îmbunătățit și compact */}
-        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
+        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-              <div className="p-1.5 bg-gradient-to-r from-purple-200 to-pink-200 rounded-lg text-purple-600">
+              <div className="p-1.5 bg-gradient-to-r from-purple-200 to-indigo-200 rounded-lg text-purple-700">
                 <Scissors className="w-4 h-4" />
               </div>
               <span>Serviciul ales</span>
@@ -87,7 +87,7 @@ export default function BookingConfirmationStep({ onConfirm, onEdit }: BookingCo
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex items-start space-x-3">
-              <div className="p-2 bg-gradient-to-r from-purple-200 to-pink-200 rounded-lg text-purple-600">
+              <div className="p-2 bg-gradient-to-r from-purple-200 to-indigo-200 rounded-lg text-purple-700">
                 {getServiceIcon(service.name)}
               </div>
               <div className="flex-1">
@@ -167,10 +167,10 @@ export default function BookingConfirmationStep({ onConfirm, onEdit }: BookingCo
         </Card>
 
         {/* Datele clientului Card îmbunătățit și compact */}
-        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50">
+        <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-indigo-50">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg font-semibold flex items-center space-x-2">
-              <div className="p-1.5 bg-gradient-to-r from-purple-200 to-pink-200 rounded-lg text-purple-600">
+              <div className="p-1.5 bg-gradient-to-r from-purple-200 to-indigo-200 rounded-lg text-purple-700">
                 <User className="w-4 h-4" />
               </div>
               <span>Datele tale</span>
@@ -248,7 +248,7 @@ export default function BookingConfirmationStep({ onConfirm, onEdit }: BookingCo
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+          className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white shadow-lg hover:shadow-xl transition-all duration-300"
         >
           {isLoading ? (
             <div className="flex items-center space-x-2">

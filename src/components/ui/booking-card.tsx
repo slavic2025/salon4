@@ -42,8 +42,8 @@ export function BookingCard({
       <Card
         className={cn(
           'cursor-pointer transition-all duration-200 hover:shadow-md group',
-          'border hover:border-purple-300 hover:scale-[1.02] transform',
-          isSelected && 'ring-2 ring-purple-500 shadow-lg border-purple-500 scale-[1.02]',
+          'border hover:border-purple-400 hover:scale-[1.02] transform',
+          isSelected && 'ring-2 ring-purple-700 shadow-lg border-purple-700 scale-[1.02]',
           disabled && 'opacity-50 cursor-not-allowed hover:scale-100',
           className,
         )}
@@ -56,8 +56,8 @@ export function BookingCard({
               className={cn(
                 'mx-auto mb-2 p-2 rounded-lg transition-colors duration-200',
                 isSelected
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                  : 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 group-hover:from-purple-200 group-hover:to-pink-200',
+                  ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white'
+                  : 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 group-hover:from-purple-200 group-hover:to-indigo-200',
               )}
             >
               <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
@@ -123,7 +123,7 @@ export function BookingCard({
           <div className="flex items-start space-x-3 flex-1">
             {/* Icon compact pentru stylists */}
             {icon && variant === 'stylist' && (
-              <div className="p-1.5 rounded-md bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600">
+              <div className="p-1.5 rounded-md bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700">
                 <div className="w-4 h-4">{icon}</div>
               </div>
             )}
@@ -135,7 +135,7 @@ export function BookingCard({
           </div>
 
           {isSelected && (
-            <div className="ml-2 p-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+            <div className="ml-2 p-1 bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}

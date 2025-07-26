@@ -63,7 +63,7 @@ const ServiceErrorState = ({ error, onRetry }: { error: string; onRetry: () => v
       <p className="text-gray-600 mb-4 text-sm">{error}</p>
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm"
+        className="px-4 py-2 bg-gradient-to-r from-purple-700 to-indigo-800 text-white rounded-lg hover:from-purple-800 hover:to-indigo-900 transition-colors font-medium text-sm"
       >
         Încearcă din nou
       </button>
@@ -170,13 +170,13 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
       {/* Selected Service Info îmbunătățit și compact */}
       {service && (
         <motion.div
-          className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl"
+          className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-r from-purple-200 to-pink-200 rounded-lg text-purple-600">
+            <div className="p-2 bg-gradient-to-r from-purple-200 to-indigo-200 rounded-lg text-purple-700">
               {getServiceIcon(service.name)}
             </div>
             <div className="flex-1">
@@ -194,7 +194,7 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
       )}
 
       {/* Informații suplimentare compacte */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl">
+      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl">
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0">
             <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

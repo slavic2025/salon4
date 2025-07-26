@@ -77,7 +77,7 @@ export function StepNavigation({
         size="sm"
         onClick={onNext}
         disabled={!canGoNext || isLoading}
-        className="transition-all duration-200 h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+        className="transition-all duration-200 h-9 px-4 bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white"
       >
         {isLastStep ? (
           <span className="text-sm">{isLoading ? 'Se trimite...' : 'Finalizează'}</span>

@@ -55,30 +55,46 @@ export function BookingCalendar({
 
   const modifiersStyles = {
     selected: {
-      backgroundColor: 'hsl(var(--primary))',
+      backgroundColor: 'hsl(262, 83%, 58%)', // Purple-600
       color: 'white',
       fontWeight: 'bold',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(147, 51, 234, 0.3)',
     },
     available: {
-      backgroundColor: 'hsl(var(--primary) / 0.1)',
-      color: 'hsl(var(--primary))',
-      fontWeight: '500',
+      backgroundColor: 'hsl(262, 83%, 95%)', // Purple-50
+      color: 'hsl(262, 83%, 58%)', // Purple-600
+      fontWeight: '600',
+      borderRadius: '8px',
     },
     today: {
       fontWeight: 'bold',
-      textDecoration: 'underline',
+      backgroundColor: 'hsl(262, 83%, 90%)', // Purple-100
+      color: 'hsl(262, 83%, 58%)', // Purple-600
+      borderRadius: '8px',
+      border: '2px solid hsl(262, 83%, 58%)', // Purple-600
     },
   }
 
   return (
-    <div className={cn('bg-white rounded-lg border shadow-sm p-4', className)}>
-      {/* Header */}
-      <div className="flex items-center space-x-2 mb-4">
-        <CalendarIcon className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold text-gray-900">Selectează data</h3>
+    <div
+      className={cn(
+        'bg-white rounded-2xl border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300',
+        className,
+      )}
+    >
+      {/* Header îmbunătățit */}
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="p-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg">
+          <CalendarIcon className="w-5 h-5 text-purple-600" />
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-900 text-lg">Selectează data</h3>
+          <p className="text-sm text-gray-500">Alege ziua potrivită pentru programare</p>
+        </div>
       </div>
 
-      {/* Calendar */}
+      {/* Calendar cu stilizare îmbunătățită */}
       <div className="relative">
         <DayPicker
           mode="single"
@@ -93,50 +109,62 @@ export function BookingCalendar({
           classNames={{
             months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
             month: 'space-y-4',
-            caption: 'flex justify-center pt-1 relative items-center mb-4',
-            caption_label: 'text-sm font-medium',
+            caption: 'flex justify-center pt-1 relative items-center mb-6',
+            caption_label: 'text-lg font-bold text-gray-900',
             nav: 'space-x-1 flex items-center',
             nav_button: cn(
-              'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-              'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+              'inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-200',
+              'h-10 w-10 bg-gray-100 hover:bg-purple-100 p-0 opacity-70 hover:opacity-100',
+              'hover:scale-105 hover:shadow-md',
             ),
             nav_button_previous: 'absolute left-1',
             nav_button_next: 'absolute right-1',
-            table: 'w-full border-collapse space-y-1',
-            head_row: '',
-            head_cell: '',
-            row: '',
-            cell: '',
-            day: '',
-            day_selected: '',
-            day_today: '',
-            day_outside: '',
-            day_disabled: '',
-            day_range_middle: '',
-            day_hidden: '',
+            table: 'w-full border-collapse space-y-2',
+            head_row: 'flex mb-2',
+            head_cell: 'text-gray-500 font-semibold text-sm w-10 h-10 flex items-center justify-center',
+            row: 'flex w-full mt-2',
+            cell: 'relative p-0 text-center text-sm focus-within:relative focus-within:z-20 w-10 h-10',
+            day: cn(
+              'h-10 w-10 p-0 font-normal aria-selected:opacity-100',
+              'hover:bg-purple-100 hover:text-purple-700 hover:scale-110 transition-all duration-200',
+              'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2',
+            ),
+            day_selected: 'bg-purple-600 text-white hover:bg-purple-700 hover:text-white',
+            day_today: 'bg-purple-100 text-purple-700 font-bold',
+            day_outside: 'text-gray-400 opacity-50',
+            day_disabled: 'text-gray-300 opacity-30 cursor-not-allowed hover:bg-transparent hover:scale-100',
+            day_range_middle: 'aria-selected:bg-purple-100 aria-selected:text-purple-700',
+            day_hidden: 'invisible',
           }}
-          // Custom navigation icons removed due to type issues
         />
       </div>
 
-      {/* Info Section */}
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <div className="space-y-2 text-sm">
+      {/* Info Section îmbunătățită */}
+      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-100">
+        <div className="space-y-3">
           {selectedDate && (
-            <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Data selectată:</span>
-              <span className="font-medium text-primary">
+            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200">
+              <span className="text-gray-600 font-medium">Data selectată:</span>
+              <span className="font-bold text-purple-700">
                 {format(selectedDate, 'EEEE, d MMMM yyyy', { locale: ro })}
               </span>
             </div>
           )}
 
-          {availableDates.length > 0 && (
-            <div className="text-xs text-muted-foreground">
-              <span className="inline-block w-3 h-3 bg-primary/10 rounded mr-2"></span>
-              Zilele evidențiate au sloturi disponibile
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-purple-600 rounded-full"></div>
+              <span className="text-gray-700">Data selectată</span>
             </div>
-          )}
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-purple-200 rounded-full"></div>
+              <span className="text-gray-700">Disponibil</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+              <span className="text-gray-700">Indisponibil</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

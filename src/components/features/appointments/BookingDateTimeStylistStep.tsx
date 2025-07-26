@@ -37,7 +37,7 @@ const slideIn = {
 const LoadingSkeleton = () => (
   <div className="flex items-center justify-center py-16">
     <div className="text-center">
-      <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full animate-pulse mx-auto mb-6"></div>
+      <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full animate-pulse mx-auto mb-6"></div>
       <div className="space-y-3">
         <div className="h-6 bg-gray-200 rounded-lg w-48 mx-auto animate-pulse"></div>
         <div className="h-4 bg-gray-200 rounded w-64 mx-auto animate-pulse"></div>
@@ -146,16 +146,30 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
   return (
     <div className="space-y-8">
       {/* Progress indicator îmbunătățit pentru sub-pași */}
-      <div className="flex items-center justify-center space-x-3 mb-10">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-center space-x-4 mb-12">
+        <div className="flex items-center space-x-3">
           <div
-            className={`w-4 h-4 rounded-full transition-all duration-300 ${
-              currentSubStep === 'date' ? 'bg-primary scale-125' : selectedDate ? 'bg-emerald-500' : 'bg-gray-300'
+            className={`w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center ${
+              currentSubStep === 'date'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 scale-125 shadow-lg'
+                : selectedDate
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                  : 'bg-gray-300'
             }`}
-          />
+          >
+            {selectedDate && currentSubStep !== 'date' && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
           <span
-            className={`text-sm font-medium transition-colors ${
-              currentSubStep === 'date' ? 'text-primary' : selectedDate ? 'text-emerald-600' : 'text-gray-400'
+            className={`text-sm font-semibold transition-colors ${
+              currentSubStep === 'date' ? 'text-purple-700' : selectedDate ? 'text-emerald-700' : 'text-gray-400'
             }`}
           >
             Data
@@ -163,20 +177,34 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
         </div>
 
         <div
-          className={`w-12 h-0.5 transition-all duration-300 ${
-            availableSlots.length > 0 ? 'bg-emerald-500' : 'bg-gray-300'
+          className={`w-16 h-1 rounded-full transition-all duration-300 ${
+            availableSlots.length > 0 ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gray-300'
           }`}
         />
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <div
-            className={`w-4 h-4 rounded-full transition-all duration-300 ${
-              currentSubStep === 'time' ? 'bg-primary scale-125' : slot ? 'bg-emerald-500' : 'bg-gray-300'
+            className={`w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center ${
+              currentSubStep === 'time'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 scale-125 shadow-lg'
+                : slot
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                  : 'bg-gray-300'
             }`}
-          />
+          >
+            {slot && currentSubStep !== 'time' && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
           <span
-            className={`text-sm font-medium transition-colors ${
-              currentSubStep === 'time' ? 'text-primary' : slot ? 'text-emerald-600' : 'text-gray-400'
+            className={`text-sm font-semibold transition-colors ${
+              currentSubStep === 'time' ? 'text-purple-700' : slot ? 'text-emerald-700' : 'text-gray-400'
             }`}
           >
             Ora
@@ -184,20 +212,34 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
         </div>
 
         <div
-          className={`w-12 h-0.5 transition-all duration-300 ${
-            availableStylists.length > 0 ? 'bg-emerald-500' : 'bg-gray-300'
+          className={`w-16 h-1 rounded-full transition-all duration-300 ${
+            availableStylists.length > 0 ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gray-300'
           }`}
         />
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <div
-            className={`w-4 h-4 rounded-full transition-all duration-300 ${
-              currentSubStep === 'stylist' ? 'bg-primary scale-125' : stylist ? 'bg-emerald-500' : 'bg-gray-300'
+            className={`w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center ${
+              currentSubStep === 'stylist'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 scale-125 shadow-lg'
+                : stylist
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                  : 'bg-gray-300'
             }`}
-          />
+          >
+            {stylist && currentSubStep !== 'stylist' && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
           <span
-            className={`text-sm font-medium transition-colors ${
-              currentSubStep === 'stylist' ? 'text-primary' : stylist ? 'text-emerald-600' : 'text-gray-400'
+            className={`text-sm font-semibold transition-colors ${
+              currentSubStep === 'stylist' ? 'text-purple-700' : stylist ? 'text-emerald-700' : 'text-gray-400'
             }`}
           >
             Stilist
@@ -244,7 +286,7 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
             <>
               <button
                 onClick={() => goBackToSubStep('date')}
-                className="px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors font-medium"
+                className="px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full hover:from-purple-200 hover:to-indigo-200 transition-all duration-200 font-medium text-purple-700 hover:scale-105"
               >
                 {format(selectedDate, 'dd MMM yyyy', { locale: ro })}
               </button>
@@ -253,7 +295,7 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
                   <span className="text-gray-300">→</span>
                   <button
                     onClick={() => goBackToSubStep('time')}
-                    className="px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors font-medium"
+                    className="px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full hover:from-purple-200 hover:to-indigo-200 transition-all duration-200 font-medium text-purple-700 hover:scale-105"
                   >
                     {slot ? format(new Date(slot.start), 'HH:mm', { locale: ro }) : 'Ora'}
                   </button>
@@ -267,7 +309,7 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
       {/* Error Display îmbunătățit */}
       {error && (
         <motion.div
-          className="mb-8 p-6 bg-red-50 border-l-4 border-red-400 rounded-xl shadow-sm"
+          className="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -351,7 +393,7 @@ export default function BookingDateTimeStylistStep({ onNext }: BookingDateTimeSt
             transition={{ duration: 0.2 }}
           >
             <div className="flex items-center space-x-4">
-              <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
               <div>
                 <p className="text-gray-700 font-medium">Se încarcă...</p>
                 <p className="text-sm text-gray-500">

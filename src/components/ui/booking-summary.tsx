@@ -42,8 +42,8 @@ export function BookingSummary({ className, showTitle = true }: BookingSummaryPr
 
       <CardContent className="space-y-3">
         {/* Serviciu */}
-        <div className="flex items-start space-x-2 p-2.5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-          <div className="p-1.5 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg text-purple-600 flex-shrink-0">
+        <div className="flex items-start space-x-2 p-2.5 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
+          <div className="p-1.5 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg text-purple-700 flex-shrink-0">
             {getServiceIcon(service.name)}
           </div>
           <div className="flex-1 min-w-0">

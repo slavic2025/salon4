@@ -49,14 +49,51 @@ const testimonials = [
   },
 ]
 
+// Exemple de gradiente pentru testare
+const gradientExamples = [
+  { name: 'Original (Purple-Pink)', class: 'gradient-original' },
+  { name: 'Elegant (Slate-Blue)', class: 'gradient-elegant' },
+  { name: 'Modern (Gray-Purple)', class: 'gradient-modern' },
+  { name: 'Profesional (Blue-Indigo)', class: 'gradient-professional' },
+  { name: 'Sophisticated (Slate-Gray)', class: 'gradient-sophisticated' },
+  { name: 'Warm (Amber-Orange)', class: 'gradient-warm' },
+  { name: 'Cool (Teal-Cyan)', class: 'gradient-cool' },
+  { name: 'Rich (Purple-Indigo)', class: 'gradient-rich' },
+  { name: 'Neutral (Stone-Slate)', class: 'gradient-neutral' },
+  { name: 'Bold (Red-Pink)', class: 'gradient-bold' },
+]
+
 export default async function Home() {
   // Preluăm serviciile active din baza de date
   const services = await getActiveServicesPublicAction()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      {/* Secțiunea de testare gradiente - TEMPORARĂ */}
+      <section className="py-8 bg-white border-b-2 border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+            🎨 Testare Gradiente - Alegeți varianta optimă
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {gradientExamples.map((gradient, index) => (
+              <div key={index} className="text-center">
+                <div
+                  className={`h-20 rounded-lg mb-2 ${gradient.class} shadow-md hover:shadow-lg transition-shadow cursor-pointer`}
+                  title={gradient.name}
+                ></div>
+                <p className="text-xs text-gray-600 font-medium">{gradient.name}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Click pe un gradient pentru a vedea cum ar arăta în aplicație
+          </p>
+        </div>
+      </section>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white">
+      <section className="relative overflow-hidden gradient-rich text-white">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="text-center animate-fade-in">
@@ -89,7 +126,7 @@ export default async function Home() {
               <div key={service.id} className="group animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
                 <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 hover:scale-105">
                   <CardHeader className="text-center pb-4">
-                    <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white group-hover:scale-110 transition-transform duration-300">
+                    <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white group-hover:scale-110 transition-transform duration-300">
                       {getServiceIcon(service.name)}
                     </div>
                     <div className="flex items-center justify-center gap-2 mb-2">
@@ -104,7 +141,7 @@ export default async function Home() {
                     <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
 
                     <div className="flex items-center justify-between mb-4">
-                      <div className="text-2xl font-bold text-purple-600">{service.price} RON</div>
+                      <div className="text-2xl font-bold text-purple-600">{service.price} lei</div>
                       <div className="flex items-center text-gray-500 text-sm">
                         <Clock className="h-4 w-4 mr-1" />
                         {service.duration} min
@@ -121,7 +158,7 @@ export default async function Home() {
       </section>
 
       {/* Beneficii Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-r from-purple-50 to-indigo-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 animate-slide-up">De Ce Să Ne Alegeți</h2>
@@ -161,7 +198,7 @@ export default async function Home() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100 animate-fade-in hover:scale-105 transition-transform duration-300"
+                className="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-xl border border-purple-100 animate-fade-in hover:scale-105 transition-transform duration-300"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center mb-4">
@@ -178,7 +215,7 @@ export default async function Home() {
       </section>
 
       {/* Formular de Programare Section */}
-      <section id="booking-section" className="py-16 sm:py-20 lg:py-24 bg-gradient-to-r from-purple-600 to-pink-600">
+      <section id="booking-section" className="py-16 sm:py-20 lg:py-24 gradient-rich">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 sm:mb-16 lg:mb-20 animate-fade-in">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 animate-slide-up">
