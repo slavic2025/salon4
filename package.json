@@ -19,7 +19,8 @@
     "db:introspect": "dotenv -e .env.local -- drizzle-kit introspect",
     "promote:admin": "dotenv -e .env.local -- tsx src/lib/cli/promote-to-admin.ts",
     "db:test": "dotenv -e .env.local -- tsx src/lib/cli/test-db-connection.ts",
-    "db:test-simple": "dotenv -e .env.local -- tsx src/lib/cli/test-db-simple.ts"
+    "db:test-simple": "dotenv -e .env.local -- tsx src/lib/cli/test-db-simple.ts",
+    "db:seed-services": "dotenv -e .env.local -- tsx src/lib/cli/seed-services.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

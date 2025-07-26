@@ -39,43 +39,52 @@ export function StepNavigation({
   // Nu renderăm butoanele până când nu suntem hidratați pentru a evita diferențele server/client
   if (!isHydrated) {
     return (
-      <div className={cn('flex items-center justify-between mt-6', className)}>
+      <div className={cn('flex items-center justify-between mt-4', className)}>
         {/* Placeholder pentru butoane în timpul hidratării */}
-        <div className="h-10 w-24 bg-gray-200 rounded-md animate-pulse" />
-        <div className="text-sm text-muted-foreground">
+        <div className="h-9 w-20 bg-gray-200 rounded-md animate-pulse" />
+        <div className="text-xs text-muted-foreground">
           Pasul {currentStep + 1} din {totalSteps}
         </div>
-        <div className="h-10 w-32 bg-gray-200 rounded-md animate-pulse" />
+        <div className="h-9 w-28 bg-gray-200 rounded-md animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className={cn('flex items-center justify-between mt-6', className)}>
-      {/* Back Button */}
+    <div className={cn('flex items-center justify-between mt-4', className)}>
+      {/* Back Button compact */}
       <Button
         variant="outline"
+        size="sm"
         onClick={onPrev}
         disabled={isFirstStep || !canGoPrev || isLoading}
-        className={cn('transition-all duration-200', isFirstStep && 'invisible')}
+        className={cn(
+          'transition-all duration-200 h-9 px-3 border-purple-200 hover:bg-purple-50 hover:border-purple-300',
+          isFirstStep && 'invisible',
+        )}
       >
-        <ChevronLeft className="w-4 h-4 mr-2" />
+        <ChevronLeft className="w-3 h-3 mr-1" />
         Înapoi
       </Button>
 
-      {/* Step Indicator */}
-      <div className="text-sm text-muted-foreground">
+      {/* Step Indicator compact */}
+      <div className="text-xs text-gray-600">
         Pasul {currentStep + 1} din {totalSteps}
       </div>
 
-      {/* Next/Submit Button */}
-      <Button onClick={onNext} disabled={!canGoNext || isLoading} className="transition-all duration-200">
+      {/* Next/Submit Button compact */}
+      <Button
+        size="sm"
+        onClick={onNext}
+        disabled={!canGoNext || isLoading}
+        className="transition-all duration-200 h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+      >
         {isLastStep ? (
-          <>{isLoading ? 'Se trimite...' : 'Finalizează programarea'}</>
+          <span className="text-sm">{isLoading ? 'Se trimite...' : 'Finalizează'}</span>
         ) : (
           <>
-            Următorul pas
-            <ChevronRight className="w-4 h-4 ml-2" />
+            <span className="text-sm">Următorul</span>
+            <ChevronRight className="w-3 h-3 ml-1" />
           </>
         )}
       </Button>

@@ -17,14 +17,14 @@ interface BookingClientStepProps {
   onSubmit: () => void
 }
 
-// Component pentru validare vizuală
+// Component pentru validare vizuală compact
 const ValidationIndicator = ({ isValid, isDirty, error }: { isValid: boolean; isDirty: boolean; error?: string }) => {
   if (!isDirty) return null
 
   if (error) {
     return (
-      <div className="flex items-center space-x-2 text-red-600 text-sm">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-center space-x-1.5 text-red-600 text-xs">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -39,8 +39,8 @@ const ValidationIndicator = ({ isValid, isDirty, error }: { isValid: boolean; is
 
   if (isValid) {
     return (
-      <div className="flex items-center space-x-2 text-emerald-600 text-sm">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-center space-x-1.5 text-purple-600 text-xs">
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
         </svg>
         <span>Perfect!</span>
@@ -123,24 +123,24 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
   const completionPercentage = (completedRequiredFields / requiredFields.length) * 100
 
   return (
-    <div className="space-y-8">
-      {/* Header Section îmbunătățit */}
+    <div className="space-y-6">
+      {/* Header Section îmbunătățit și compact */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Informațiile tale</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">Informațiile tale</h2>
+        <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
           Completează datele pentru finalizarea programării. Toate câmpurile marcate cu * sunt obligatorii.
         </p>
       </div>
 
-      {/* Progress bar îmbunătățit pentru completarea formularului */}
+      {/* Progress bar îmbunătățit și compact pentru completarea formularului */}
       <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+        <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
           <span>Progres completare</span>
           <span className="font-semibold">{Math.round(completionPercentage)}%</span>
         </div>
-        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full"
+            className="h-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -148,28 +148,28 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
         </div>
       </div>
 
-      {/* Form îmbunătățit */}
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-lg mx-auto space-y-8">
+      {/* Form îmbunătățit și compact */}
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-lg mx-auto space-y-6">
         {/* Nume complet */}
         <motion.div
-          className="space-y-3"
+          className="space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Label htmlFor="clientName" className="text-base font-semibold text-gray-900">
+          <Label htmlFor="clientName" className="text-sm font-semibold text-gray-900">
             Nume și prenume <span className="text-red-500">*</span>
           </Label>
           <Input
             id="clientName"
             {...form.register('clientName')}
             placeholder="ex: Ana Maria Popescu"
-            className={`h-12 text-base transition-all duration-300 ${
+            className={`h-10 text-sm transition-all duration-300 ${
               form.formState.errors.clientName
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientName')?.trim()
-                  ? 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'
-                  : 'focus:ring-primary focus:border-primary'
+                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
+                  : 'focus:ring-purple-500 focus:border-purple-500'
             }`}
             autoComplete="name"
           />
@@ -182,12 +182,12 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
 
         {/* Număr de telefon */}
         <motion.div
-          className="space-y-3"
+          className="space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Label htmlFor="clientPhone" className="text-base font-semibold text-gray-900">
+          <Label htmlFor="clientPhone" className="text-sm font-semibold text-gray-900">
             Număr de telefon <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -195,12 +195,12 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             {...form.register('clientPhone')}
             placeholder="ex: 0721234567"
             type="tel"
-            className={`h-12 text-base transition-all duration-300 ${
+            className={`h-10 text-sm transition-all duration-300 ${
               form.formState.errors.clientPhone
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientPhone')?.trim()
-                  ? 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'
-                  : 'focus:ring-primary focus:border-primary'
+                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
+                  : 'focus:ring-purple-500 focus:border-purple-500'
             }`}
             autoComplete="tel"
           />
@@ -209,17 +209,17 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             isDirty={!!form.watch('clientPhone')}
             error={form.formState.errors.clientPhone?.message}
           />
-          <p className="text-sm text-gray-500">Vom folosi acest număr pentru confirmarea programării</p>
+          <p className="text-xs text-gray-500">Vom folosi acest număr pentru confirmarea programării</p>
         </motion.div>
 
         {/* Adresa de email */}
         <motion.div
-          className="space-y-3"
+          className="space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Label htmlFor="clientEmail" className="text-base font-semibold text-gray-900">
+          <Label htmlFor="clientEmail" className="text-sm font-semibold text-gray-900">
             Adresa de email <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -227,12 +227,12 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             type="email"
             {...form.register('clientEmail')}
             placeholder="ex: ana.popescu@email.com"
-            className={`h-12 text-base transition-all duration-300 ${
+            className={`h-10 text-sm transition-all duration-300 ${
               form.formState.errors.clientEmail
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientEmail')?.trim()
-                  ? 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'
-                  : 'focus:ring-primary focus:border-primary'
+                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
+                  : 'focus:ring-purple-500 focus:border-purple-500'
             }`}
             autoComplete="email"
           />
@@ -241,17 +241,17 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             isDirty={!!form.watch('clientEmail')}
             error={form.formState.errors.clientEmail?.message}
           />
-          <p className="text-sm text-gray-500">Vei primi confirmarea programării pe acest email</p>
+          <p className="text-xs text-gray-500">Vei primi confirmarea programării pe acest email</p>
         </motion.div>
 
         {/* Note opționale */}
         <motion.div
-          className="space-y-3"
+          className="space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Label htmlFor="clientNotes" className="text-base font-semibold text-gray-900">
+          <Label htmlFor="clientNotes" className="text-sm font-semibold text-gray-900">
             Note sau cerințe speciale
             <span className="text-gray-500 ml-2 font-normal">(opțional)</span>
           </Label>
@@ -259,22 +259,22 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             id="clientNotes"
             {...form.register('clientNotes')}
             placeholder="ex: Am părul foarte gros, prefer stilul clasic, sunt alergic la..."
-            rows={4}
-            className="resize-none transition-all duration-300 focus:ring-primary focus:border-primary text-base"
+            rows={3}
+            className="resize-none transition-all duration-300 focus:ring-purple-500 focus:border-purple-500 text-sm"
           />
-          <p className="text-sm text-gray-500">Ajută-ne să îți oferim exact ceea ce dorești</p>
+          <p className="text-xs text-gray-500">Ajută-ne să îți oferim exact ceea ce dorești</p>
         </motion.div>
 
-        {/* Submit button îmbunătățit */}
+        {/* Submit button îmbunătățit și compact */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Button
             type="submit"
-            className="w-full h-14 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
             disabled={form.formState.isSubmitting || !form.formState.isValid}
           >
             {form.formState.isSubmitting ? (
-              <div className="flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="flex items-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 <span>Se salvează...</span>
               </div>
             ) : (
@@ -283,15 +283,15 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
           </Button>
         </motion.div>
 
-        {/* Informații de confidențialitate îmbunătățite */}
+        {/* Informații de confidențialitate îmbunătățite și compacte */}
         <motion.div
-          className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200"
+          className="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center space-x-2 mb-1">
+            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -299,9 +299,9 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
-            <span className="text-sm font-semibold text-blue-900">Confidențialitate garantată</span>
+            <span className="text-xs font-semibold text-purple-900">Confidențialitate garantată</span>
           </div>
-          <p className="text-sm text-blue-700">
+          <p className="text-xs text-purple-700">
             Datele tale sunt în siguranță și vor fi folosite doar pentru programare
           </p>
         </motion.div>

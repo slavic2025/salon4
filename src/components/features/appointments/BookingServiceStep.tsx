@@ -17,26 +17,26 @@ interface BookingServiceStepProps {
   onNext: () => void
 }
 
-// Loading skeleton îmbunătățit
+// Loading skeleton îmbunătățit și compact
 const ServiceLoadingSkeleton = () => (
-  <div className="space-y-8">
+  <div className="space-y-6">
     <div className="text-center">
-      <div className="h-8 bg-gray-200 rounded-lg w-3/4 mx-auto mb-4 animate-pulse"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
+      <div className="h-6 bg-gray-200 rounded-lg w-3/4 mx-auto mb-3 animate-pulse"></div>
+      <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto animate-pulse"></div>
     </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {[...Array(6)].map((_, i) => (
-        <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+        <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse">
+          <div className="flex flex-col items-center text-center space-y-3">
+            <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
             <div className="space-y-2 w-full">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+              <div className="h-5 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3 mx-auto"></div>
             </div>
-            <div className="flex justify-between items-center w-full pt-4">
-              <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+            <div className="flex justify-between items-center w-full pt-3">
+              <div className="h-5 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-5 bg-gray-200 rounded w-1/4"></div>
             </div>
           </div>
         </div>
@@ -45,12 +45,12 @@ const ServiceLoadingSkeleton = () => (
   </div>
 )
 
-// Error state îmbunătățit
+// Error state îmbunătățit și compact
 const ServiceErrorState = ({ error, onRetry }: { error: string; onRetry: () => void }) => (
-  <div className="text-center py-16">
+  <div className="text-center py-12">
     <div className="max-w-md mx-auto">
-      <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-        <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -59,11 +59,11 @@ const ServiceErrorState = ({ error, onRetry }: { error: string; onRetry: () => v
           />
         </svg>
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-3">Oops! Ceva nu a mers bine</h3>
-      <p className="text-gray-600 mb-6">{error}</p>
+      <h3 className="text-lg font-bold text-gray-900 mb-2">Oops! Ceva nu a mers bine</h3>
+      <p className="text-gray-600 mb-4 text-sm">{error}</p>
       <button
         onClick={onRetry}
-        className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors font-medium"
+        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors font-medium text-sm"
       >
         Încearcă din nou
       </button>
@@ -71,12 +71,12 @@ const ServiceErrorState = ({ error, onRetry }: { error: string; onRetry: () => v
   </div>
 )
 
-// Empty state îmbunătățit
+// Empty state îmbunătățit și compact
 const ServiceEmptyState = () => (
-  <div className="text-center py-16">
+  <div className="text-center py-12">
     <div className="max-w-md mx-auto">
-      <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-        <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -85,8 +85,8 @@ const ServiceEmptyState = () => (
           />
         </svg>
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-3">Nu sunt servicii disponibile momentan</h3>
-      <p className="text-gray-600">Vă rugăm să reveniți mai târziu pentru a vedea serviciile noastre.</p>
+      <h3 className="text-lg font-bold text-gray-900 mb-2">Nu sunt servicii disponibile momentan</h3>
+      <p className="text-gray-600 text-sm">Vă rugăm să reveniți mai târziu pentru a vedea serviciile noastre.</p>
     </div>
   </div>
 )
@@ -141,24 +141,22 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header Section îmbunătățit */}
+    <div className="space-y-6">
+      {/* Header Section îmbunătățit și compact */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Alegeți serviciul dorit</h2>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Selectați serviciul pe care doriți să îl rezervați din gama noastră completă de servicii profesionale. Fiecare
-          serviciu este oferit de stilistii noștri experimentați.
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">Alegeți serviciul dorit</h2>
+        <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Selectați serviciul pe care doriți să îl rezervați din gama noastră completă de servicii profesionale.
         </p>
       </div>
 
-      {/* Services Grid îmbunătățit */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      {/* Services Grid îmbunătățit și compact - 3 coloane pe desktop pentru 6 servicii */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {services.map((serviceItem: Service) => (
           <BookingCard
             key={serviceItem.id}
             id={serviceItem.id}
             title={serviceItem.name}
-            description={serviceItem.description || undefined}
             price={`${serviceItem.price} lei`}
             duration={`${serviceItem.duration} min`}
             icon={getServiceIcon(serviceItem.name)}
@@ -169,23 +167,25 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
         ))}
       </div>
 
-      {/* Selected Service Info îmbunătățit */}
+      {/* Selected Service Info îmbunătățit și compact */}
       {service && (
         <motion.div
-          className="mt-10 p-6 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-2xl"
+          className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-primary/20 rounded-full text-primary">{getServiceIcon(service.name)}</div>
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-gradient-to-r from-purple-200 to-pink-200 rounded-lg text-purple-600">
+              {getServiceIcon(service.name)}
+            </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600 mb-1">Serviciu selectat:</p>
-              <p className="font-bold text-lg text-primary">{service.name}</p>
+              <p className="text-xs text-gray-600 mb-1">Serviciu selectat:</p>
+              <p className="font-bold text-base text-purple-600">{service.name}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600 mb-1">Preț & Durată:</p>
-              <p className="font-bold text-lg text-gray-900">
+              <p className="text-xs text-gray-600 mb-1">Preț & Durată:</p>
+              <p className="font-bold text-base text-gray-900">
                 {service.price} lei • {service.duration} min
               </p>
             </div>
@@ -193,11 +193,11 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
         </motion.div>
       )}
 
-      {/* Informații suplimentare */}
-      <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
+      {/* Informații suplimentare compacte */}
+      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl">
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -207,8 +207,8 @@ export default function BookingServiceStep({ onNext }: BookingServiceStepProps) 
             </svg>
           </div>
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">Informații importante</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <h4 className="font-semibold text-purple-900 mb-1 text-sm">Informații importante</h4>
+            <ul className="text-xs text-purple-800 space-y-0.5">
               <li>• Toate serviciile includ consultația inițială</li>
               <li>• Prețurile sunt finale, fără costuri suplimentare</li>
               <li>• Durata include timpul pentru pregătire și finalizare</li>

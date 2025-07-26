@@ -1,111 +1,256 @@
-import Image from 'next/image'
-import Link from 'next/link'
+import { Award, Clock, MapPin, Star, Users } from 'lucide-react'
 
 import BookingFormStepper from '@/components/features/appointments/BookingFormStepper'
-import { NavigationTest } from '@/components/shared/NavigationTest'
+import { InteractiveButtons, ServiceBookingButton } from '@/components/shared/InteractiveButtons'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getActiveServicesPublicAction } from '@/features/appointments/actions'
+import { getServiceIcon } from '@/lib/service-icons'
 
-export default function Home() {
+// Date mock pentru beneficiile salonului
+const benefits = [
+  {
+    icon: Star,
+    title: 'Calitate Premium',
+    description: 'Folosim doar produse de top și tehnici moderne',
+  },
+  {
+    icon: Users,
+    title: 'Experiență',
+    description: 'Echipa noastră are peste 10 ani de experiență',
+  },
+  {
+    icon: Clock,
+    title: 'Program Flexibil',
+    description: 'Programări online 24/7, programare rapidă',
+  },
+  {
+    icon: Award,
+    title: 'Certificări',
+    description: 'Toți stilistii noștri sunt certificați profesional',
+  },
+]
+
+const testimonials = [
+  {
+    name: 'Maria Popescu',
+    text: 'Cel mai bun salon din oraș! Serviciul este excelent și rezultatul depășește așteptările.',
+    rating: 5,
+  },
+  {
+    name: 'Ana Ionescu',
+    text: 'Am fost mulțumită de fiecare dată. Recomand cu încredere!',
+    rating: 5,
+  },
+  {
+    name: 'Elena Dumitrescu',
+    text: 'Profesionalism și calitate la cel mai înalt nivel. Mulțumesc!',
+    rating: 5,
+  },
+]
+
+export default async function Home() {
+  // Preluăm serviciile active din baza de date
+  const services = await getActiveServicesPublicAction()
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image className="dark:invert" src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          <div className="text-center animate-fade-in">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
+              Frumusețea Ta Este
+              <span className="block text-yellow-300">Prioritatea Noastră</span>
+            </h1>
 
-        <div className="p-6 mb-4 rounded-lg bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-white shadow-lg w-full max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-2">Tailwind CSS funcționează! 🎉</h2>
-          <p className="text-base">Dacă vezi acest mesaj colorat și stilizat, Tailwind este configurat corect.</p>
+            <p className="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto animate-slide-up animation-delay-200">
+              Descoperă serviciile noastre premium de înfrumusețare și lasă-ne să-ți oferim experiența pe care o meriți
+            </p>
+
+            <InteractiveButtons />
+          </div>
         </div>
+      </section>
 
-        {/* Componenta de test pentru preloader */}
-        <NavigationTest />
+      {/* Servicii Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 animate-slide-up">Serviciile Noastre</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-slide-up animation-delay-200">
+              Oferim o gamă completă de servicii de înfrumusețare pentru a-ți oferi aspectul pe care îl dorești
+            </p>
+          </div>
 
-        <div className="text-center">
-          <Link
-            href="/test"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200"
-          >
-            Testează Preloader-ul Global →
-          </Link>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <div key={service.id} className="group animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+                <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 hover:scale-105">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white group-hover:scale-110 transition-transform duration-300">
+                      {getServiceIcon(service.name)}
+                    </div>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <CardTitle className="text-xl font-bold text-gray-900">{service.name}</CardTitle>
+                    </div>
+                    <Badge variant="secondary" className="text-sm">
+                      {service.category}
+                    </Badge>
+                  </CardHeader>
+
+                  <CardContent className="text-center pt-0">
+                    <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
+
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-2xl font-bold text-purple-600">{service.price} RON</div>
+                      <div className="flex items-center text-gray-500 text-sm">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {service.duration} min
+                      </div>
+                    </div>
+
+                    <ServiceBookingButton />
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <div className="bg-blue-500 text-white p-4">Test Tailwind simplu</div>
-        <div className="flex flex-wrap gap-4 justify-center items-center mb-6">
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-300 shadow-md">
-            Buton Verde
-          </button>
-          <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full border-2 border-white shadow-lg">
-            Buton Roșu
-          </button>
-          <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            Badge Galben
-          </span>
-          <span className="inline-block bg-gray-800 text-white px-3 py-1 rounded text-xs font-mono">
-            Text Monospace
-          </span>
-        </div>
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{' '}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
-        </ol>
+      {/* Beneficii Section */}
+      <section className="py-20 bg-gradient-to-r from-gray-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 animate-slide-up">De Ce Să Ne Alegeți</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto animate-slide-up animation-delay-200">
+              Ne dedicăm să-ți oferim cea mai bună experiență de înfrumusețare
+            </p>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image className="dark:invert" src="/vercel.svg" alt="Vercel logomark" width={20} height={20} />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {benefits.map((benefit, index) => (
+              <div
+                key={index}
+                className="text-center group animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="mx-auto mb-6 p-4 rounded-full bg-white shadow-lg group-hover:shadow-xl transition-shadow duration-300 w-16 h-16 flex items-center justify-center group-hover:scale-110">
+                  <benefit.icon className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{benefit.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* --- FORMULAR PUBLIC DE PROGRAMARE --- */}
-        <div className="w-full max-w-7xl mt-12">
-          <BookingFormStepper />
+      {/* Testimoniale Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 animate-slide-up">
+              Ce Spun Clienții Noștri
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100 animate-fade-in hover:scale-105 transition-transform duration-300"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex items-center mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-4 italic">&ldquo;{testimonial.text}&rdquo;</p>
+                <p className="font-semibold text-gray-900">{testimonial.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/file.svg" alt="File icon" width={16} height={16} />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/window.svg" alt="Window icon" width={16} height={16} />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src="/globe.svg" alt="Globe icon" width={16} height={16} />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Formular de Programare Section */}
+      <section id="booking-section" className="py-16 sm:py-20 lg:py-24 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20 animate-fade-in">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 animate-slide-up">
+              Programează-te Online
+            </h2>
+            <p className="text-lg sm:text-xl lg:text-2xl text-purple-100 max-w-3xl mx-auto leading-relaxed px-4 animate-slide-up animation-delay-200">
+              Rezervă-ți locul în câteva clicuri. Nu mai trebuie să suni la telefon!
+            </p>
+          </div>
+
+          <div className="max-w-6xl mx-auto animate-fade-in animation-delay-400">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
+              <BookingFormStepper />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-xl font-bold mb-4">Salonul Nostru</h3>
+              <p className="text-gray-300 mb-4">
+                Oferim servicii de înfrumusețare de cea mai înaltă calitate, într-un mediu relaxant și profesional.
+              </p>
+              <div className="flex items-center text-gray-300 mb-2">
+                <MapPin className="h-4 w-4 mr-2" />
+                <span>Strada Exemplu, Nr. 123, București</span>
+              </div>
+              <div className="flex items-center text-gray-300">
+                <span className="h-4 w-4 mr-2">📞</span>
+                <span>+40 123 456 789</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-4">Program</h3>
+              <div className="space-y-2 text-gray-300">
+                <div className="flex justify-between">
+                  <span>Luni - Vineri:</span>
+                  <span>09:00 - 20:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Sâmbătă:</span>
+                  <span>09:00 - 18:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Duminică:</span>
+                  <span>10:00 - 16:00</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-4">Servicii</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Tuns & Coafat</li>
+                <li>• Vopsit & Balayage</li>
+                <li>• Manichiură & Pedichiură</li>
+                <li>• Tratamente Faciale</li>
+                <li>• Extensii Gene</li>
+                <li>• Make-up Profesional</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-300">
+            <p>&copy; 2024 Salonul Nostru. Toate drepturile rezervate.</p>
+          </div>
+        </div>
       </footer>
     </div>
   )
