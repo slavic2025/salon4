@@ -83,12 +83,15 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
     const firstErrorField = Object.keys(errors)[0]
 
     if (firstErrorField) {
-      const errorInput = document.querySelector(
-        `input[name="${firstErrorField}"], textarea[name="${firstErrorField}"]`,
-      ) as HTMLElement
-      if (errorInput) {
-        errorInput.focus()
-      }
+      setTimeout(() => {
+        const errorInput = document.querySelector(
+          `input[name="${firstErrorField}"], textarea[name="${firstErrorField}"]`,
+        ) as HTMLElement
+        if (errorInput) {
+          errorInput.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          errorInput.focus()
+        }
+      }, 300) // Delay pentru a permite animațiile să se termine
     }
   }, [form.formState.errors])
 

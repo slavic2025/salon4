@@ -3,6 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 
 import { BookingSummary } from '@/components/ui/booking-summary'
 import { ProgressIndicator } from '@/components/ui/progress-indicator'
@@ -88,6 +89,25 @@ export default function BookingFormStepper() {
     reset,
   } = useBookingStore()
 
+  // Funcție pentru scroll automat la erori
+  const scrollToError = () => {
+    if (error) {
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-display')
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    }
+  }
+
+  // Scroll la erori când se afișează
+  useEffect(() => {
+    if (error) {
+      scrollToError()
+    }
+  }, [error])
+
   // Reset store when component mounts
   useEffect(() => {
     return () => {
@@ -115,7 +135,12 @@ export default function BookingFormStepper() {
 
   const handleSubmit = async () => {
     if (!service || !stylist || !slot || !clientData) {
-      setError('Toate câmpurile sunt obligatorii')
+      const errorMessage = 'Toate câmpurile sunt obligatorii pentru a finaliza programarea'
+      setError(errorMessage)
+      toast.error('Eroare de validare', {
+        description: errorMessage,
+        duration: 5000,
+      })
       return
     }
 
@@ -137,7 +162,46 @@ export default function BookingFormStepper() {
 
       const validationResult = bookingFormSchema.safeParse(bookingData)
       if (!validationResult.success) {
-        setError('Datele introduse nu sunt valide.')
+        // Parsez erorile de validare pentru a le afișa specific
+        const fieldErrors = validationResult.error.flatten().fieldErrors
+        const errorMessages = Object.entries(fieldErrors)
+          .map(([field, errors]) => {
+            const fieldName =
+              {
+                clientName: 'Numele',
+                clientPhone: 'Numărul de telefon',
+                clientEmail: 'Adresa de email',
+                serviceId: 'Serviciul',
+                stylistId: 'Stilistul',
+                startTime: 'Ora de început',
+                endTime: 'Ora de sfârșit',
+              }[field] || field
+
+            return `${fieldName}: ${errors?.[0] || 'Câmp invalid'}`
+          })
+          .join('\n')
+
+        const errorMessage = 'Vă rugăm să corectați următoarele erori:\n' + errorMessages
+        setError(errorMessage)
+
+        // Afișez notificare cu erorile specifice
+        toast.error('Eroare de validare', {
+          description: errorMessages,
+          duration: 8000,
+        })
+
+        // Scroll la primul câmp cu eroare
+        const firstErrorField = Object.keys(fieldErrors)[0]
+        if (firstErrorField) {
+          setTimeout(() => {
+            const errorElement = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement
+            if (errorElement) {
+              errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              errorElement.focus()
+            }
+          }, 100)
+        }
+
         return
       }
 
@@ -148,14 +212,34 @@ export default function BookingFormStepper() {
       if (data && typeof data === 'object' && 'success' in data) {
         if (data.success) {
           setSubmitted(true)
+          toast.success('Programare trimisă cu succes!', {
+            description: 'Vă mulțumim pentru programare. Veți primi o confirmare în curând.',
+            duration: 6000,
+          })
         } else {
-          setError(typeof (data as any).message === 'string' ? (data as any).message : 'Eroare la trimitere.')
+          const errorMessage =
+            typeof (data as any).message === 'string' ? (data as any).message : 'Eroare la trimiterea programării'
+          setError(errorMessage)
+          toast.error('Eroare la trimitere', {
+            description: errorMessage,
+            duration: 6000,
+          })
         }
       } else {
-        setError('Eroare la trimitere.')
+        const errorMessage = 'Eroare la trimiterea programării. Vă rugăm să încercați din nou.'
+        setError(errorMessage)
+        toast.error('Eroare la trimitere', {
+          description: errorMessage,
+          duration: 6000,
+        })
       }
-    } catch {
-      setError('A apărut o eroare neașteptată. Vă rugăm să încercați din nou.')
+    } catch (error) {
+      const errorMessage = 'A apărut o eroare neașteptată. Vă rugăm să încercați din nou.'
+      setError(errorMessage)
+      toast.error('Eroare neașteptată', {
+        description: errorMessage,
+        duration: 6000,
+      })
     } finally {
       setLoading(false)
     }
@@ -275,29 +359,38 @@ export default function BookingFormStepper() {
     >
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header îmbunătățit */}
-        <motion.div className="text-center mb-12" variants={containerVariants} initial="hidden" animate="visible">
-          <motion.h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4" variants={itemVariants}>
+        <motion.div
+          className="text-center mb-8 sm:mb-12"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4" variants={itemVariants}>
             Programează-te online
           </motion.h1>
-          <motion.p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed" variants={itemVariants}>
+          <motion.p
+            className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4"
+            variants={itemVariants}
+          >
             Simplu, rapid și convenabil - rezervă-ți locul în salon în câteva minute
           </motion.p>
         </motion.div>
 
         {/* Progress Indicator îmbunătățit */}
-        <motion.div className="mb-12" variants={itemVariants} initial="hidden" animate="visible">
+        <motion.div className="mb-8 sm:mb-12 px-4" variants={itemVariants} initial="hidden" animate="visible">
           <ProgressIndicator currentStep={currentStep} totalSteps={totalSteps} steps={steps} />
         </motion.div>
 
         {/* Main Content with Sidebar - layout îmbunătățit */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8 xl:gap-12">
           {/* Main Content */}
           <div className="xl:col-span-3">
             {/* Error Display îmbunătățit */}
             <AnimatePresence>
               {error && (
                 <motion.div
-                  className="mb-8 p-6 bg-red-50 border-l-4 border-red-400 rounded-xl shadow-sm"
+                  id="error-display"
+                  className="mb-6 sm:mb-8 p-4 sm:p-6 bg-red-50 border-l-4 border-red-400 rounded-xl shadow-lg sticky top-4 z-10"
                   initial={{ opacity: 0, y: -20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -305,7 +398,12 @@ export default function BookingFormStepper() {
                 >
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0">
-                      <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="w-5 h-5 sm:w-6 sm:h-6 text-red-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -314,9 +412,24 @@ export default function BookingFormStepper() {
                         />
                       </svg>
                     </div>
-                    <div>
-                      <h3 className="text-red-800 font-semibold mb-1">Eroare</h3>
-                      <p className="text-red-700 text-sm">{error}</p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-red-800 font-semibold mb-2 text-base sm:text-lg">Eroare de validare</h3>
+                      <div className="text-red-700 text-sm space-y-1">
+                        {error.split('\n').map((line, index) => (
+                          <p key={index} className="leading-relaxed break-words">
+                            {line}
+                          </p>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setError(null)
+                          toast.dismiss()
+                        }}
+                        className="mt-3 text-red-600 hover:text-red-800 text-sm font-medium underline"
+                      >
+                        Închide mesajul
+                      </button>
                     </div>
                   </div>
                 </motion.div>

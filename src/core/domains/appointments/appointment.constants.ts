@@ -97,7 +97,8 @@ export const APPOINTMENT_VALIDATION_MESSAGES = {
   CLIENT_NAME_MAX_LENGTH: 'Numele clientului nu poate depăși 100 de caractere',
   CLIENT_NAME_INVALID_FORMAT: 'Numele poate conține doar litere și spații',
   CLIENT_PHONE_REQUIRED: 'Numărul de telefon este obligatoriu pentru contact',
-  CLIENT_PHONE_INVALID_FORMAT: 'Numărul de telefon trebuie să fie în format românesc (+40 sau 0 urmat de 9 cifre)',
+  CLIENT_PHONE_INVALID_FORMAT:
+    'Numărul de telefon trebuie să fie în format moldovenesc (+373, 373 sau 0 urmat de 8 cifre)',
   CLIENT_NOTES_MAX_LENGTH: 'Notele nu pot depăși 500 de caractere',
   SERVICE_ID_REQUIRED: 'Serviciul este obligatoriu pentru programare',
   SERVICE_ID_INVALID: 'ID-ul serviciului trebuie să fie un UUID valid',

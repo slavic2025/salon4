@@ -31,7 +31,7 @@ const clientNameValidator = z
 const clientPhoneValidator = z
   .string()
   .min(1, APPOINTMENT_VALIDATION_MESSAGES.CLIENT_PHONE_REQUIRED)
-  .regex(/^(\+40|0)[0-9]{9}$/, APPOINTMENT_VALIDATION_MESSAGES.CLIENT_PHONE_INVALID_FORMAT)
+  .regex(/^(\+373|373|0)[0-9]{8}$/, APPOINTMENT_VALIDATION_MESSAGES.CLIENT_PHONE_INVALID_FORMAT)
 
 /**
  * Validator pentru notele clientului

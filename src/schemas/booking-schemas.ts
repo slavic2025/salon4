@@ -3,7 +3,13 @@ import { z } from 'zod'
 // Schema pentru datele clientului
 export const clientDataSchema = z.object({
   clientName: z.string().min(2, 'Numele trebuie să aibă cel puțin 2 caractere'),
-  clientPhone: z.string().min(10, 'Numărul de telefon trebuie să aibă cel puțin 10 cifre'),
+  clientPhone: z
+    .string()
+    .min(1, 'Numărul de telefon este obligatoriu')
+    .regex(
+      /^(\+373|373|0)[0-9]{8}$/,
+      'Numărul de telefon trebuie să fie în format moldovenesc (+373, 373 sau 0 urmat de 8 cifre)',
+    ),
   clientEmail: z.string().email('Adresa de email nu este validă'),
   clientNotes: z.string().optional(),
 })
@@ -31,7 +37,13 @@ export const bookingFormSchema = z.object({
   startTime: z.string().min(1, 'Ora de început este obligatorie'),
   endTime: z.string().min(1, 'Ora de sfârșit este obligatorie'),
   clientName: z.string().min(2, 'Numele trebuie să aibă cel puțin 2 caractere'),
-  clientPhone: z.string().min(10, 'Numărul de telefon trebuie să aibă cel puțin 10 cifre'),
+  clientPhone: z
+    .string()
+    .min(1, 'Numărul de telefon este obligatoriu')
+    .regex(
+      /^(\+373|373|0)[0-9]{8}$/,
+      'Numărul de telefon trebuie să fie în format moldovenesc (+373, 373 sau 0 urmat de 8 cifre)',
+    ),
   clientEmail: z.string().email('Adresa de email nu este validă'),
   clientNotes: z.string().optional(),
 })

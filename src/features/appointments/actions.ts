@@ -226,3 +226,59 @@ export async function createPublicAppointmentAction(payload: CreateAppointmentPa
     }
   })
 }
+
+// --- STYLIST APPOINTMENT ACTIONS ---
+
+/**
+ * Obține programările pentru un stilist specific
+ */
+export async function getStylistAppointmentsAction(stylistId: string) {
+  try {
+    logger.info('Obținere programări pentru stilist', { stylistId })
+    const appointments = await appointmentService.getAppointmentsByStylist(stylistId)
+    return { data: appointments }
+  } catch (error) {
+    logger.error('Eroare la obținerea programărilor stilistului', { error, stylistId })
+    return { serverError: 'Eroare la încărcarea programărilor' }
+  }
+}
+
+/**
+ * Obține programările cu detalii pentru un stilist specific
+ */
+export async function getStylistAppointmentsWithDetailsAction(stylistId: string) {
+  try {
+    logger.info('Obținere programări cu detalii pentru stilist', { stylistId })
+    const appointments = await appointmentService.getAppointmentsWithDetails({ stylistId })
+    return { data: appointments }
+  } catch (error) {
+    logger.error('Eroare la obținerea programărilor cu detalii pentru stilist', { error, stylistId })
+    return { serverError: 'Eroare la încărcarea programărilor' }
+  }
+}
+
+/**
+ * Actualizează statusul unei programări (pentru stilist)
+ */
+export async function updateStylistAppointmentStatusAction(payload: UpdateAppointmentStatusPayload) {
+  return executeSafeAction(UpdateAppointmentStatusActionSchema, payload, async (validatedPayload) => {
+    try {
+      logger.info('Actualizare status programare pentru stilist', validatedPayload)
+      const result = await appointmentService.updateAppointmentStatus(validatedPayload.id, validatedPayload.status)
+
+      if (result.success) {
+        revalidatePath('/stylist/appointments')
+        logger.info('Status programare actualizat cu succes', {
+          appointmentId: validatedPayload.id,
+          status: validatedPayload.status,
+        })
+        return { data: result.data }
+      } else {
+        return { serverError: result.message }
+      }
+    } catch (error) {
+      logger.error('Eroare la actualizarea statusului programării', { error, payload: validatedPayload })
+      return { serverError: 'Eroare la actualizarea statusului programării' }
+    }
+  })
+}
