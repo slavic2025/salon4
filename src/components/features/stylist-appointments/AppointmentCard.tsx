@@ -14,9 +14,15 @@ type AppointmentCardProps = {
     status: 'confirmed' | 'refused' | 'cancelled' | 'completed' | 'no_show',
   ) => void
   showActions: boolean
+  isUpdating?: boolean
 }
 
-export function AppointmentCard({ appointment, onStatusUpdate, showActions }: AppointmentCardProps) {
+export function AppointmentCard({
+  appointment,
+  onStatusUpdate,
+  showActions,
+  isUpdating = false,
+}: AppointmentCardProps) {
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('ro-RO', {
       weekday: 'long',
@@ -168,16 +174,18 @@ export function AppointmentCard({ appointment, onStatusUpdate, showActions }: Ap
                     size="sm"
                     onClick={() => onStatusUpdate(appointment.id, 'confirmed')}
                     className="flex-1 bg-green-600 hover:bg-green-700"
+                    disabled={isUpdating}
                   >
-                    Acceptă
+                    {isUpdating ? 'Se procesează...' : 'Acceptă'}
                   </Button>
                   <Button
                     size="sm"
                     variant="destructive"
                     onClick={() => onStatusUpdate(appointment.id, 'refused')}
                     className="flex-1"
+                    disabled={isUpdating}
                   >
-                    Refuză
+                    {isUpdating ? 'Se procesează...' : 'Refuză'}
                   </Button>
                 </>
               )}
@@ -188,16 +196,18 @@ export function AppointmentCard({ appointment, onStatusUpdate, showActions }: Ap
                     size="sm"
                     onClick={() => onStatusUpdate(appointment.id, 'completed')}
                     className="flex-1 bg-green-600 hover:bg-green-700"
+                    disabled={isUpdating}
                   >
-                    Finalizează
+                    {isUpdating ? 'Se procesează...' : 'Finalizează'}
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => onStatusUpdate(appointment.id, 'cancelled')}
                     className="flex-1"
+                    disabled={isUpdating}
                   >
-                    Anulează
+                    {isUpdating ? 'Se procesează...' : 'Anulează'}
                   </Button>
                 </>
               )}
@@ -208,8 +218,9 @@ export function AppointmentCard({ appointment, onStatusUpdate, showActions }: Ap
                   variant="destructive"
                   onClick={() => onStatusUpdate(appointment.id, 'no_show')}
                   className="flex-1"
+                  disabled={isUpdating}
                 >
-                  No-show
+                  {isUpdating ? 'Se procesează...' : 'No-show'}
                 </Button>
               )}
             </div>

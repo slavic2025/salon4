@@ -2,7 +2,7 @@
 'use client'
 
 import { AlertCircle, Calendar, CalendarX, CheckCircle, XCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -22,11 +22,15 @@ type StylistAppointmentsPageContentProps = {
 }
 
 export function StylistAppointmentsPageContent({
-  appointments,
-  stylistId,
+  appointments: initialAppointments,
+  stylistId: _stylistId,
   pageTitle,
   pageDescription,
 }: StylistAppointmentsPageContentProps) {
+  const [appointments, setAppointments] = useState(initialAppointments)
+  const [isPending, startTransition] = useTransition()
+  const [updatingAppointmentId, setUpdatingAppointmentId] = useState<string | null>(null)
+
   const [filters, setFilters] = useState({
     status: 'all' as 'all' | 'waiting' | 'confirmed' | 'refused' | 'cancelled' | 'completed' | 'no_show',
     dateRange: 'all' as 'all' | 'today' | 'week' | 'month',
@@ -104,28 +108,44 @@ export function StylistAppointmentsPageContent({
     }
   }, [appointments, filters])
 
-  // Handler pentru actualizarea statusului
+  // Handler pentru actualizarea statusului cu optimistic updates
   const handleStatusUpdate = async (
     appointmentId: string,
     newStatus: 'confirmed' | 'refused' | 'cancelled' | 'completed' | 'no_show',
   ) => {
-    try {
-      const result = await updateStylistAppointmentStatusAction({
-        id: appointmentId,
-        status: newStatus,
-      })
+    // Salvez starea anterioară pentru rollback în caz de eroare
+    const previousAppointments = [...appointments]
 
-      if (result.data) {
-        toast.success('Statusul programării a fost actualizat cu succes')
-        // Reîncărcăm pagina pentru a reflecta schimbările
-        window.location.reload()
-      } else {
-        toast.error(result.serverError || 'Eroare la actualizarea statusului')
+    // Optimistic update - actualizez UI-ul imediat
+    setAppointments((prev) => prev.map((apt) => (apt.id === appointmentId ? { ...apt, status: newStatus } : apt)))
+
+    // Setez loading state pentru acest appointment
+    setUpdatingAppointmentId(appointmentId)
+
+    startTransition(async () => {
+      try {
+        const result = await updateStylistAppointmentStatusAction({
+          id: appointmentId,
+          status: newStatus,
+        })
+
+        if (result.data) {
+          toast.success('Statusul programării a fost actualizat cu succes')
+          // Revalidarea se face automat prin revalidatePath din server action
+        } else {
+          // Rollback la starea anterioară în caz de eroare
+          setAppointments(previousAppointments)
+          toast.error(result.serverError || 'Eroare la actualizarea statusului')
+        }
+      } catch (error) {
+        // Rollback la starea anterioară în caz de eroare
+        setAppointments(previousAppointments)
+        toast.error('Eroare la actualizarea statusului programării')
+        console.error('Error updating appointment status:', error)
+      } finally {
+        setUpdatingAppointmentId(null)
       }
-    } catch (error) {
-      toast.error('Eroare la actualizarea statusului programării')
-      console.error('Error updating appointment status:', error)
-    }
+    })
   }
 
   // Calculăm statisticile
@@ -145,6 +165,18 @@ export function StylistAppointmentsPageContent({
 
   return (
     <div className="space-y-6">
+      {/* Loading overlay pentru întreaga pagină */}
+      {isPending && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="text-sm font-medium">Se procesează modificarea...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header cu statistici */}
       <div className="flex items-center justify-between">
         <div>
@@ -176,6 +208,7 @@ export function StylistAppointmentsPageContent({
                 appointment={appointment}
                 onStatusUpdate={handleStatusUpdate}
                 showActions={true}
+                isUpdating={updatingAppointmentId === appointment.id}
               />
             ))}
           </div>
@@ -216,6 +249,7 @@ export function StylistAppointmentsPageContent({
                   appointment={appointment}
                   onStatusUpdate={handleStatusUpdate}
                   showActions={true}
+                  isUpdating={updatingAppointmentId === appointment.id}
                 />
               ))}
           </div>
@@ -256,6 +290,7 @@ export function StylistAppointmentsPageContent({
                   appointment={appointment}
                   onStatusUpdate={handleStatusUpdate}
                   showActions={true}
+                  isUpdating={updatingAppointmentId === appointment.id}
                 />
               ))}
           </div>
