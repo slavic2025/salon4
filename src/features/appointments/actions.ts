@@ -150,10 +150,19 @@ export const getAvailableSlotsPublicAction = async (payload: {
   fromDate: string // ISO date
   days: number
 }) => {
+  logger.info('Încărcare sloturi disponibile', { payload })
+
   // Dacă nu avem un stilist specific, obținem toți stiliștii care oferă serviciul
   if (!payload.stylistId) {
     const stylistsForService = await getStylistsForServicePublicAction(payload.serviceId)
+    logger.info('Stiliști pentru serviciu', {
+      serviceId: payload.serviceId,
+      stylistsCount: stylistsForService.length,
+      stylistIds: stylistsForService.map((s) => s.id),
+    })
+
     if (!stylistsForService.length) {
+      logger.warn('Nu există stiliști pentru serviciul selectat', { serviceId: payload.serviceId })
       return [] // Nu există stiliști pentru acest serviciu
     }
 
@@ -161,6 +170,11 @@ export const getAvailableSlotsPublicAction = async (payload: {
 
     // Obținem programele pentru toți stiliștii
     const schedules = await workScheduleService.getMultipleStylists(stylistIds)
+    logger.info('Programe obținute', {
+      stylistIds,
+      schedulesCount: schedules.length,
+      schedules: schedules.map((s) => ({ stylistId: s.stylistId, days: Object.keys(s.schedule) })),
+    })
 
     const from = new Date(payload.fromDate)
     const to = new Date(from)
@@ -168,6 +182,11 @@ export const getAvailableSlotsPublicAction = async (payload: {
 
     // Obținem programările pentru toți stiliștii
     const appointments = await appointmentService.getAppointmentsByStylistIds(stylistIds, from, to)
+    logger.info('Programări obținute', {
+      stylistIds,
+      appointmentsCount: appointments.length,
+      dateRange: { from: payload.fromDate, to: to.toISOString().slice(0, 10) },
+    })
 
     // Obținem indisponibilitățile pentru toți stiliștii
     const unavailabilities = await unavailabilityService.getUnavailabilitiesByStylistIds(
@@ -175,12 +194,18 @@ export const getAvailableSlotsPublicAction = async (payload: {
       payload.fromDate,
       to.toISOString().slice(0, 10),
     )
+    logger.info('Indisponibilități obținute', {
+      stylistIds,
+      unavailabilitiesCount: unavailabilities.length,
+      dateRange: { from: payload.fromDate, to: to.toISOString().slice(0, 10) },
+    })
 
     const service = await serviceService.getServiceById(payload.serviceId)
     if (!service) throw new Error('Serviciul nu a fost găsit')
+    logger.info('Serviciu obținut', { serviceId: service.id, duration: service.duration })
 
     // Generăm sloturile disponibile pentru toți stiliștii
-    return generateAvailableSlotsForMultipleStylists({
+    const slots = generateAvailableSlotsForMultipleStylists({
       schedules,
       appointments,
       unavailabilities,
@@ -188,6 +213,14 @@ export const getAvailableSlotsPublicAction = async (payload: {
       fromDate: payload.fromDate,
       days: payload.days,
     })
+
+    logger.info('Sloturi generate', {
+      slotsCount: slots.length,
+      availableSlots: slots.filter((s) => s.available).length,
+      unavailableSlots: slots.filter((s) => !s.available).length,
+    })
+
+    return slots
   }
 
   // Cazul când avem un stilist specific (logica existentă)

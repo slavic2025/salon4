@@ -41,7 +41,7 @@ export function BookingCard({
     return (
       <Card
         className={cn(
-          'cursor-pointer transition-all duration-200 hover:shadow-md group h-full',
+          'cursor-pointer transition-all duration-200 hover:shadow-md group',
           'border hover:border-purple-300 hover:scale-[1.02] transform',
           isSelected && 'ring-2 ring-purple-500 shadow-lg border-purple-500 scale-[1.02]',
           disabled && 'opacity-50 cursor-not-allowed hover:scale-100',
@@ -49,12 +49,12 @@ export function BookingCard({
         )}
         onClick={disabled ? undefined : onClick}
       >
-        <CardHeader className="pb-3 text-center">
+        <CardHeader className="pb-2 text-center">
           {/* Icon compact și modern */}
           {icon && (
             <div
               className={cn(
-                'mx-auto mb-3 p-2.5 rounded-lg transition-colors duration-200',
+                'mx-auto mb-2 p-2 rounded-lg transition-colors duration-200',
                 isSelected
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                   : 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 group-hover:from-purple-200 group-hover:to-pink-200',
@@ -65,12 +65,15 @@ export function BookingCard({
           )}
 
           {/* Title compact */}
-          <CardTitle className="text-base font-semibold mb-2 text-gray-900 leading-tight">{title}</CardTitle>
+          <CardTitle className="text-base font-semibold mb-1 text-gray-900 leading-tight">{title}</CardTitle>
         </CardHeader>
 
-        <CardContent className="pt-0 pb-4 flex flex-col justify-end h-full">
-          {/* Preț și durată compacte */}
-          <div className="space-y-2">
+        <CardContent className="pt-0 pb-3 flex flex-col h-full">
+          {/* Spacer pentru a împinge prețul și durata la bottom */}
+          <div className="flex-1"></div>
+
+          {/* Preț și durată compacte - aliniate la bottom */}
+          <div className="space-y-1.5">
             {/* Preț proeminent dar compact */}
             {price && (
               <div className="text-center">
@@ -91,7 +94,7 @@ export function BookingCard({
 
           {/* Selection indicator compact */}
           {isSelected && (
-            <div className="mt-3 flex items-center justify-center">
+            <div className="mt-2 flex items-center justify-center">
               <div className="flex items-center text-purple-600 text-xs font-medium">
                 <Check className="w-3 h-3 mr-1" />
                 Selectat

@@ -266,9 +266,12 @@ export function generateSlotsForMultipleStylists(
 
   for (const schedule of schedules) {
     const stylistId = schedule.stylistId
-    const daySchedule = schedule.schedule[getDayOfWeek(currentDate)] || []
+    const dayOfWeek = getDayOfWeek(currentDate)
+    const daySchedule = schedule.schedule[dayOfWeek] || []
 
-    if (!daySchedule.length) continue
+    if (!daySchedule.length) {
+      continue
+    }
 
     const stylistAppointments = appointmentsByStylist.get(stylistId) || []
     const stylistUnavailabilities = unavailabilitiesByStylist.get(stylistId) || []
