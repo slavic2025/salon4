@@ -124,8 +124,8 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <div key={service.id} className="group animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 hover:scale-105">
-                  <CardHeader className="text-center pb-4">
+                <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-gray-50 hover:scale-105 flex flex-col">
+                  <CardHeader className="text-center pb-4 flex-shrink-0">
                     <div className="mx-auto mb-4 p-4 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white group-hover:scale-110 transition-transform duration-300">
                       {getServiceIcon(service.name)}
                     </div>
@@ -137,18 +137,22 @@ export default async function Home() {
                     </Badge>
                   </CardHeader>
 
-                  <CardContent className="text-center pt-0">
-                    <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
+                  <CardContent className="text-center pt-0 flex-1 flex flex-col">
+                    <div className="flex-1">
+                      <p className="text-gray-600 mb-6 leading-relaxed min-h-[3rem]">{service.description}</p>
 
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="text-2xl font-bold text-purple-600">{service.price} lei</div>
-                      <div className="flex items-center text-gray-500 text-sm">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {service.duration} min
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-2xl font-bold text-purple-600">{service.price} lei</div>
+                        <div className="flex items-center text-gray-500 text-sm">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {service.duration} min
+                        </div>
                       </div>
                     </div>
 
-                    <ServiceBookingButton />
+                    <div className="mt-auto pt-4">
+                      <ServiceBookingButton />
+                    </div>
                   </CardContent>
                 </Card>
               </div>
