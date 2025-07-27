@@ -25,15 +25,15 @@ export function BookingStylistPicker({
     return (
       <div className={cn('bg-white rounded-lg border shadow-sm p-6', className)}>
         <div className="flex items-center space-x-2 mb-4">
-          <Users className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold text-gray-900">Selectează stilistul</h3>
+          <Users className="w-5 h-5 text-slate-600" />
+          <h3 className="font-semibold text-slate-900">Selectează stilistul</h3>
         </div>
 
         <div className="text-center py-8">
-          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Users className="w-8 h-8 text-yellow-600" />
+          <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-slate-600" />
           </div>
-          <p className="text-gray-600 font-medium mb-2">Nu sunt stiliști disponibili</p>
+          <p className="text-slate-600 font-medium mb-2">Nu sunt stiliști disponibili</p>
           <p className="text-sm text-muted-foreground">pentru slotul de timp selectat</p>
         </div>
       </div>
@@ -44,8 +44,8 @@ export function BookingStylistPicker({
     <div className={cn('bg-white rounded-lg border shadow-sm p-6', className)}>
       {/* Header */}
       <div className="flex items-center space-x-2 mb-6">
-        <Users className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold text-gray-900">Selectează stilistul</h3>
+        <Users className="w-5 h-5 text-slate-600" />
+        <h3 className="font-semibold text-slate-900">Selectează stilistul</h3>
         <span className="text-sm text-muted-foreground ml-auto">
           ({stylists.length} {stylists.length === 1 ? 'disponibil' : 'disponibili'})
         </span>
@@ -71,16 +71,16 @@ export function BookingStylistPicker({
 
       {/* Selected Stylist Info */}
       {selectedStylist && (
-        <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+        <div className="mt-6 p-4 bg-gradient-to-r from-stone-50 to-stone-100 border border-stone-200 rounded-lg">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-full text-primary">
+            <div className="p-2 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full text-slate-700">
               <User className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Stilist selectat:</p>
-              <p className="font-semibold text-primary">{selectedStylist.fullName}</p>
+              <p className="text-sm text-slate-600">Stilist selectat:</p>
+              <p className="font-semibold text-slate-700">{selectedStylist.fullName}</p>
               {selectedStylist.description && (
-                <p className="text-sm text-muted-foreground mt-1">{selectedStylist.description}</p>
+                <p className="text-sm text-slate-500 mt-1">{selectedStylist.description}</p>
               )}
             </div>
           </div>

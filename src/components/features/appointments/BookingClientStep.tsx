@@ -39,7 +39,7 @@ const ValidationIndicator = ({ isValid, isDirty, error }: { isValid: boolean; is
 
   if (isValid) {
     return (
-      <div className="flex items-center space-x-1.5 text-purple-600 text-xs">
+      <div className="flex items-center space-x-1.5 text-slate-600 text-xs">
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
         </svg>
@@ -126,21 +126,21 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
     <div className="space-y-6">
       {/* Header Section îmbunătățit și compact */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">Informațiile tale</h2>
-        <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">
+        <h2 className="text-2xl font-bold text-slate-900 mb-3">Informațiile tale</h2>
+        <p className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
           Completează datele pentru finalizarea programării. Toate câmpurile marcate cu * sunt obligatorii.
         </p>
       </div>
 
       {/* Progress bar îmbunătățit și compact pentru completarea formularului */}
       <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-between text-xs text-gray-600 mb-2">
+        <div className="flex items-center justify-between text-xs text-slate-600 mb-2">
           <span>Progres completare</span>
           <span className="font-semibold">{Math.round(completionPercentage)}%</span>
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full"
+            className="h-full bg-gradient-to-r from-slate-700 to-slate-800 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -157,7 +157,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Label htmlFor="clientName" className="text-sm font-semibold text-gray-900">
+          <Label htmlFor="clientName" className="text-sm font-semibold text-slate-900">
             Nume și prenume <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -168,8 +168,8 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
               form.formState.errors.clientName
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientName')?.trim()
-                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
-                  : 'focus:ring-purple-500 focus:border-purple-500'
+                  ? 'border-slate-300 focus:ring-slate-500 focus:border-slate-500'
+                  : 'focus:ring-slate-500 focus:border-slate-500'
             }`}
             autoComplete="name"
           />
@@ -187,7 +187,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Label htmlFor="clientPhone" className="text-sm font-semibold text-gray-900">
+          <Label htmlFor="clientPhone" className="text-sm font-semibold text-slate-900">
             Număr de telefon <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -199,8 +199,8 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
               form.formState.errors.clientPhone
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientPhone')?.trim()
-                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
-                  : 'focus:ring-purple-500 focus:border-purple-500'
+                  ? 'border-slate-300 focus:ring-slate-500 focus:border-slate-500'
+                  : 'focus:ring-slate-500 focus:border-slate-500'
             }`}
             autoComplete="tel"
           />
@@ -209,7 +209,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             isDirty={!!form.watch('clientPhone')}
             error={form.formState.errors.clientPhone?.message}
           />
-          <p className="text-xs text-gray-500">Vom folosi acest număr pentru confirmarea programării</p>
+          <p className="text-xs text-slate-500">Vom folosi acest număr pentru confirmarea programării</p>
         </motion.div>
 
         {/* Adresa de email */}
@@ -219,7 +219,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Label htmlFor="clientEmail" className="text-sm font-semibold text-gray-900">
+          <Label htmlFor="clientEmail" className="text-sm font-semibold text-slate-900">
             Adresa de email <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -231,8 +231,8 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
               form.formState.errors.clientEmail
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : form.watch('clientEmail')?.trim()
-                  ? 'border-purple-300 focus:ring-purple-500 focus:border-purple-500'
-                  : 'focus:ring-purple-500 focus:border-purple-500'
+                  ? 'border-slate-300 focus:ring-slate-500 focus:border-slate-500'
+                  : 'focus:ring-slate-500 focus:border-slate-500'
             }`}
             autoComplete="email"
           />
@@ -241,7 +241,7 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
             isDirty={!!form.watch('clientEmail')}
             error={form.formState.errors.clientEmail?.message}
           />
-          <p className="text-xs text-gray-500">Vei primi confirmarea programării pe acest email</p>
+          <p className="text-xs text-slate-500">Vei primi confirmarea programării pe acest email</p>
         </motion.div>
 
         {/* Note opționale */}
@@ -251,25 +251,25 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Label htmlFor="clientNotes" className="text-sm font-semibold text-gray-900">
+          <Label htmlFor="clientNotes" className="text-sm font-semibold text-slate-900">
             Note sau cerințe speciale
-            <span className="text-gray-500 ml-2 font-normal">(opțional)</span>
+            <span className="text-slate-500 ml-2 font-normal">(opțional)</span>
           </Label>
           <Textarea
             id="clientNotes"
             {...form.register('clientNotes')}
             placeholder="ex: Am părul foarte gros, prefer stilul clasic, sunt alergic la..."
             rows={3}
-            className="resize-none transition-all duration-300 focus:ring-purple-500 focus:border-purple-500 text-sm"
+            className="resize-none transition-all duration-300 focus:ring-slate-500 focus:border-slate-500 text-sm"
           />
-          <p className="text-xs text-gray-500">Ajută-ne să îți oferim exact ceea ce dorești</p>
+          <p className="text-xs text-slate-500">Ajută-ne să îți oferim exact ceea ce dorești</p>
         </motion.div>
 
         {/* Submit button îmbunătățit și compact */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Button
             type="submit"
-            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white"
+            className="w-full h-12 text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white"
             disabled={form.formState.isSubmitting || !form.formState.isValid}
           >
             {form.formState.isSubmitting ? (
@@ -285,13 +285,13 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
 
         {/* Informații de confidențialitate îmbunătățite și compacte */}
         <motion.div
-          className="text-center p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200"
+          className="text-center p-4 bg-gradient-to-r from-stone-50 to-stone-100 rounded-xl border border-stone-200"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
           <div className="flex items-center justify-center space-x-2 mb-1">
-            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -299,9 +299,9 @@ export default function BookingClientStep({ onSubmit }: BookingClientStepProps) 
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
-            <span className="text-xs font-semibold text-purple-900">Confidențialitate garantată</span>
+            <span className="text-xs font-semibold text-slate-900">Confidențialitate garantată</span>
           </div>
-          <p className="text-xs text-purple-700">
+          <p className="text-xs text-slate-700">
             Datele tale sunt în siguranță și vor fi folosite doar pentru programare
           </p>
         </motion.div>

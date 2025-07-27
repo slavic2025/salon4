@@ -51,6 +51,7 @@ export interface StylistFilters {
 
 export interface StylistRepository {
   findAll(): Promise<Stylist[]>
+  findActive(): Promise<Stylist[]>
   findById(id: string): Promise<Stylist | undefined>
   findByEmail(email: string): Promise<Stylist | undefined>
   findByPhone(phone: string): Promise<Stylist | undefined>
@@ -63,6 +64,7 @@ export interface StylistRepository {
 
 export interface StylistService {
   getAllStylists(): Promise<Stylist[]>
+  getActiveStylists(): Promise<Stylist[]>
   getStylistById(id: string): Promise<Stylist | null>
   createStylist(payload: CreateStylistPayload): Promise<{
     success: boolean

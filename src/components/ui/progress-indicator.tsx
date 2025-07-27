@@ -18,7 +18,7 @@ export function ProgressIndicator({ currentStep, totalSteps, steps, className }:
       <div className="relative mb-4">
         <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-purple-700 to-indigo-800 transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-slate-700 to-slate-800 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -37,9 +37,8 @@ export function ProgressIndicator({ currentStep, totalSteps, steps, className }:
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-200',
-                  isCompleted && 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white',
-                  isActive &&
-                    'bg-gradient-to-r from-purple-700 to-indigo-800 text-white ring-3 ring-purple-300 scale-110',
+                  isCompleted && 'bg-gradient-to-r from-slate-700 to-slate-800 text-white',
+                  isActive && 'bg-gradient-to-r from-slate-700 to-slate-800 text-white ring-3 ring-slate-300 scale-110',
                   isUpcoming && 'bg-gray-200 text-gray-500',
                 )}
               >
@@ -64,8 +63,8 @@ export function ProgressIndicator({ currentStep, totalSteps, steps, className }:
               <div
                 className={cn(
                   'mt-1.5 text-xs font-medium text-center transition-colors duration-200 leading-tight',
-                  isActive && 'text-purple-600 font-semibold',
-                  isCompleted && 'text-purple-600',
+                  isActive && 'text-slate-600 font-semibold',
+                  isCompleted && 'text-slate-600',
                   isUpcoming && 'text-gray-500',
                 )}
               >

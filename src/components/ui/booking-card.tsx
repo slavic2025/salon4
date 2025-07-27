@@ -42,8 +42,8 @@ export function BookingCard({
       <Card
         className={cn(
           'cursor-pointer transition-all duration-200 hover:shadow-md group',
-          'border hover:border-purple-400 hover:scale-[1.02] transform',
-          isSelected && 'ring-2 ring-purple-700 shadow-lg border-purple-700 scale-[1.02]',
+          'border hover:border-slate-400 hover:scale-[1.02] transform',
+          isSelected && 'ring-2 ring-slate-700 shadow-lg border-slate-700 scale-[1.02]',
           disabled && 'opacity-50 cursor-not-allowed hover:scale-100',
           className,
         )}
@@ -56,8 +56,8 @@ export function BookingCard({
               className={cn(
                 'mx-auto mb-2 p-2 rounded-lg transition-colors duration-200',
                 isSelected
-                  ? 'bg-gradient-to-r from-purple-700 to-indigo-800 text-white'
-                  : 'bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700 group-hover:from-purple-200 group-hover:to-indigo-200',
+                  ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white'
+                  : 'bg-gradient-to-r from-stone-100 to-stone-200 text-slate-700 group-hover:from-stone-200 group-hover:to-stone-300',
               )}
             >
               <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
@@ -65,7 +65,7 @@ export function BookingCard({
           )}
 
           {/* Title compact */}
-          <CardTitle className="text-base font-semibold mb-1 text-gray-900 leading-tight">{title}</CardTitle>
+          <CardTitle className="text-base font-semibold mb-1 text-slate-900 leading-tight">{title}</CardTitle>
         </CardHeader>
 
         <CardContent className="pt-0 pb-3 flex flex-col h-full">
@@ -77,14 +77,14 @@ export function BookingCard({
             {/* Preț proeminent dar compact */}
             {price && (
               <div className="text-center">
-                <div className="text-lg font-bold text-purple-600">{price}</div>
+                <div className="text-lg font-bold text-slate-600">{price}</div>
               </div>
             )}
 
             {/* Durată cu badge compact */}
             {duration && (
               <div className="text-center">
-                <div className="inline-flex items-center px-2 py-1 rounded-md bg-purple-100 text-xs text-purple-700 font-medium">
+                <div className="inline-flex items-center px-2 py-1 rounded-md bg-stone-100 text-xs text-slate-700 font-medium">
                   <span className="mr-1">⏱</span>
                   {duration}
                 </div>
@@ -95,7 +95,7 @@ export function BookingCard({
           {/* Selection indicator compact */}
           {isSelected && (
             <div className="mt-2 flex items-center justify-center">
-              <div className="flex items-center text-purple-600 text-xs font-medium">
+              <div className="flex items-center text-slate-600 text-xs font-medium">
                 <Check className="w-3 h-3 mr-1" />
                 Selectat
               </div>
@@ -111,8 +111,8 @@ export function BookingCard({
     <Card
       className={cn(
         'cursor-pointer transition-all duration-200 hover:shadow-md',
-        'border hover:border-purple-300',
-        isSelected && 'ring-2 ring-purple-500 shadow-lg border-purple-500',
+        'border hover:border-slate-300',
+        isSelected && 'ring-2 ring-slate-500 shadow-lg border-slate-500',
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
@@ -123,7 +123,7 @@ export function BookingCard({
           <div className="flex items-start space-x-3 flex-1">
             {/* Icon compact pentru stylists */}
             {icon && variant === 'stylist' && (
-              <div className="p-1.5 rounded-md bg-gradient-to-r from-purple-100 to-indigo-100 text-purple-700">
+              <div className="p-1.5 rounded-md bg-gradient-to-r from-stone-100 to-stone-200 text-slate-700">
                 <div className="w-4 h-4">{icon}</div>
               </div>
             )}
@@ -135,7 +135,7 @@ export function BookingCard({
           </div>
 
           {isSelected && (
-            <div className="ml-2 p-1 bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full">
+            <div className="ml-2 p-1 bg-gradient-to-r from-slate-700 to-slate-800 rounded-full">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
@@ -146,9 +146,9 @@ export function BookingCard({
         {description && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{description}</p>}
 
         <div className="flex items-center justify-between">
-          {price && <div className="font-semibold text-sm text-purple-600">{price}</div>}
+          {price && <div className="font-semibold text-sm text-slate-600">{price}</div>}
           {duration && (
-            <div className="text-xs text-muted-foreground bg-purple-100 px-2 py-0.5 rounded">Durată: {duration}</div>
+            <div className="text-xs text-muted-foreground bg-stone-100 px-2 py-0.5 rounded">Durată: {duration}</div>
           )}
         </div>
       </CardContent>

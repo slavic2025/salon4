@@ -1,0 +1,8 @@
+export { default as BenefitsSection } from './BenefitsSection'
+export { default as Footer } from './Footer'
+export { default as HeroSection } from './HeroSection'
+export { default as HowItWorksSection } from './HowItWorksSection'
+export { default as LocationSection } from './LocationSection'
+export { default as ServicesSection } from './ServicesSection'
+export { default as StylistsSection } from './StylistsSection'
+export { default as TestimonialsSection } from './TestimonialsSection'

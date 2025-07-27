@@ -133,6 +133,10 @@ export async function getAllStylistsPublicAction() {
   return await stylistService.getAllStylists()
 }
 
+export async function getActiveStylistsPublicAction() {
+  return await stylistService.getActiveStylists()
+}
+
 export async function getStylistsForServicePublicAction(serviceId: string) {
   // Obține toate legăturile pentru serviciul dat
   const links = await stylistServiceLinkService.getLinksByServiceId(serviceId)

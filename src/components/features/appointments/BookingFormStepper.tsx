@@ -249,7 +249,7 @@ export default function BookingFormStepper() {
   if (isSubmitted) {
     return (
       <motion.div
-        className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4 sm:p-6"
+        className="min-h-screen bg-gradient-to-br from-stone-50 via-stone-50 to-stone-50 flex items-center justify-center p-4 sm:p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -261,11 +261,11 @@ export default function BookingFormStepper() {
           animate="visible"
         >
           <motion.div
-            className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 border border-purple-100"
+            className="bg-white rounded-3xl shadow-2xl p-8 sm:p-12 border border-stone-100"
             variants={itemVariants}
           >
             <motion.div
-              className="w-20 h-20 bg-gradient-to-r from-purple-700 to-indigo-800 rounded-full flex items-center justify-center mx-auto mb-6"
+              className="w-20 h-20 bg-gradient-to-r from-slate-700 to-slate-800 rounded-full flex items-center justify-center mx-auto mb-6"
               variants={itemVariants}
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ duration: 0.3 }}
@@ -275,42 +275,42 @@ export default function BookingFormStepper() {
               </svg>
             </motion.div>
 
-            <motion.h2 className="text-3xl font-bold text-purple-700 mb-4" variants={itemVariants}>
+            <motion.h2 className="text-3xl font-bold text-slate-700 mb-4" variants={itemVariants}>
               Programarea a fost trimisă cu succes! 🎉
             </motion.h2>
 
-            <motion.p className="text-gray-700 text-lg mb-2" variants={itemVariants}>
-              Vă mulțumim pentru programare, <strong className="text-gray-900">{clientData?.clientName}</strong>!
+            <motion.p className="text-slate-700 text-lg mb-2" variants={itemVariants}>
+              Vă mulțumim pentru programare, <strong className="text-slate-900">{clientData?.clientName}</strong>!
             </motion.p>
 
-            <motion.p className="text-gray-600 mb-8" variants={itemVariants}>
-              Veți primi o confirmare pe email la <strong className="text-gray-900">{clientData?.clientEmail}</strong>{' '}
+            <motion.p className="text-slate-600 mb-8" variants={itemVariants}>
+              Veți primi o confirmare pe email la <strong className="text-slate-900">{clientData?.clientEmail}</strong>{' '}
               în curând.
             </motion.p>
 
             {/* Detalii programare în success - design îmbunătățit */}
             <motion.div
-              className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8 text-left border border-purple-200"
+              className="bg-gradient-to-r from-stone-50 to-stone-100 rounded-2xl p-6 mb-8 text-left border border-stone-200"
               variants={itemVariants}
             >
-              <h3 className="font-bold text-gray-900 mb-4 text-base flex items-center">
-                <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+              <h3 className="font-bold text-slate-900 mb-4 text-base flex items-center">
+                <span className="w-2 h-2 bg-slate-500 rounded-full mr-2"></span>
                 Detaliile programării:
               </h3>
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center py-1 border-b border-purple-200">
-                  <span className="text-gray-600">Serviciu:</span>
-                  <span className="font-semibold text-gray-900">{service?.name}</span>
+                <div className="flex justify-between items-center py-1 border-b border-stone-200">
+                  <span className="text-slate-600">Serviciu:</span>
+                  <span className="font-semibold text-slate-900">{service?.name}</span>
                 </div>
-                <div className="flex justify-between items-center py-1 border-b border-purple-200">
-                  <span className="text-gray-600">Stilist:</span>
-                  <span className="font-semibold text-gray-900">{stylist?.fullName}</span>
+                <div className="flex justify-between items-center py-1 border-b border-stone-200">
+                  <span className="text-slate-600">Stilist:</span>
+                  <span className="font-semibold text-slate-900">{stylist?.fullName}</span>
                 </div>
                 {slot && (
                   <>
-                    <div className="flex justify-between items-center py-1 border-b border-purple-200">
-                      <span className="text-gray-600">Data:</span>
-                      <span className="font-semibold text-gray-900">
+                    <div className="flex justify-between items-center py-1 border-b border-stone-200">
+                      <span className="text-slate-600">Data:</span>
+                      <span className="font-semibold text-slate-900">
                         {new Date(slot.start).toLocaleDateString('ro-RO', {
                           weekday: 'long',
                           year: 'numeric',
@@ -319,25 +319,25 @@ export default function BookingFormStepper() {
                         })}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center py-1 border-b border-purple-200">
-                      <span className="text-gray-600">Ora:</span>
-                      <span className="font-semibold text-gray-900">
+                    <div className="flex justify-between items-center py-1 border-b border-stone-200">
+                      <span className="text-slate-600">Ora:</span>
+                      <span className="font-semibold text-slate-900">
                         {new Date(slot.start).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })} -{' '}
                         {new Date(slot.end).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </>
                 )}
-                <div className="flex justify-between items-center py-2 bg-purple-100 rounded-lg px-3">
-                  <span className="text-gray-700 font-medium">Total:</span>
-                  <span className="font-bold text-xl text-purple-600">{service?.price} lei</span>
+                <div className="flex justify-between items-center py-2 bg-stone-100 rounded-lg px-3">
+                  <span className="text-slate-700 font-medium">Total:</span>
+                  <span className="font-bold text-xl text-slate-600">{service?.price} lei</span>
                 </div>
               </div>
             </motion.div>
 
             <motion.button
               onClick={reset}
-              className="px-8 py-3 bg-gradient-to-r from-purple-700 to-indigo-800 text-white rounded-xl hover:from-purple-800 hover:to-indigo-900 transition-all duration-300 font-semibold text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+              className="px-8 py-3 bg-gradient-to-r from-slate-700 to-slate-800 text-white rounded-xl hover:from-slate-800 hover:to-slate-900 transition-all duration-300 font-semibold text-base shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -352,7 +352,7 @@ export default function BookingFormStepper() {
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-br from-slate-50 to-white"
+      className="min-h-screen bg-gradient-to-br from-stone-50 to-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -365,11 +365,11 @@ export default function BookingFormStepper() {
           initial="hidden"
           animate="visible"
         >
-          <motion.h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3" variants={itemVariants}>
+          <motion.h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-3" variants={itemVariants}>
             Programează-te online
           </motion.h1>
           <motion.p
-            className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed px-4"
+            className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed px-4"
             variants={itemVariants}
           >
             Simplu, rapid și convenabil - rezervă-ți locul în salon în câteva minute
@@ -438,7 +438,7 @@ export default function BookingFormStepper() {
 
             {/* Step Content - design îmbunătățit și compact */}
             <motion.div
-              className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+              className="bg-white rounded-xl shadow-lg border border-stone-100 overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -500,7 +500,7 @@ export default function BookingFormStepper() {
               {/* Navigation îmbunătățită și compactă */}
               {currentStep !== 3 && (
                 <motion.div
-                  className="border-t border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50 p-4 sm:p-6"
+                  className="border-t border-stone-100 bg-gradient-to-r from-stone-50 to-stone-100 p-4 sm:p-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3, duration: 0.3 }}

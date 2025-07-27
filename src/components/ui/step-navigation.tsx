@@ -59,7 +59,7 @@ export function StepNavigation({
         onClick={onPrev}
         disabled={isFirstStep || !canGoPrev || isLoading}
         className={cn(
-          'transition-all duration-200 h-9 px-3 border-purple-200 hover:bg-purple-50 hover:border-purple-300',
+          'transition-all duration-200 h-9 px-3 border-stone-200 hover:bg-stone-50 hover:border-stone-300',
           isFirstStep && 'invisible',
         )}
       >
@@ -68,7 +68,7 @@ export function StepNavigation({
       </Button>
 
       {/* Step Indicator compact */}
-      <div className="text-xs text-gray-600">
+      <div className="text-xs text-slate-600">
         Pasul {currentStep + 1} din {totalSteps}
       </div>
 
@@ -77,7 +77,7 @@ export function StepNavigation({
         size="sm"
         onClick={onNext}
         disabled={!canGoNext || isLoading}
-        className="transition-all duration-200 h-9 px-4 bg-gradient-to-r from-purple-700 to-indigo-800 hover:from-purple-800 hover:to-indigo-900 text-white"
+        className="transition-all duration-200 h-9 px-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white"
       >
         {isLastStep ? (
           <span className="text-sm">{isLoading ? 'Se trimite...' : 'Finalizează'}</span>

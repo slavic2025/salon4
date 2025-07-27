@@ -37,6 +37,7 @@ export function createStylistService(repository: StylistRepository, supabaseAdmi
 
   return {
     getAllStylists: () => repository.findAll(),
+    getActiveStylists: () => repository.findActive(),
 
     async createStylist(payload: CreateStylistPayload) {
       await _ensureUniqueness({ email: payload.email, phone: payload.phone })

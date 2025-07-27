@@ -58,14 +58,14 @@ export function BookingTimeSlots({
 
   if (availableSlots.length === 0) {
     return (
-      <div className={cn('bg-white rounded-2xl border border-gray-200 shadow-lg p-8', className)}>
+      <div className={cn('bg-white rounded-2xl border border-stone-200 shadow-lg p-8', className)}>
         <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg">
-            <Clock className="w-5 h-5 text-purple-600" />
+          <div className="p-2 bg-gradient-to-r from-stone-100 to-stone-200 rounded-lg">
+            <Clock className="w-5 h-5 text-slate-600" />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900 text-lg">Selectează ora</h3>
-            <p className="text-sm text-gray-500">Alege momentul potrivit pentru programare</p>
+            <h3 className="font-bold text-slate-900 text-lg">Selectează ora</h3>
+            <p className="text-sm text-slate-500">Alege momentul potrivit pentru programare</p>
           </div>
         </div>
 
@@ -73,11 +73,11 @@ export function BookingTimeSlots({
           <div className="w-20 h-20 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Clock className="w-10 h-10 text-yellow-600" />
           </div>
-          <h4 className="text-xl font-bold text-gray-900 mb-2">Nu sunt sloturi disponibile</h4>
-          <p className="text-gray-600">
+          <h4 className="text-xl font-bold text-slate-900 mb-2">Nu sunt sloturi disponibile</h4>
+          <p className="text-slate-600">
             {date ? `pentru ${format(date, 'EEEE, d MMMM', { locale: ro })}` : 'pentru data selectată'}
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-slate-500 mt-2">
             Încearcă o altă dată sau contactează-ne pentru programări speciale
           </p>
         </div>
@@ -88,23 +88,23 @@ export function BookingTimeSlots({
   return (
     <div
       className={cn(
-        'bg-white rounded-2xl border border-gray-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300',
+        'bg-white rounded-2xl border border-stone-200 shadow-lg p-6 hover:shadow-xl transition-all duration-300',
         className,
       )}
     >
       {/* Header îmbunătățit */}
       <div className="flex items-center space-x-3 mb-8">
-        <div className="p-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg">
-          <Clock className="w-5 h-5 text-purple-600" />
+        <div className="p-2 bg-gradient-to-r from-stone-100 to-stone-200 rounded-lg">
+          <Clock className="w-5 h-5 text-slate-600" />
         </div>
         <div className="flex-1">
-          <h3 className="font-bold text-gray-900 text-lg">Selectează ora</h3>
-          <p className="text-sm text-gray-500">Alege momentul potrivit pentru programare</p>
+          <h3 className="font-bold text-slate-900 text-lg">Selectează ora</h3>
+          <p className="text-sm text-slate-500">Alege momentul potrivit pentru programare</p>
         </div>
         {date && (
           <div className="text-right">
-            <div className="px-3 py-1 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full">
-              <span className="text-sm font-semibold text-purple-700">
+            <div className="px-3 py-1 bg-gradient-to-r from-stone-100 to-stone-200 rounded-full">
+              <span className="text-sm font-semibold text-slate-700">
                 {format(date, 'EEEE, d MMMM', { locale: ro })}
               </span>
             </div>
@@ -117,13 +117,13 @@ export function BookingTimeSlots({
         {groupedSlots.map(({ key, label, icon: Icon, slots: periodSlots, color }) => (
           <div key={key} className="space-y-4">
             {/* Period Header îmbunătățit */}
-            <div className="flex items-center space-x-3 border-b border-gray-100 pb-3">
+            <div className="flex items-center space-x-3 border-b border-stone-100 pb-3">
               <div className={`p-2 bg-gradient-to-r ${color} rounded-lg text-white`}>
                 <Icon className="w-4 h-4" />
               </div>
               <div className="flex-1">
-                <h4 className="text-lg font-bold text-gray-900">{label}</h4>
-                <p className="text-sm text-gray-500">
+                <h4 className="text-lg font-bold text-slate-900">{label}</h4>
+                <p className="text-sm text-slate-500">
                   {periodSlots.length} {periodSlots.length === 1 ? 'slot disponibil' : 'sloturi disponibile'}
                 </p>
               </div>
@@ -145,10 +145,10 @@ export function BookingTimeSlots({
                     className={cn(
                       'h-auto p-4 flex flex-col items-center transition-all duration-300',
                       'hover:scale-105 hover:shadow-lg border-2',
-                      'focus:ring-2 focus:ring-purple-500 focus:ring-offset-2',
+                      'focus:ring-2 focus:ring-slate-500 focus:ring-offset-2',
                       isSelected
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-600 shadow-lg scale-105'
-                        : 'hover:border-purple-300 hover:bg-purple-50',
+                        ? 'bg-gradient-to-r from-slate-600 to-slate-700 text-white border-slate-600 shadow-lg scale-105'
+                        : 'hover:border-slate-300 hover:bg-stone-50',
                       disabled && 'hover:scale-100 opacity-50 cursor-not-allowed',
                     )}
                     onClick={() => onSlotSelect(slot)}
@@ -166,24 +166,24 @@ export function BookingTimeSlots({
 
       {/* Selected Slot Info îmbunătățit */}
       {selectedSlot && (
-        <div className="mt-8 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+        <div className="mt-8 p-6 bg-gradient-to-r from-stone-50 to-stone-100 rounded-xl border border-stone-200">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full text-white">
+            <div className="p-3 bg-gradient-to-r from-slate-600 to-slate-700 rounded-full text-white">
               <Clock className="w-5 h-5" />
             </div>
             <div className="flex-1">
-              <p className="text-sm text-gray-600 font-medium">Ora selectată:</p>
-              <p className="text-xl font-bold text-purple-700">
+              <p className="text-sm text-slate-600 font-medium">Ora selectată:</p>
+              <p className="text-xl font-bold text-slate-700">
                 {format(new Date(selectedSlot.start), 'HH:mm', { locale: ro })} -{' '}
                 {format(new Date(selectedSlot.end), 'HH:mm', { locale: ro })}
               </p>
               {date && (
-                <p className="text-sm text-gray-500 mt-1">{format(date, 'EEEE, d MMMM yyyy', { locale: ro })}</p>
+                <p className="text-sm text-slate-500 mt-1">{format(date, 'EEEE, d MMMM yyyy', { locale: ro })}</p>
               )}
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-purple-600 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-purple-700">Confirmat</span>
+              <div className="w-3 h-3 bg-slate-600 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-slate-700">Confirmat</span>
             </div>
           </div>
         </div>

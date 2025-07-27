@@ -24,6 +24,12 @@ export function createStylistRepository(db: DbClient) {
         orderBy: [desc(stylists.createdAt)],
       })
     },
+    async findActive(): Promise<Stylist[]> {
+      return db.query.stylists.findMany({
+        where: eq(stylists.isActive, true),
+        orderBy: [desc(stylists.createdAt)],
+      })
+    },
     async findById(id: string): Promise<Stylist | undefined> {
       return _findOneBy('id', id)
     },
